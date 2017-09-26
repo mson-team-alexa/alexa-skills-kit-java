@@ -13,7 +13,6 @@
 
 package com.amazon.speech.speechlet.interfaces.core;
 
-import com.amazon.speech.speechlet.interfaces.core.Hint;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
 /**
