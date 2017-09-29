@@ -28,6 +28,9 @@ Here are a few direct links to our documentation:
 - [Getting Started](https://developer.amazon.com/appsandservices/solutions/alexa/alexa-skills-kit/getting-started-guide)
 - [Invocation Name Guidelines](https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit/docs/choosing-the-invocation-name-for-an-alexa-skill)
 - [Developing an Alexa Skill as an AWS Lambda Function](https://developer.amazon.com/appsandservices/solutions/alexa/alexa-skills-kit/docs/developing-an-alexa-skill-as-a-lambda-function)
+<<<<<<< HEAD
 
 Mavis
 Garret
+=======
+>>>>>>> 152da0533136da7a6fb6e6235fb6c2140867f3f7

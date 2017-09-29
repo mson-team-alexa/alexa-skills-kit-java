@@ -9,7 +9,6 @@
  */
 package spacegeek;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import com.amazon.speech.speechlet.lambda.SpeechletRequestStreamHandler;
@@ -30,7 +29,7 @@ public final class SpaceGeekSpeechletRequestStreamHandler extends SpeechletReque
          * Alexa Skill and put the relevant Application Ids in this Set.
          */
         supportedApplicationIds = new HashSet<String>();
-        // supportedApplicationIds.add("amzn1.echo-sdk-ams.app.[unique-value-here]");
+        supportedApplicationIds.add("amzn1.echo-sdk-ams.app.[unique-value-here]");
     }
 
     public SpaceGeekSpeechletRequestStreamHandler() {
