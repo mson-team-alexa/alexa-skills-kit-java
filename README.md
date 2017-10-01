@@ -1,3 +1,6 @@
+# Jack Ditto figured out how to commit changes!
+
+
 # Java Alexa Skills Kit SDK & Samples
 
 ##Alexa Skills Kit Documentation
