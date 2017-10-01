@@ -50,7 +50,3 @@ target/
 .cache-main
 .scala_dependencies
 .worksheet
-<<<<<<< HEAD
-/target/
-=======
->>>>>>> master
