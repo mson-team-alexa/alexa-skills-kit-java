@@ -13,7 +13,6 @@
 
 package com.amazon.speech.slu;
 
-import com.amazon.speech.slu.entityresolution.Resolutions;
 import org.apache.commons.lang3.Validate;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -63,7 +62,6 @@ public final class Slot {
     private final String name;
     private final String value;
     private final ConfirmationStatus confirmationStatus;
-    private final Resolutions resolutions;
 
     /**
      * Returns a new builder instance used to construct a new {@code Slot}.
@@ -84,7 +82,6 @@ public final class Slot {
         name = builder.name;
         value = builder.value;
         confirmationStatus = builder.confirmationStatus;
-        resolutions = builder.resolutions;
     }
 
     /**
@@ -97,12 +94,10 @@ public final class Slot {
      */
     private Slot(@JsonProperty("name") final String name,
             @JsonProperty("value") final String value,
-            @JsonProperty("confirmationStatus") final ConfirmationStatus confirmationStatus,
-            @JsonProperty("resolutions") final Resolutions resolutions) {
+            @JsonProperty("confirmationStatus") final ConfirmationStatus confirmationStatus) {
         this.name = name;
         this.value = value;
         this.confirmationStatus = confirmationStatus;
-        this.resolutions = resolutions;
     }
 
     /**
@@ -133,22 +128,12 @@ public final class Slot {
     }
 
     /**
-     * Returns the {@code Resolutions} for this {@code Slot}.
-     *
-     * @return the resolutions
-     */
-    public Resolutions getResolutions() {
-        return resolutions;
-    }
-
-    /**
      * Builder used to construct a new {@code Slot}.
      */
     public static final class Builder {
         private String name;
         private String value;
         private ConfirmationStatus confirmationStatus;
-        private Resolutions resolutions;
 
         public Builder withName(final String name) {
             this.name = name;
@@ -162,11 +147,6 @@ public final class Slot {
 
         public Builder withConfirmationStatus(final ConfirmationStatus confirmationStatus) {
             this.confirmationStatus = confirmationStatus;
-            return this;
-        }
-
-        public Builder withResolutions(final Resolutions resolutions) {
-            this.resolutions = resolutions;
             return this;
         }
 
