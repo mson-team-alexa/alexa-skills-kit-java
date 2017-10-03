@@ -82,7 +82,7 @@ public class SpaceGeekSpeechlet implements Speechlet {
         String intentName = (intent != null) ? intent.getName() : null;
 
         if ("GetNewFactIntent".equals(intentName)) {
-            return getFactResponse();
+            return getNewFactResponse();
 
         } else if ("AMAZON.HelpIntent".equals(intentName)) {
             return getHelpResponse();
