@@ -88,6 +88,8 @@ public class MinecraftSpeechlet implements Speechlet {
             return getRecipe(intent);
         } else if ("AMAZON.HelpIntent".equals(intentName)) {
             return getHelp();
+        } else if ("BirthdayIntent".equals(intentName)) {
+        	return getBirthday();
         } else if ("AMAZON.StopIntent".equals(intentName)) {
             PlainTextOutputSpeech outputSpeech = new PlainTextOutputSpeech();
             outputSpeech.setText("Goodbye");
@@ -167,7 +169,16 @@ public class MinecraftSpeechlet implements Speechlet {
                         + " chest, or you can say exit... Now, what can I help you with?";
         return newAskResponse(speechOutput, repromptText);
     }
-
+    
+    /**
+     * creates a response for birthday intent
+     * @return Speechlet response
+     */
+    private SpeechletResponse getBirthday() {
+    	PlainTextOutputSpeech outputSpeech = new PlainTextOutputSpeech();
+        outputSpeech.setText("Minecraft was originally published May 17th 2009");
+        return SpeechletResponse.newTellResponse(outputSpeech);
+    }
     /**
      * Wrapper for creating the Ask response. The OutputSpeech and {@link Reprompt} objects are
      * created from the input strings.
