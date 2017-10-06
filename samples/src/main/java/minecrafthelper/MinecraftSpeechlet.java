@@ -86,7 +86,10 @@ public class MinecraftSpeechlet implements Speechlet {
 
         if ("RecipeIntent".equals(intentName)) {
             return getRecipe(intent);
-        } else if ("AMAZON.HelpIntent".equals(intentName)) {
+        } else if ("AnimalIntent".equals(intentName)) {
+        		return getAnimal(intent);
+        }
+        else if ("AMAZON.HelpIntent".equals(intentName)) {
             return getHelp();
         } else if ("AMAZON.StopIntent".equals(intentName)) {
             PlainTextOutputSpeech outputSpeech = new PlainTextOutputSpeech();
@@ -151,6 +154,42 @@ public class MinecraftSpeechlet implements Speechlet {
             return getHelp();
         }
     }
+    
+    
+    
+    
+    private SpeechletResponse getAnimal(Intent intent) {
+        Slot itemSlot = intent.getSlot(ITEM_SLOT);
+        if (itemSlot != null && itemSlot.getValue() != null) {
+            String itemName = itemSlot.getValue();
+
+            // Get the recipe for the item
+            String animal = Animals.get(itemName);
+
+            if (animal != null) {
+                // If we have the recipe, return it to the user.
+                PlainTextOutputSpeech outputSpeech = new PlainTextOutputSpeech();
+                outputSpeech.setText(animal);
+
+                SimpleCard card = new SimpleCard();
+                card.setTitle("Recipe for " + itemName);
+                card.setContent(animal);
+
+                return SpeechletResponse.newTellResponse(outputSpeech, card);
+            } else {
+                
+                String speechOutput =
+                        "I'm sorry, I currently do not know anything about that animal " + itemName
+                                + ". What else can I help with?";
+                String repromptSpeech = "What else can I help with?";
+                return newAskResponse(speechOutput, repromptSpeech);
+            }
+        } else {
+            // There was no item in the intent so return the help prompt.
+            return getHelp();
+        }
+    }
+
 
     /**
      * Creates a {@code SpeechletResponse} for the HelpIntent.
