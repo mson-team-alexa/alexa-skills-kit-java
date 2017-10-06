@@ -48,6 +48,7 @@ public class MinecraftSpeechlet implements Speechlet {
      * The key to get the item from the intent.
      */
     private static final String ITEM_SLOT = "Item";
+    private static final String ANIMAL_SLOT = "Animal";
 
     @Override
     public void onSessionStarted(final SessionStartedRequest request, final Session session)
@@ -159,9 +160,9 @@ public class MinecraftSpeechlet implements Speechlet {
     
     
     private SpeechletResponse getAnimal(Intent intent) {
-        Slot itemSlot = intent.getSlot(ITEM_SLOT);
-        if (itemSlot != null && itemSlot.getValue() != null) {
-            String itemName = itemSlot.getValue();
+        Slot animalSlot = intent.getSlot(ANIMAL_SLOT);
+        if (animalSlot != null &&animalSlot.getValue() != null) {
+            String itemName = animalSlot.getValue();
 
             // Get the recipe for the item
             String animal = Animals.get(itemName);
@@ -172,7 +173,7 @@ public class MinecraftSpeechlet implements Speechlet {
                 outputSpeech.setText(animal);
 
                 SimpleCard card = new SimpleCard();
-                card.setTitle("Recipe for " + itemName);
+                card.setTitle("Information about " + itemName);
                 card.setContent(animal);
 
                 return SpeechletResponse.newTellResponse(outputSpeech, card);
