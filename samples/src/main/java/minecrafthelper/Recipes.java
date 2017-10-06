@@ -20,6 +20,8 @@ public final class Recipes {
     }
 
     static {
+    	recipes.put("invisibility potion",
+                "An invisibility potion can be created by placing a fermented spider eye on top of a night vision potion");
         recipes.put("snow golem",
                 "A snow golem can be created by placing a pumpkin on top of  two snow "
                         + "blocks on the ground.");
