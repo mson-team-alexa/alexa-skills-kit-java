@@ -111,7 +111,7 @@ public class SpaceGeekSpeechlet implements Speechlet {
     }
     
     private SpeechletResponse getFactResponse() {
-		String fact = SPACE_FACTS[SPACE_FACTS.length];
+		String fact = SPACE_FACTS[SPACE_FACTS.length-1];
 		
 		// Create speech output
         String speechText = "Here's your space fact: " + fact;
