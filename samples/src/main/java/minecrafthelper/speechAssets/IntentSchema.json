@@ -9,9 +9,20 @@
         }
       ]
     },
+	{
+		"intent": "CheatsIntent",
+		"slots": [
+		{
+			"name" : "Code",
+			"type" : "LIST_OF_CODES"
+		
+		}
+		]
+	},
     {
       "intent": "AMAZON.HelpIntent"
     },
+   
     {
       "intent": "AMAZON.StopIntent"
     },

@@ -40,6 +40,8 @@ import com.amazon.speech.ui.SimpleCard;
  * User: "Alexa, ask Minecraft Helper how to make paper."
  * <p>
  * Alexa:"(reads back recipe for paper)."
+ * Alexa: "(reads back a cheat,too)
+ * 
  */
 public class MinecraftSpeechlet implements Speechlet {
     private static final Logger log = LoggerFactory.getLogger(MinecraftSpeechlet.class);
@@ -48,6 +50,7 @@ public class MinecraftSpeechlet implements Speechlet {
      * The key to get the item from the intent.
      */
     private static final String ITEM_SLOT = "Item";
+    private static final String CODE_SLOT = "Code";
 
     @Override
     public void onSessionStarted(final SessionStartedRequest request, final Session session)
@@ -66,7 +69,10 @@ public class MinecraftSpeechlet implements Speechlet {
 
         String speechOutput =
                 "Welcome to the Minecraft Helper. You can ask a question like, "
-                        + "what's the recipe for a chest? ... Now, what can I help you with?";
+                        + "what's the recipe for a chest?  or How can I make a time machine..." 
+                	       + "I have also been upgraded with a new feature... " 
+                        + "I can tell you some of those cheats and console commands, too." 
+                	       +" Now, what can I help you with?";
         // If the user either does not reply to the welcome message or says
         // something that is not understood, they will be prompted again with this text.
         String repromptText = "For instructions on what you can say, please say help me.";
@@ -86,7 +92,12 @@ public class MinecraftSpeechlet implements Speechlet {
 
         if ("RecipeIntent".equals(intentName)) {
             return getRecipe(intent);
-        } else if ("AMAZON.HelpIntent".equals(intentName)) {
+      
+        } 
+        else if("CheatsIntent".equals(intentName)) {
+        		return getCheat(intent);
+        }
+        else if ("AMAZON.HelpIntent".equals(intentName)) {
             return getHelp();
         } else if ("AMAZON.StopIntent".equals(intentName)) {
             PlainTextOutputSpeech outputSpeech = new PlainTextOutputSpeech();
@@ -151,6 +162,45 @@ public class MinecraftSpeechlet implements Speechlet {
             return getHelp();
         }
     }
+    /**
+     * Creates a {@code SpeechletResponse} for the CheatIntent.
+     *
+     * @param intent
+     *            intent for the request
+     * @return SpeechletResponse spoken and visual response for the given intent
+     */
+    private SpeechletResponse getCheat(Intent intent) {
+        Slot codeSlot = intent.getSlot(CODE_SLOT);
+        if (codeSlot != null && codeSlot.getValue() != null) {
+            String codeName = codeSlot.getValue();
+
+            // Get the recipe for the item
+            String cheat = Cheats.get(codeName);
+
+            if (cheat != null) {
+                // If we have the recipe, return it to the user.
+                PlainTextOutputSpeech outputSpeech = new PlainTextOutputSpeech();
+                outputSpeech.setText(cheat);
+
+                SimpleCard card = new SimpleCard();
+                card.setTitle("The command for " + codeName);
+                card.setContent(cheat);
+
+                return SpeechletResponse.newTellResponse(outputSpeech, card);
+            } else {
+                // We don't have a code, so keep the session open and ask the user for another
+                // code.
+                String speechOutput =
+                        "I'm sorry, I currently do not know the command for " + codeName
+                                + ". What else can I help with?";
+                String repromptSpeech = "What else can I help with?";
+                return newAskResponse(speechOutput, repromptSpeech);
+            }
+        } else {
+            // There was no item in the intent so return the help prompt.
+            return getHelp();
+        }
+    }
 
     /**
      * Creates a {@code SpeechletResponse} for the HelpIntent.
@@ -160,11 +210,10 @@ public class MinecraftSpeechlet implements Speechlet {
     private SpeechletResponse getHelp() {
         String speechOutput =
                 "You can ask questions about minecraft such as, what's "
-                        + "the recipe for a chest, or, you can say exit... "
+                        + "the recipe for a chest, or, what is the teleport command ,or, you can say exit... "
                         + "Now, what can I help you with?";
-        String repromptText =
-                "You can say things like, what's the recipe for a"
-                        + " chest, or you can say exit... Now, what can I help you with?";
+        String repromptText = "Thankfully, Minecraft console commands are wonderfully simple to use. When creating a new Minecraft world you’ll be prompted to choose whether or not to allow cheats. After selecting yes and loading up the world, you’ll need to press the “C” key to pull up the command bar, which is where you’ll be inputting all your cheats and commands.\n" + 
+        		"Any command you enter in single player will need to be prefixed by forward slash (/); multiplayer commands will not work with this prefix. Now it’s just a simple case of typing in the desired command and hitting the “Enter” key.\n";
         return newAskResponse(speechOutput, repromptText);
     }
 

@@ -28,7 +28,7 @@ public final class MinecraftHelperSpeechletRequestStreamHandler extends
          * Alexa Skill and put the relevant Application Ids in this Set.
          */
         supportedApplicationIds = new HashSet<String>();
-        // supportedApplicationIds.add("amzn1.echo-sdk-ams.app.[unique-value-here]");
+         supportedApplicationIds.add("amzn1.ask.skill.c91891f2-caa0-4ec4-bd04-34ce40f77d4c");
     }
 
     public MinecraftHelperSpeechletRequestStreamHandler() {

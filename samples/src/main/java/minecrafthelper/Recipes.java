@@ -729,6 +729,10 @@ public final class Recipes {
         recipes.put("light gray carpet",
                 "Any type of carpet can be crafted by placing two wool, of the same color, "
                         + "next to each other in a crafting window.");
+    
+        
+        
+
         recipes.put("iron boots",
                 "All boots are crafted by placing the desired material in the middle left, bottom "
                         + "left, middle right, and bottom right squares of a crafting table.");
@@ -1374,6 +1378,13 @@ public final class Recipes {
                         "A beacon can be obtained by placing a nether star in the very center square, three "
                                 + "obsidian across the bottom row, and five glass in the remaining squares in a "
                                 + "crafting table.");
+        recipes
+        			.put("time machine",
+        					"Step 1: Get a command block, Type /give @p command_block and press enter. A command block will appear in your inventory!.\n" + 
+        					"\n" + "Step 2: Make it do something, Right-click the Command Block and type time add 20000 and click done. You could also type time subtract 20000, but remember, you can't have both at once. It will only work if you have one or the other.\n" + 
+        					"Step 3: Make It Look Cool, Place 4 blocks of your choice (I used obsidian) around the command block, as shown. Place 1 stair block on one of the blocks (not the command block) and place a blank sign on both sides to make a chair. Place a 2-block high tower on the side opposite of the chair. Place an item frame with a clock in it on the top block of your tower. Place a carpet of your choice on the command block, and make sure to sneak when you do this or it won't work. Finally, place a power source (button, lever, etc.) on one of the 2 remaining blocks and you're done!\n" + 
+        					"\n" + "\n");
+        recipes.put("time traveler", "You can become a real life time traveler, by building a time machine");
         recipes.put("blue stained clay",
                 "Any type of stained clay can be crafted by placing the appropriate dye in the "
                         + "center square and hardened clay surrounding it.");
@@ -1567,7 +1578,9 @@ public final class Recipes {
         recipes.put("black stained glass pane",
                 "Any type of stained glass pane can be crafted by placing the same color stained "
                         + "glass, horizontally, in the bottom two rows.");
-    }
+   
+}
+    
 
     public static String get(String item) {
         return recipes.get(item);

@@ -82,7 +82,7 @@ public class SpaceGeekSpeechlet implements Speechlet {
         String intentName = (intent != null) ? intent.getName() : null;
 
         if ("GetNewFactIntent".equals(intentName)) {
-            return getFactResponse();
+            return getNewFactResponse();
 
         } else if ("AMAZON.HelpIntent".equals(intentName)) {
             return getHelpResponse();
@@ -110,24 +110,24 @@ public class SpaceGeekSpeechlet implements Speechlet {
         // any cleanup logic goes here
     }
     
-    private SpeechletResponse getFactResponse() {
-		String fact = SPACE_FACTS[SPACE_FACTS.length];
-		
-		// Create speech output
-        String speechText = "Here's your space fact: " + fact;
-
-        // Create the Simple card content.
-        SimpleCard card = new SimpleCard();
-        card.setTitle("SpaceGeek");
-        card.setContent(speechText);
-
-        // Create the plain text output.
-        PlainTextOutputSpeech speech = new PlainTextOutputSpeech();
-        speech.setText(speechText);
-
-        return SpeechletResponse.newTellResponse(speech, card);
-    	
-    }
+//    private SpeechletResponse getFactResponse() {
+//		String fact = SPACE_FACTS[SPACE_FACTS.length-1];
+//		
+//		// Create speech output
+//        String speechText = "Here's your space fact: " + fact;
+//
+//        // Create the Simple card content.
+//        SimpleCard card = new SimpleCard();
+//        card.setTitle("SpaceGeek");
+//        card.setContent(speechText);
+//
+//        // Create the plain text output.
+//        PlainTextOutputSpeech speech = new PlainTextOutputSpeech();
+//        speech.setText(speechText);
+//
+//        return SpeechletResponse.newTellResponse(speech, card);
+//    	
+//    }
 
     /**
      * Gets a random new fact from the list and returns to the user.
@@ -171,3 +171,9 @@ public class SpaceGeekSpeechlet implements Speechlet {
         return SpeechletResponse.newAskResponse(speech, reprompt);
     }
 }
+
+
+
+
+
+
