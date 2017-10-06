@@ -134,3 +134,7 @@ RecipeIntent how to build {Item}
 RecipeIntent how to get a {Item}
 RecipeIntent how to get an {Item}
 RecipeIntent how to get {Item}
+JokeIntent tell me a joke
+JokeIntent tell me a minecraft joke
+JokeIntent give me a joke
+JokeIntent give me a minecraft joke

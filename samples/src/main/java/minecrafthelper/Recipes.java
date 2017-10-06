@@ -20,6 +20,7 @@ public final class Recipes {
     }
 
     static {
+    		recipes.put("sandwich", "You can't make a sandwich in minecraft. What were you thinking?");
         recipes.put("snow golem",
                 "A snow golem can be created by placing a pumpkin on top of  two snow "
                         + "blocks on the ground.");

@@ -48,6 +48,14 @@ public class MinecraftSpeechlet implements Speechlet {
      * The key to get the item from the intent.
      */
     private static final String ITEM_SLOT = "Item";
+    private static final String[] MINECRAFT_JOKES = new String[] {
+    		"Did you hear about the creeper that went to a party? He had a blast.",
+    		"Which musical instrument do skeletons play? They play the trombone",
+    		"Why didn’t the skeleton go to the prom? He had no body to dance with",
+    		"What do they teach in witch school? Spelling",
+    		"What did the zombie say to the villager? Nice to eat you",
+    		"Do you hear about the Minecraft movie? It's a block buster"
+    };
 
     @Override
     public void onSessionStarted(final SessionStartedRequest request, final Session session)
@@ -96,8 +104,11 @@ public class MinecraftSpeechlet implements Speechlet {
         } else if ("AMAZON.CancelIntent".equals(intentName)) {
             PlainTextOutputSpeech outputSpeech = new PlainTextOutputSpeech();
             outputSpeech.setText("Goodbye");
-
+            
             return SpeechletResponse.newTellResponse(outputSpeech);
+            
+        } else if ("JokeIntent".equals(intentName)) { 
+        		return getNewJokeResponse();
         } else {
             throw new SpeechletException("Invalid Intent");
         }
@@ -189,4 +200,25 @@ public class MinecraftSpeechlet implements Speechlet {
 
         return SpeechletResponse.newAskResponse(outputSpeech, reprompt);
     }
+    private SpeechletResponse getNewJokeResponse() {
+	    // Get a random space fact from the space facts list
+	    int factIndex = (int) Math.floor(Math.random() * MINECRAFT_JOKES.length);
+	    String fact = MINECRAFT_JOKES[factIndex];
+	
+	    // Create speech output
+	    String speechText = fact;
+	
+	    // Create the Simple card content.
+	    SimpleCard card = new SimpleCard();
+	    card.setTitle("MinecraftJoke");
+	    card.setContent(speechText);
+	
+	    // Create the plain text output.
+	    PlainTextOutputSpeech speech = new PlainTextOutputSpeech();
+	    speech.setText(speechText);
+	
+	    return SpeechletResponse.newTellResponse(speech, card);
+	}
 }
+	
+
