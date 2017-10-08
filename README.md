@@ -12,8 +12,11 @@ Here are a few direct links to our documentation:
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 ##Ajaz
 =======
+=======
+>>>>>>> amzn/master
 =======
 >>>>>>> amzn/master
 
@@ -29,6 +32,10 @@ The sample skills demonstrate how to use many Alexa features:
 - Connecting to Third Party APIs : [TidePooler](https://github.com/alexa/skill-samples-java/tree/master/tidepooler)
 - Session Management : [WiseGuy](https://github.com/alexa/skill-samples-java/tree/master/wiseguy)
 <<<<<<< HEAD
+<<<<<<< HEAD
+- Building a skill for Echo Show: [Display Interface Guide](https://github.com/alexa/skill-samples-java/tree/master/displaytutorial)
+>>>>>>> amzn/master
+=======
 - Building a skill for Echo Show: [Display Interface Guide](https://github.com/alexa/skill-samples-java/tree/master/displaytutorial)
 >>>>>>> amzn/master
 =======
