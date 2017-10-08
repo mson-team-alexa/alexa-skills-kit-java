@@ -31,6 +31,8 @@ import com.amazon.speech.ui.SimpleCard;
 public class HelloWorldSpeechlet implements Speechlet {
     private static final Logger log = LoggerFactory.getLogger(HelloWorldSpeechlet.class);
 
+    // Satyen's copy of the HelloWorldSpeechlet class.
+
     @Override
     public void onSessionStarted(final SessionStartedRequest request, final Session session)
             throws SpeechletException {
