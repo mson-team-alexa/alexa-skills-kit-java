@@ -21,7 +21,7 @@ public class BartHelperSpeechletRequestStreamHandler extends SpeechletRequestStr
          * Alexa Skill and put the relevant Application Ids in this Set.
          */
         supportedApplicationIds = new HashSet<String>();
-        // supportedApplicationIds.add("amzn1.echo-sdk-ams.app.[unique-value-here]");
+         supportedApplicationIds.add("amzn1.ask.skill.6f87da2a-d95d-4070-a3e8-fded4cbc94b1");
     }
 
     public BartHelperSpeechletRequestStreamHandler() {

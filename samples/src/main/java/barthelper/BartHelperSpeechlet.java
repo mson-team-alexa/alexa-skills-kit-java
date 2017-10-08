@@ -41,9 +41,11 @@ import com.amazonaws.util.json.JSONObject;
  */
 
 public class BartHelperSpeechlet implements Speechlet {
+	 
     private static final Logger log = LoggerFactory.getLogger(BartHelperSpeechlet.class);
 
     private static final String URL_PREFIX = "https://api.bart.gov/api/sched.aspx?json=y&";
+  
     
     private static final String API_KEY = "MW9S-E7SL-26DU-VV8V";
     
@@ -120,16 +122,15 @@ public class BartHelperSpeechlet implements Speechlet {
     	
     	String command = "holiday";
     	String holidayURL = URL_PREFIX + "key=" + API_KEY + "&cmd=" + command;
-    	
-    	log.info("BART Holidays URL: " + holidayURL);
-    	
+        	log.info("BART Holidays URL: " + holidayURL);
+       
     	URL url = new URL(holidayURL);
     	Scanner scan = new Scanner(url.openStream());
-    	String holidayOutput = new String();
+    	String  holidayOutput = new String();
     	while (scan.hasNext()) {
     		holidayOutput += scan.nextLine();
     	}
-    	scan.close();
+//    	scan.close();
     	
     	// build a JSON object
     	JSONObject output = new JSONObject(holidayOutput);
@@ -147,9 +148,9 @@ public class BartHelperSpeechlet implements Speechlet {
     	for (int i=0; i < MAX_HOLIDAYS; i++) {
     		JSONObject o = (JSONObject) holidayList.get(i);
     		if (i == MAX_HOLIDAYS - 1) {
-        		speechOutput = speechOutput + "and " + o.getString("name") + ".";
+        		speechOutput = speechOutput + "and " + o.getString("name") + " on " + o.getString("date")+". ";
     		} else {
-    			speechOutput = speechOutput + o.getString("name") + ", ";
+    			speechOutput = speechOutput + o.getString("name") +" on " + o.getString("date") + ", ";
     		}
     	}
     	
