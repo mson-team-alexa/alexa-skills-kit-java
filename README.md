@@ -11,8 +11,11 @@ Here are a few direct links to our documentation:
 - [Developing an Alexa Skill as an AWS Lambda Function](https://developer.amazon.com/appsandservices/solutions/alexa/alexa-skills-kit/docs/developing-an-alexa-skill-as-a-lambda-function)
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 ##Ajaz
 =======
+=======
+>>>>>>> amzn/master
 
 ## Sample Skills
 
@@ -25,5 +28,9 @@ The sample skills demonstrate how to use many Alexa features:
 - Connecting to Alexa APIs : [Device Address Skill](https://github.com/alexa/skill-samples-java/tree/master/address)
 - Connecting to Third Party APIs : [TidePooler](https://github.com/alexa/skill-samples-java/tree/master/tidepooler)
 - Session Management : [WiseGuy](https://github.com/alexa/skill-samples-java/tree/master/wiseguy)
+<<<<<<< HEAD
+- Building a skill for Echo Show: [Display Interface Guide](https://github.com/alexa/skill-samples-java/tree/master/displaytutorial)
+>>>>>>> amzn/master
+=======
 - Building a skill for Echo Show: [Display Interface Guide](https://github.com/alexa/skill-samples-java/tree/master/displaytutorial)
 >>>>>>> amzn/master
