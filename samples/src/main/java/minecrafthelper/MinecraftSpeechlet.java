@@ -90,13 +90,15 @@ public class MinecraftSpeechlet implements Speechlet {
         Intent intent = request.getIntent();
         String intentName = (intent != null) ? intent.getName() : null;
 
-        if ("RecipeIntent".equals(intentName)) {
-            return getRecipe(intent);
-      
-        } 
-        else if("CheatsIntent".equals(intentName)) {
+         if("CheatsIntent".equals(intentName)) {
         		return getCheat(intent);
+        		
         }
+
+         else  if ("RecipeIntent".equals(intentName)) {
+             return getRecipe(intent);
+       
+         } 
         else if ("AMAZON.HelpIntent".equals(intentName)) {
             return getHelp();
         } else if ("AMAZON.StopIntent".equals(intentName)) {
@@ -178,15 +180,15 @@ public class MinecraftSpeechlet implements Speechlet {
             String cheat = Cheats.get(codeName);
 
             if (cheat != null) {
-                // If we have the recipe, return it to the user.
-                PlainTextOutputSpeech outputSpeech = new PlainTextOutputSpeech();
-                outputSpeech.setText(cheat);
+                // If we have the code, return it to the user.
+                PlainTextOutputSpeech ous = new PlainTextOutputSpeech();
+                ous.setText(cheat);
 
-                SimpleCard card = new SimpleCard();
-                card.setTitle("The command for " + codeName);
-                card.setContent(cheat);
+                SimpleCard cards = new SimpleCard();
+                cards.setTitle("The command for " + codeName);
+                cards.setContent(cheat);
 
-                return SpeechletResponse.newTellResponse(outputSpeech, card);
+                return SpeechletResponse.newTellResponse(ous, cards);
             } else {
                 // We don't have a code, so keep the session open and ask the user for another
                 // code.
