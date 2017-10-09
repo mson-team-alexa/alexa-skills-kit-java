@@ -1567,6 +1567,8 @@ public final class Recipes {
         recipes.put("black stained glass pane",
                 "Any type of stained glass pane can be crafted by placing the same color stained "
                         + "glass, horizontally, in the bottom two rows.");
+        recipes.put("horse", "You can tame a horse by riding it repeatedly until you see red hearts. To "
+        		+ "control the horse after you've tamed it, you must give it a saddle.");
     }
 
     public static String get(String item) {
