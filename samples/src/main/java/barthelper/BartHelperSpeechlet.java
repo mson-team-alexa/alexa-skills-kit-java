@@ -140,16 +140,18 @@ public class BartHelperSpeechlet implements Speechlet {
     	JSONArray holidays = root.getJSONArray("holidays");
     	
     	JSONObject list = holidays.getJSONObject(0);
-    	
+   	
     	JSONArray holidayList = list.getJSONArray("holiday");
-    	
+	
     	String speechOutput = "The upcoming " + MAX_HOLIDAYS + " holidays are: ";
     	for (int i=0; i < MAX_HOLIDAYS; i++) {
     		JSONObject o = (JSONObject) holidayList.get(i);
+    		JSONObject d = (JSONObject) holidayList.get(i);
     		if (i == MAX_HOLIDAYS - 1) {
-        		speechOutput = speechOutput + "and " + o.getString("name") + ".";
+
+        		speechOutput = speechOutput + "and " + o.getString("name") + " on "+ d.getString("date") +  ".";
     		} else {
-    			speechOutput = speechOutput + o.getString("name") + ", ";
+    			speechOutput = speechOutput + o.getString("name") + " on "+ d.getString("date") + ", ";
     		}
     	}
     	

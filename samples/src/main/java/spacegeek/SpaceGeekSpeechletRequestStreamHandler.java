@@ -9,8 +9,10 @@
  */
 package spacegeek;
 
+import java.util.HashSet;
 import java.util.Set;
 
+import com.amazon.speech.speechlet.Speechlet;
 import com.amazon.speech.speechlet.lambda.SpeechletRequestStreamHandler;
 
 /**
@@ -32,7 +34,8 @@ public final class SpaceGeekSpeechletRequestStreamHandler extends SpeechletReque
         //supportedApplicationIds.add("amzn1.echo-sdk-ams.app.[unique-value-here]");
     }
 
-    public SpaceGeekSpeechletRequestStreamHandler() {
-        super(new SpaceGeekSpeechlet(), supportedApplicationIds);
+    public SpaceGeekSpeechletRequestStreamHandler(Speechlet speechlet,
+            Set<String> supportedApplicationIds) {
+        super(speechlet, supportedApplicationIds);
     }
 }
