@@ -147,9 +147,9 @@ public class BartHelperSpeechlet implements Speechlet {
     	for (int i=0; i < MAX_HOLIDAYS; i++) {
     		JSONObject o = (JSONObject) holidayList.get(i);
     		if (i == MAX_HOLIDAYS - 1) {
-        		speechOutput = speechOutput + "and " + o.getString("name") + ".";
+        		speechOutput = speechOutput + "and " + o.getString("name") + " on " + o.getString("date") + ".";
     		} else {
-    			speechOutput = speechOutput + o.getString("name") + ", ";
+    			speechOutput = speechOutput + o.getString("name") + " on " + o.getString("date") + ", ";
     		}
     	}
     	
