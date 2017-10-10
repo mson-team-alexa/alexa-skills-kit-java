@@ -120,6 +120,7 @@ public class BartHelperSpeechlet implements Speechlet {
     	
     	String command = "holiday";
     	String holidayURL = URL_PREFIX + "key=" + API_KEY + "&cmd=" + command;
+    	String dateURL = URL_PREFIX + "key=" + API_KEY + "&cmd=" + command;
     	
     	log.info("BART Holidays URL: " + holidayURL);
     	
@@ -130,6 +131,14 @@ public class BartHelperSpeechlet implements Speechlet {
     		holidayOutput += scan.nextLine();
     	}
     	scan.close();
+    	
+     	URL urld = new URL(dateURL);
+    	Scanner scand = new Scanner(urld.openStream());
+    	String dateOutput = new String();
+    	while (scand.hasNext()) {
+    		dateOutput += scand.nextLine();
+    	}
+    	scand.close();
     	
     	// build a JSON object
     	JSONObject output = new JSONObject(holidayOutput);
@@ -142,14 +151,26 @@ public class BartHelperSpeechlet implements Speechlet {
     	JSONObject list = holidays.getJSONObject(0);
     	
     	JSONArray holidayList = list.getJSONArray("holiday");
+    
+    	
+    	//date
+   
+    	JSONObject outputd = new JSONObject(dateOutput);
+    	
+    JSONObject rootd = outputd.getJSONObject("root");
+    JSONArray dates = rootd.getJSONArray("holidays");
+    JSONObject listd = dates.getJSONObject(0);
+    	JSONArray dateList = listd.getJSONArray("holiday");
+   
     	
     	String speechOutput = "The upcoming " + MAX_HOLIDAYS + " holidays are: ";
     	for (int i=0; i < MAX_HOLIDAYS; i++) {
     		JSONObject o = (JSONObject) holidayList.get(i);
+    		JSONObject d = (JSONObject) dateList.get(i);
     		if (i == MAX_HOLIDAYS - 1) {
-        		speechOutput = speechOutput + "and " + o.getString("name") + ".";
+        		speechOutput = speechOutput + "and " + o.getString("name") + " on " + d.getString("date") + ".";
     		} else {
-    			speechOutput = speechOutput + o.getString("name") + ", ";
+    			speechOutput = speechOutput + o.getString("name") + " on " + d.getString("date") + ", ";
     		}
     	}
     	
@@ -265,7 +286,7 @@ public class BartHelperSpeechlet implements Speechlet {
             ((SsmlOutputSpeech) repromptOutputSpeech).setSsml(repromptText);
         } else {
             repromptOutputSpeech = new PlainTextOutputSpeech();
-            ((PlainTextOutputSpeech) repromptOutputSpeech).setText(repromptText);
+             ((PlainTextOutputSpeech) repromptOutputSpeech).setText(repromptText);
         }
         Reprompt reprompt = new Reprompt();
         reprompt.setOutputSpeech(repromptOutputSpeech);
