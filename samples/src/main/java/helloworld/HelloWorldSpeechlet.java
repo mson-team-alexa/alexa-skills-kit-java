@@ -79,7 +79,7 @@ public class HelloWorldSpeechlet implements Speechlet {
      * @return SpeechletResponse spoken and visual response for the given intent
      */
     private SpeechletResponse getWelcomeResponse() {
-        String speechText = "Welcome to the Alexa Skills Kit, you can say hello";
+        String speechText = "Welcome to Alexa boy, what's good?";
 
         // Create the Simple card content.
         SimpleCard card = new SimpleCard();
@@ -103,7 +103,7 @@ public class HelloWorldSpeechlet implements Speechlet {
      * @return SpeechletResponse spoken and visual response for the given intent
      */
     private SpeechletResponse getHelloResponse() {
-        String speechText = "Hello world";
+        String speechText = "I'm good honey I'm real good";
 
         // Create the Simple card content.
         SimpleCard card = new SimpleCard();
@@ -123,7 +123,7 @@ public class HelloWorldSpeechlet implements Speechlet {
      * @return SpeechletResponse spoken and visual response for the given intent
      */
     private SpeechletResponse getHelpResponse() {
-        String speechText = "You can say hello to me!";
+        String speechText = "You can holla at me boy! HA!";
 
         // Create the Simple card content.
         SimpleCard card = new SimpleCard();
