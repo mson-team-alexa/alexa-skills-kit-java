@@ -45,7 +45,11 @@ public class BartHelperSpeechlet implements Speechlet {
 
     private static final String URL_PREFIX = "https://api.bart.gov/api/sched.aspx?json=y&";
     
+    private static final String ELEVATOR_URL_PREFIX = "https://api.bart.gov/api/bsa.aspx?json=y";
+    
     private static final String API_KEY = "MW9S-E7SL-26DU-VV8V";
+    
+    private static final String API_ELEVATOR_KEY = "MW9S-E7SL-26DU-VV8V";
     
     private static final int MAX_HOLIDAYS = 3;
 
@@ -88,7 +92,22 @@ public class BartHelperSpeechlet implements Speechlet {
 				e.printStackTrace();
 				return getErrorResponse(intent);
 			}
-        } else if ("AMAZON.HelpIntent".equals(intentName)) {
+        	
+        } 
+        else if("GetElevatorStatus".equals(intentName)) {
+        	try {
+        		return getElevatorStatus(intent);
+			} catch (IOException e) {
+				log.error("Holidays IO Error");
+				e.printStackTrace();
+				return getErrorResponse(intent);
+			} catch (JSONException e) {
+				log.error("Holidays JSON Error");
+				e.printStackTrace();
+				return getErrorResponse(intent);
+			}
+        }
+        else if ("AMAZON.HelpIntent".equals(intentName)) {
             return getHelpResponse(intent);
         } else if ("AMAZON.StopIntent".equals(intentName)) {
             return getStopResponse(intent);
@@ -107,6 +126,59 @@ public class BartHelperSpeechlet implements Speechlet {
                 session.getSessionId());
 
         // any session cleanup logic would go here
+    }
+    
+    private SpeechletResponse getElevatorStatus(Intent intent) throws IOException, JSONException {
+     	String command = "elev";
+     	String elevatorURL = ELEVATOR_URL_PREFIX + "key=" + API_KEY + "&cmd=" + command;
+    	
+     	log.info("BART Holidays URL: " + elevatorURL);
+    	
+     	URL url = new URL(elevatorURL);
+     	Scanner scan = new Scanner(url.openStream());
+     	String elevatorOutput = new String();
+     	while (scan.hasNext()) {
+     		elevatorOutput += scan.nextLine();
+     	}
+    	scan.close();
+    	
+    	// build a JSON object
+    	JSONObject output = new JSONObject(elevatorOutput);
+    	
+    	//get the results
+    	JSONObject root = output.getJSONObject("root");
+    	
+    	JSONArray elevator = root.getJSONArray("bsa");
+    	
+    	JSONObject list = elevator.getJSONObject(0);
+   	
+    	JSONObject elevatorList = list.getJSONObject("description");
+    	
+    	JSONObject data = elevatorList.getJSONObject("#cdata-section");
+	
+    	/*String speechOutput = "The upcoming " + MAX_HOLIDAYS + " holidays are: ";
+    	for (int i=0; i < data.; i++) {
+    		JSONObject o = elevatorList.get(i);
+    		JSONObject d = elevatorList.get(i);
+    		if (i == MAX_HOLIDAYS - 1) {
+
+        		speechOutput = speechOutput + "and " + o.getString("name") + " on "+ d.getString("date") +  ".";
+    		} else {
+    			speechOutput = speechOutput + o.getString("name") + " on "+ d.getString("date") + ", ";
+    		}
+    	}
+    	*/
+    	String speechOutput = elevatorList.getString("#cdata-section");
+    	
+    	PlainTextOutputSpeech outputSpeech = new PlainTextOutputSpeech();
+        outputSpeech.setText(speechOutput);
+
+        SimpleCard card = new SimpleCard();
+        card.setTitle("Elevators out of Service");
+        card.setContent(speechOutput);
+
+        return SpeechletResponse.newTellResponse(outputSpeech, card);
+    	
     }
     
     /**
