@@ -30,32 +30,31 @@ import com.amazon.speech.ui.Reprompt;
 import com.amazon.speech.ui.SimpleCard;
 
 /**
- * This sample shows how to create a simple speechlet for handling intent requests and managing
- * session interactions.
+ * This sample shows how to create a simple speechlet for handling intent
+ * requests and managing session interactions.
  */
 public class SessionSpeechlet implements Speechlet {
-    private static final Logger log = LoggerFactory.getLogger(SessionSpeechlet.class);
+	private static final Logger log = LoggerFactory.getLogger(SessionSpeechlet.class);
 
-    private static final String COLOR_KEY = "COLOR";
-    private static final String COLOR_SLOT = "Color";
+	private static final String COLOR_KEY = "COLOR";
+	private static final String COLOR_SLOT = "Color";
 
-    @Override
-    public void onSessionStarted(final SessionStartedRequest request, final Session session)
-            throws SpeechletException {
-        log.info("onSessionStarted requestId={}, sessionId={}", request.getRequestId(),
-                session.getSessionId());
-        // any initialization logic goes here
-    }
+	private static final String LANG_KEY = "LANG";
+	private static final String LANG_SLOT = "Lang";
 
-    @Override
-    public SpeechletResponse onLaunch(final LaunchRequest request, final Session session)
-            throws SpeechletException {
-        log.info("onLaunch requestId={}, sessionId={}", request.getRequestId(),
-                session.getSessionId());
-        return getWelcomeResponse();
-    }
+	@Override
+	public void onSessionStarted(final SessionStartedRequest request, final Session session) throws SpeechletException {
+		log.info("onSessionStarted requestId={}, sessionId={}", request.getRequestId(), session.getSessionId());
+		// any initialization logic goes here
+	}
 
-    @Override
+	@Override
+	public SpeechletResponse onLaunch(final LaunchRequest request, final Session session) throws SpeechletException {
+		log.info("onLaunch requestId={}, sessionId={}", request.getRequestId(), session.getSessionId());
+		return getWelcomeResponse();
+	}
+
+	@Override
     public SpeechletResponse onIntent(final IntentRequest request, final Session session)
             throws SpeechletException {
         log.info("onIntent requestId={}, sessionId={}", request.getRequestId(),
@@ -70,128 +69,170 @@ public class SessionSpeechlet implements Speechlet {
         if ("MyColorIsIntent".equals(intentName)) {
             return setColorInSession(intent, session);
         } else if ("WhatsMyColorIntent".equals(intentName)) {
-            return getColorFromSession(intent, session);
-        } else {
+            return getColorFromSession(intent, session);   
+        } else if ("MyLangIsIntent".equals(intentName)) {
+            return setLangInSession(intent, session);
+        } else if ("WhatsMyLangIntent".equals(intentName)) {
+                return getLangFromSession(intent, session);
+        }else {
             throw new SpeechletException("Invalid Intent");
         }
+        
+        
     }
 
-    @Override
-    public void onSessionEnded(final SessionEndedRequest request, final Session session)
-            throws SpeechletException {
-        log.info("onSessionEnded requestId={}, sessionId={}", request.getRequestId(),
-                session.getSessionId());
-        // any cleanup logic goes here
-    }
+	@Override
+	public void onSessionEnded(final SessionEndedRequest request, final Session session) throws SpeechletException {
+		log.info("onSessionEnded requestId={}, sessionId={}", request.getRequestId(), session.getSessionId());
+		// any cleanup logic goes here
+	}
 
-    /**
-     * Creates and returns a {@code SpeechletResponse} with a welcome message.
-     *
-     * @return SpeechletResponse spoken and visual welcome message
-     */
-    private SpeechletResponse getWelcomeResponse() {
-        // Create the welcome message.
-        String speechText =
-                "Welcome to the Alexa Skills Kit sample. Please tell me your favorite color by "
-                        + "saying, my favorite color is red";
-        String repromptText =
-                "Please tell me your favorite color by saying, my favorite color is red";
+	/**
+	 * Creates and returns a {@code SpeechletResponse} with a welcome message.
+	 *
+	 * @return SpeechletResponse spoken and visual welcome message
+	 */
+	private SpeechletResponse getWelcomeResponse() {
+		// Create the welcome message.
+		String speechText = "Welcome to the Alexa Skills Kit sample. Please tell me your favorite color by "
+				+ "saying, my favorite color is red";
+		String repromptText = "Please tell me your favorite color by saying, my favorite color is red";
 
-        return getSpeechletResponse(speechText, repromptText, true);
-    }
+		return getSpeechletResponse(speechText, repromptText, true);
+	}
 
-    /**
-     * Creates a {@code SpeechletResponse} for the intent and stores the extracted color in the
-     * Session.
-     *
-     * @param intent
-     *            intent for the request
-     * @return SpeechletResponse spoken and visual response the given intent
-     */
-    private SpeechletResponse setColorInSession(final Intent intent, final Session session) {
-        // Get the slots from the intent.
-        Map<String, Slot> slots = intent.getSlots();
+	/**
+	 * Creates a {@code SpeechletResponse} for the intent and stores the extracted
+	 * color in the Session.
+	 *
+	 * @param intent
+	 *            intent for the request
+	 * @return SpeechletResponse spoken and visual response the given intent
+	 */
+	private SpeechletResponse setColorInSession(final Intent intent, final Session session) {
+		// Get the slots from the intent.
+		Map<String, Slot> slots = intent.getSlots();
 
-        // Get the color slot from the list of slots.
-        Slot favoriteColorSlot = slots.get(COLOR_SLOT);
-        String speechText, repromptText;
+		// Get the color slot from the list of slots.
+		Slot favoriteColorSlot = slots.get(COLOR_SLOT);
+		String speechText, repromptText;
 
-        // Check for favorite color and create output to user.
-        if (favoriteColorSlot != null) {
-            // Store the user's favorite color in the Session and create response.
-            String favoriteColor = favoriteColorSlot.getValue();
-            session.setAttribute(COLOR_KEY, favoriteColor);
-            speechText =
-                    String.format("I now know that your favorite color is %s. You can ask me your "
-                            + "favorite color by saying, what's my favorite color?", favoriteColor);
-            repromptText =
-                    "You can ask me your favorite color by saying, what's my favorite color?";
+		// Check for favorite color and create output to user.
+		if (favoriteColorSlot != null) {
+			// Store the user's favorite color in the Session and create response.
+			String favoriteColor = favoriteColorSlot.getValue();
+			session.setAttribute(COLOR_KEY, favoriteColor);
+			speechText = String.format("I now know that your favorite color is %s. You can ask me your "
+					+ "favorite color by saying, what's my favorite color?", favoriteColor);
+			repromptText = "You can ask me your favorite color by saying, what's my favorite color?";
 
-        } else {
-            // Render an error since we don't know what the users favorite color is.
-            speechText = "I'm not sure what your favorite color is, please try again";
-            repromptText =
-                    "I'm not sure what your favorite color is. You can tell me your favorite "
-                            + "color by saying, my favorite color is red";
-        }
+		} else {
+			// Render an error since we don't know what the users favorite color is.
+			speechText = "I'm not sure what your favorite color is, please try again";
+			repromptText = "I'm not sure what your favorite color is. You can tell me your favorite "
+					+ "color by saying, my favorite color is red";
+		}
 
-        return getSpeechletResponse(speechText, repromptText, true);
-    }
+		return getSpeechletResponse(speechText, repromptText, true);
+	}
 
-    /**
-     * Creates a {@code SpeechletResponse} for the intent and get the user's favorite color from the
-     * Session.
-     *
-     * @param intent
-     *            intent for the request
-     * @return SpeechletResponse spoken and visual response for the intent
-     */
-    private SpeechletResponse getColorFromSession(final Intent intent, final Session session) {
-        String speechText;
-        boolean isAskResponse = false;
+	private SpeechletResponse setLangInSession(final Intent intent, final Session session) {
+		// Get the slots from the intent.
+		Map<String, Slot> slots = intent.getSlots();
 
-        // Get the user's favorite color from the session.
-        String favoriteColor = (String) session.getAttribute(COLOR_KEY);
+		// Get the color slot from the list of slots.
+		Slot favoriteLangSlot = slots.get(LANG_SLOT);
+		String speechText, repromptText;
 
-        // Check to make sure user's favorite color is set in the session.
-        if (StringUtils.isNotEmpty(favoriteColor)) {
-            speechText = String.format("Your favorite color is %s. Goodbye.", favoriteColor);
-        } else {
-            // Since the user's favorite color is not set render an error message.
-            speechText =
-                    "I'm not sure what your favorite color is. You can say, my favorite color is "
-                            + "red";
-            isAskResponse = true;
-        }
+		// Check for favorite color and create output to user.
+		if (favoriteLangSlot != null) {
+			// Store the user's favorite color in the Session and create response.
+			String favoriteLang = favoriteLangSlot.getValue();
+			session.setAttribute(LANG_KEY, favoriteLang);
+			speechText = String.format("I now know that your favorite coding language is %s. You can ask me your "
+					+ "favorite coding language by saying, what's my favorite language?", favoriteLang);
+			repromptText = "You can ask me your favorite coding language by asking, what's my favorite language?";
 
-        return getSpeechletResponse(speechText, speechText, isAskResponse);
-    }
+		} else {
+			// Render an error since we don't know what the users favorite lang is.
+			speechText = "I'm not sure what your favorite coding language is, please try again";
+			repromptText = "I'm not sure what your favorite coding language is. You can tell me your favorite "
+					+ "coding language by saying, my favorite codaing language is Java";
+		}
 
-    /**
-     * Returns a Speechlet response for a speech and reprompt text.
-     */
-    private SpeechletResponse getSpeechletResponse(String speechText, String repromptText,
-            boolean isAskResponse) {
-        // Create the Simple card content.
-        SimpleCard card = new SimpleCard();
-        card.setTitle("Session");
-        card.setContent(speechText);
+		return getSpeechletResponse(speechText, repromptText, true);
+	}
 
-        // Create the plain text output.
-        PlainTextOutputSpeech speech = new PlainTextOutputSpeech();
-        speech.setText(speechText);
+	/**
+	 * Creates a {@code SpeechletResponse} for the intent and get the user's
+	 * favorite color from the Session.
+	 *
+	 * @param intent
+	 *            intent for the request
+	 * @return SpeechletResponse spoken and visual response for the intent
+	 */
+	private SpeechletResponse getColorFromSession(final Intent intent, final Session session) {
+		String speechText;
+		boolean isAskResponse = false;
 
-        if (isAskResponse) {
-            // Create reprompt
-            PlainTextOutputSpeech repromptSpeech = new PlainTextOutputSpeech();
-            repromptSpeech.setText(repromptText);
-            Reprompt reprompt = new Reprompt();
-            reprompt.setOutputSpeech(repromptSpeech);
+		// Get the user's favorite color from the session.
+		String favoriteColor = (String) session.getAttribute(COLOR_KEY);
 
-            return SpeechletResponse.newAskResponse(speech, reprompt, card);
+		// Check to make sure user's favorite color is set in the session.
+		if (StringUtils.isNotEmpty(favoriteColor)) {
+			speechText = String.format("Your favorite color is %s. Goodbye.", favoriteColor);
+		} else {
+			// Since the user's favorite color is not set render an error message.
+			speechText = "I'm not sure what your favorite color is. You can say, my favorite color is " + "red";
+			isAskResponse = true;
+		}
 
-        } else {
-            return SpeechletResponse.newTellResponse(speech, card);
-        }
-    }
+		return getSpeechletResponse(speechText, speechText, isAskResponse);
+	}
+
+	//private SpeechletResponse getLangFromSession(final Intent intent, final Session session) {
+		//String speechText;
+		//boolean isAskRespons = false;
+
+		// Get the user's favorite color from the session.
+		//String Lang = (String) session.getAttribute(LANG_KEY);
+
+		// Check to make sure user's favorite color is set in the session.
+		/*if (StringUtils.isNotEmpty(favoriteLang)) {
+			speechText = String.format("Your favorite color is %s. Goodbye.", favoriteLang);
+		} else {
+			// Since the user's favorite color is not set render an error message.
+			speechText = "I'm not sure what your favorite color is. You can say, my favorite color is " + "red";
+			isAskResponse = true;
+		}
+
+		return getSpeechletResponse(speechText, speechText, isAskResponse);
+	}
+
+	/**
+	 * Returns a Speechlet response for a speech and reprompt text.
+	 */
+	private SpeechletResponse getSpeechletResponse(String speechText, String repromptText, boolean isAskResponse) {
+		// Create the Simple card content.
+		SimpleCard card = new SimpleCard();
+		card.setTitle("Session");
+		card.setContent(speechText);
+
+		// Create the plain text output.
+		PlainTextOutputSpeech speech = new PlainTextOutputSpeech();
+		speech.setText(speechText);
+
+		if (isAskResponse) {
+			// Create reprompt
+			PlainTextOutputSpeech repromptSpeech = new PlainTextOutputSpeech();
+			repromptSpeech.setText(repromptText);
+			Reprompt reprompt = new Reprompt();
+			reprompt.setOutputSpeech(repromptSpeech);
+
+			return SpeechletResponse.newAskResponse(speech, reprompt, card);
+
+		} else {
+			return SpeechletResponse.newTellResponse(speech, card);
+		}
+	}
 }
