@@ -5,6 +5,3 @@ HelloWorldIntent say hi
 HelloWorldIntent say hi world
 HelloWorldIntent hi
 HelloWorldIntent how are you
-HelloWorldIntent whats good
-HelloWorldIntent whats poppin
-HelloWorldIntent whats brackin
