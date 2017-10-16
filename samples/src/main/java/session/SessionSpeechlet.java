@@ -71,15 +71,16 @@ public class SessionSpeechlet implements Speechlet {
         } else if ("WhatsMyColorIntent".equals(intentName)) {
             return getColorFromSession(intent, session);   
         } else if ("MyLangIsIntent".equals(intentName)) {
-            return setLangInSession(intent, session);
-        } else if ("WhatsMyLangIntent".equals(intentName)) {
-                return getLangFromSession(intent, session);
+            return setLangInSession(intent, session); 
         }else {
             throw new SpeechletException("Invalid Intent");
         }
+        }//else if ("WhatsMyLangIntent".equals(intentName)) {
+                //return getLangFromSession(intent, session);
+       
         
         
-    }
+
 
 	@Override
 	public void onSessionEnded(final SessionEndedRequest request, final Session session) throws SpeechletException {

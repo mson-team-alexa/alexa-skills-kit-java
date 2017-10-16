@@ -47,7 +47,11 @@ public class BartHelperSpeechlet implements Speechlet {
     
     private static final String API_KEY = "MW9S-E7SL-26DU-VV8V";
     
+    
     private static final int MAX_HOLIDAYS = 3;
+    
+    private static final int MAX_TRAINS = 5;
+
 
     @Override
     public void onSessionStarted(final SessionStartedRequest request, final Session session)
@@ -88,6 +92,19 @@ public class BartHelperSpeechlet implements Speechlet {
 				e.printStackTrace();
 				return getErrorResponse(intent);
 			}
+        } else if ("GetTrainTimesIntent".equals(intentName)) {
+        	try {
+				return getBARTTrainTimes(intent);
+			} catch (IOException e) {
+				log.error("Holidays IO Error");
+				e.printStackTrace();
+				return getErrorResponse(intent);
+			} catch (JSONException e) {
+				log.error("Holidays JSON Error");
+				e.printStackTrace();
+				return getErrorResponse(intent);
+			}	
+        	
         } else if ("AMAZON.HelpIntent".equals(intentName)) {
             return getHelpResponse(intent);
         } else if ("AMAZON.StopIntent".equals(intentName)) {
@@ -158,6 +175,54 @@ public class BartHelperSpeechlet implements Speechlet {
 
         SimpleCard card = new SimpleCard();
         card.setTitle("Upcoming BART Holidays");
+        card.setContent(speechOutput);
+
+        return SpeechletResponse.newTellResponse(outputSpeech, card);
+    	
+	}
+	
+private SpeechletResponse getBARTTrainTimes(Intent intent) throws IOException, JSONException {
+    	
+    	String command = "stnsched";
+    	String trainTimesURL = URL_PREFIX + "key=" + API_KEY + "&cmd=" + command;
+    	
+    	log.info("BART Train Times URL: " + trainTimesURL);
+    	
+    	URL url = new URL(trainTimesURL);
+    	Scanner scan = new Scanner(url.openStream());
+    	String trainOutput = new String();
+    	while (scan.hasNext()) {
+    		trainOutput += scan.nextLine();
+    	}
+    	scan.close();
+    	
+    	// build a JSON object
+    	JSONObject output = new JSONObject(trainOutput);
+    	
+    	//get the results
+    	JSONObject root = output.getJSONObject("root");
+    	
+    	JSONArray trains = root.getJSONArray("trains");
+    	
+    	JSONObject list = trains.getJSONObject(0);
+    	
+    	JSONArray trainList = list.getJSONArray("trains");
+    	
+    	String speechOutput = "The Upcoming Trains Are: ";
+    	for (int i=0; i < MAX_TRAINS; i++) {
+    		JSONObject o = (JSONObject) trainList.get(i);
+    		if (i == MAX_TRAINS - 1) {
+        		speechOutput = speechOutput + "and  from" + o.getString("name") + " on "+ o.getString("date") + " to " + o.getString("@trainHeadStation")  + ".";
+    		} else {
+    			speechOutput = speechOutput + "From" + o.getString("name") + " on " + o.getString("date") + " to " + o.getString("@trainHeadStation") + ",";
+    		}
+    	}
+    	
+    	PlainTextOutputSpeech outputSpeech = new PlainTextOutputSpeech();
+        outputSpeech.setText(speechOutput);
+
+        SimpleCard card = new SimpleCard();
+        card.setTitle("Upcoming BART Trains");
         card.setContent(speechOutput);
 
         return SpeechletResponse.newTellResponse(outputSpeech, card);

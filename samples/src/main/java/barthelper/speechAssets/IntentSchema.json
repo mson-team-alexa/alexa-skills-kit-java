@@ -4,6 +4,9 @@
       "intent": "GetHolidaysIntent"
     },
     {
+      "intent": "GetTrainTimesIntent"
+    },
+    {
       "intent": "AMAZON.HelpIntent"
     },
     {
