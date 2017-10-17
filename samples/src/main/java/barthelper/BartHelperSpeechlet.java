@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.amazon.speech.slu.Intent;
+import com.amazon.speech.slu.Slot;
 import com.amazon.speech.speechlet.IntentRequest;
 import com.amazon.speech.speechlet.LaunchRequest;
 import com.amazon.speech.speechlet.Session;
@@ -24,6 +25,8 @@ import com.amazon.speech.ui.SimpleCard;
 import com.amazonaws.util.json.JSONArray;
 import com.amazonaws.util.json.JSONException;
 import com.amazonaws.util.json.JSONObject;
+
+import minecrafthelper.Animals;
 
 /**
  * This sample shows how to create a Lambda function for handling Alexa Skill requests
@@ -45,13 +48,14 @@ public class BartHelperSpeechlet implements Speechlet {
 
     private static final String URL_PREFIX = "https://api.bart.gov/api/sched.aspx?json=y&";
     
-    private static final String ELEVATOR_URL_PREFIX = "https://api.bart.gov/api/bsa.aspx?json=y";
-    
+    private static final String TRAIN_URL_PREFIX = "http://bartjsonapi.elasticbeanstalk.com/api/departures/";
+    //private static final String TRAIN_URL_PREFIX = "https://api.bart.gov/api/etd.aspx?json=y&";
+
     private static final String API_KEY = "MW9S-E7SL-26DU-VV8V";
     
-    private static final String API_ELEVATOR_KEY = "MW9S-E7SL-26DU-VV8V";
-    
     private static final int MAX_HOLIDAYS = 3;
+    
+    public static final String STATION_NAMES = "StationName";
 
     @Override
     public void onSessionStarted(final SessionStartedRequest request, final Session session)
@@ -93,19 +97,20 @@ public class BartHelperSpeechlet implements Speechlet {
 				return getErrorResponse(intent);
 			}
         	
-        } 
-        else if("GetElevatorStatus".equals(intentName)) {
+        }
+        if ("GetTrainTimes".equals(intentName)) {
         	try {
-        		return getElevatorStatus(intent);
+				return getTrainTimes(intent);
 			} catch (IOException e) {
-				log.error("Holidays IO Error");
+				log.error("Trains IO Error");
 				e.printStackTrace();
 				return getErrorResponse(intent);
 			} catch (JSONException e) {
-				log.error("Holidays JSON Error");
+				log.error("Trains JSON Error");
 				e.printStackTrace();
 				return getErrorResponse(intent);
 			}
+        	
         }
         else if ("AMAZON.HelpIntent".equals(intentName)) {
             return getHelpResponse(intent);
@@ -127,60 +132,6 @@ public class BartHelperSpeechlet implements Speechlet {
 
         // any session cleanup logic would go here
     }
-    
-    private SpeechletResponse getElevatorStatus(Intent intent) throws IOException, JSONException {
-     	String command = "elev";
-     	String elevatorURL = ELEVATOR_URL_PREFIX + "key=" + API_KEY + "&cmd=" + command;
-    	
-     	log.info("BART Holidays URL: " + elevatorURL);
-    	
-     	URL url = new URL(elevatorURL);
-     	Scanner scan = new Scanner(url.openStream());
-     	String elevatorOutput = new String();
-     	while (scan.hasNext()) {
-     		elevatorOutput += scan.nextLine();
-     	}
-    	scan.close();
-    	
-    	// build a JSON object
-    	JSONObject output = new JSONObject(elevatorOutput);
-    	
-    	//get the results
-    	JSONObject root = output.getJSONObject("root");
-    	
-    	JSONArray elevator = root.getJSONArray("bsa");
-    	
-    	JSONObject list = elevator.getJSONObject(0);
-   	
-    	JSONObject elevatorList = list.getJSONObject("description");
-    	
-    	JSONObject data = elevatorList.getJSONObject("#cdata-section");
-	
-    	/*String speechOutput = "The upcoming " + MAX_HOLIDAYS + " holidays are: ";
-    	for (int i=0; i < data.; i++) {
-    		JSONObject o = elevatorList.get(i);
-    		JSONObject d = elevatorList.get(i);
-    		if (i == MAX_HOLIDAYS - 1) {
-
-        		speechOutput = speechOutput + "and " + o.getString("name") + " on "+ d.getString("date") +  ".";
-    		} else {
-    			speechOutput = speechOutput + o.getString("name") + " on "+ d.getString("date") + ", ";
-    		}
-    	}
-    	*/
-    	String speechOutput = elevatorList.getString("#cdata-section");
-    	
-    	PlainTextOutputSpeech outputSpeech = new PlainTextOutputSpeech();
-        outputSpeech.setText(speechOutput);
-
-        SimpleCard card = new SimpleCard();
-        card.setTitle("Elevators out of Service");
-        card.setContent(speechOutput);
-
-        return SpeechletResponse.newTellResponse(outputSpeech, card);
-    	
-    }
-    
     /**
      * Creates a {@code SpeechletResponse} for the GetHolidaysIntent.
      *
@@ -218,12 +169,12 @@ public class BartHelperSpeechlet implements Speechlet {
     	String speechOutput = "The upcoming " + MAX_HOLIDAYS + " holidays are: ";
     	for (int i=0; i < MAX_HOLIDAYS; i++) {
     		JSONObject o = (JSONObject) holidayList.get(i);
-    		JSONObject d = (JSONObject) holidayList.get(i);
+
     		if (i == MAX_HOLIDAYS - 1) {
 
-        		speechOutput = speechOutput + "and " + o.getString("name") + " on "+ d.getString("date") +  ".";
+        		speechOutput = speechOutput + "and " + o.getString("name") + " on "+ o.getString("date") +  ".";
     		} else {
-    			speechOutput = speechOutput + o.getString("name") + " on "+ d.getString("date") + ", ";
+    			speechOutput = speechOutput + o.getString("name") + " on "+ o.getString("date") + ", ";
     		}
     	}
     	
@@ -236,6 +187,58 @@ public class BartHelperSpeechlet implements Speechlet {
 
         return SpeechletResponse.newTellResponse(outputSpeech, card);
     	
+	}
+    
+	
+private SpeechletResponse getTrainTimes(Intent intent) throws IOException, JSONException {
+     String speechOutput = "";
+	 Slot stationsSlot = intent.getSlot(STATION_NAMES);
+     if (stationsSlot != null &&stationsSlot.getValue() != null) {
+         String stationName = stationsSlot.getValue();
+     
+   
+         	String station = Stations.get(stationName);
+     
+        	 	String trainURL = TRAIN_URL_PREFIX + station;
+    	
+        	 	log.info("Train Times URL: " + trainURL);
+    	
+        	 	URL url = new URL(trainURL);
+        	 	Scanner scan = new Scanner(url.openStream());
+        	 	String trainOutput = new String();
+        	 	while (scan.hasNext()) {
+        	 		trainOutput += scan.nextLine();
+        	 	}
+        	 	scan.close();
+    	
+
+    	
+        	 	JSONObject output = new JSONObject(trainOutput);
+        	 	JSONArray etd = output.getJSONArray("etd");
+
+        	 	
+    	
+    	for (int i=0; i < etd.length(); i++) {
+    		JSONObject destinations = etd.getJSONObject(i);
+    		JSONArray times = destinations.getJSONArray("estimate");
+    	 	JSONObject info = times.getJSONObject(0);
+    	 	speechOutput += "The train going to " + destinations.getString("destination") + " leaves in " + info.getString("minutes") + " minutes from platform " + info.getString("platform") + ".";
+    	}
+    	
+         }
+     else {
+     speechOutput += "I'm sorry, I couldn't find that station";
+     }
+    	PlainTextOutputSpeech outputSpeech = new PlainTextOutputSpeech();
+        outputSpeech.setText(speechOutput);
+
+        SimpleCard card = new SimpleCard();
+        card.setTitle("Train Times");
+        card.setContent(speechOutput);
+
+        return SpeechletResponse.newTellResponse(outputSpeech, card);
+     
+     
 	}
     
 	/**
