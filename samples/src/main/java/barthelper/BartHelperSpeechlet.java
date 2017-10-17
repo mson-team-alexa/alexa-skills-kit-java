@@ -96,7 +96,7 @@ public class BartHelperSpeechlet implements Speechlet {
             return getCancelResponse(intent);
             
             //GetTrainIntent code
-        } else if ("GetTrainIntent" .equals(intentName)) {
+        } else if ("GetTrainTimeIntent" .equals(intentName)) {
         	try {
 				return getTrainTime(intent);
 			} catch (IOException t) {
@@ -133,10 +133,10 @@ private SpeechletResponse getTrainTime(Intent intent) throws IOException, JSONEx
     	
     	String command = "train";
     	String trainURL = URL_PREFIX + "key=" + API_KEY + "&cmd=" + command;
-    	String timeURL = URL_PREFIX + "key=" + API_KEY + "&cmd=" + command;
+    
     	
     	log.info("BART Departures URL: " + trainURL);
-    	
+    
     	URL url = new URL(trainURL);
     	Scanner scan = new Scanner(url.openStream());
     	String trainTimeOutput = new String();
@@ -144,26 +144,20 @@ private SpeechletResponse getTrainTime(Intent intent) throws IOException, JSONEx
     		trainTimeOutput += scan.nextLine();
     	}
     	scan.close();
-    	
-     	URL urld = new URL(timeURL);
-    	Scanner scand = new Scanner(urld.openStream());
-    	String timeOutput = new String();
-    	while (scand.hasNext()) {
-    		timeOutput += scand.nextLine();
-    	}
-    	scand.close();
+
     	
     	// build a JSON object
     	JSONObject output = new JSONObject(trainTimeOutput);
     	
     	//get the results
     	//JSONObject name = new JSONObject ("name");
-    	JSONArray etd = new JSONArray ("etd");
-    	JSONObject filler = etd.getJSONObject(0);
-    	JSONArray estimate =filler.getJSONArray("estimate");
+    	JSONArray etd = output.getJSONArray ("etd");
+    JSONObject filler = etd.getJSONObject(0);
+    	JSONArray est = filler.getJSONArray("estimate");
+    //	JSONObject f2 = estimate.getJSONObject(0);
     	
     	JSONObject e = (JSONObject) etd.get(0);
-    	JSONObject t = (JSONObject) estimate.get(0);
+    	JSONObject t = (JSONObject) est.get(0);
    
     String speechOutput = "The train going to " + e.getString("destination") + " leaves in " + t.get("minutes") + " from platform " + t.get("platform") + "." ;
     
