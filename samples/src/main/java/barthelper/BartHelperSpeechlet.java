@@ -94,7 +94,23 @@ public class BartHelperSpeechlet implements Speechlet {
             return getStopResponse(intent);
         } else if ("AMAZON.CancelIntent".equals(intentName)) {
             return getCancelResponse(intent);
-        } else {
+            
+            //GetTrainIntent code
+        } else if ("GetTrainIntent" .equals(intentName)) {
+        	try {
+				return getTrainTime(intent);
+			} catch (IOException t) {
+				log.error("Train IO Error");
+				t.printStackTrace();
+				return getErrorResponse(intent);
+			} catch (JSONException t) {
+				log.error("Train JSON Error");
+				t.printStackTrace();
+				return getErrorResponse(intent);
+			}			
+		//				
+        	
+        	} else {
             throw new SpeechletException("Invalid Intent");
         }
 		
@@ -109,6 +125,58 @@ public class BartHelperSpeechlet implements Speechlet {
         // any session cleanup logic would go here
     }
     
+    
+    /////
+    
+    
+private SpeechletResponse getTrainTime(Intent intent) throws IOException, JSONException {
+    	
+    	String command = "train";
+    	String trainURL = URL_PREFIX + "key=" + API_KEY + "&cmd=" + command;
+    	String timeURL = URL_PREFIX + "key=" + API_KEY + "&cmd=" + command;
+    	
+    	log.info("BART Departures URL: " + trainURL);
+    	
+    	URL url = new URL(trainURL);
+    	Scanner scan = new Scanner(url.openStream());
+    	String trainTimeOutput = new String();
+    	while (scan.hasNext()) {
+    		trainTimeOutput += scan.nextLine();
+    	}
+    	scan.close();
+    	
+     	URL urld = new URL(timeURL);
+    	Scanner scand = new Scanner(urld.openStream());
+    	String timeOutput = new String();
+    	while (scand.hasNext()) {
+    		timeOutput += scand.nextLine();
+    	}
+    	scand.close();
+    	
+    	// build a JSON object
+    	JSONObject output = new JSONObject(trainTimeOutput);
+    	
+    	//get the results
+    	//JSONObject name = new JSONObject ("name");
+    	JSONArray etd = new JSONArray ("etd");
+    	JSONObject filler = etd.getJSONObject(0);
+    	JSONArray estimate =filler.getJSONArray("estimate");
+    	
+    	JSONObject e = (JSONObject) etd.get(0);
+    	JSONObject t = (JSONObject) estimate.get(0);
+   
+    String speechOutput = "The train going to " + e.getString("destination") + " leaves in " + t.get("minutes") + " from platform " + t.get("platform") + "." ;
+    
+    PlainTextOutputSpeech outputSpeech = new PlainTextOutputSpeech();
+    outputSpeech.setText(speechOutput);
+    return SpeechletResponse.newTellResponse(outputSpeech);
+}
+
+    	
+    	///
+    	
+    	
+    	
     /**
      * Creates a {@code SpeechletResponse} for the GetHolidaysIntent.
      *
