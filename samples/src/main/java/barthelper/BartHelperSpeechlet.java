@@ -159,7 +159,7 @@ private SpeechletResponse getTrainTime(Intent intent) throws IOException, JSONEx
     	JSONObject e = (JSONObject) etd.get(0);
     	JSONObject t = (JSONObject) est.get(0);
    
-    String speechOutput = "The train going to " + e.getString("destination") + " leaves in " + t.get("minutes") + " from platform " + t.get("platform") + "." ;
+    String speechOutput = "The train going to " + e.getString("destination") + " leaves in " + t.getString("minutes") + " from platform " + t.getString("platform") + "." ;
     
     PlainTextOutputSpeech outputSpeech = new PlainTextOutputSpeech();
     outputSpeech.setText(speechOutput);
