@@ -133,7 +133,7 @@ public class MinecraftSpeechlet implements Speechlet {
      * @return SpeechletResponse spoken and visual response for the given intent
      */
     private SpeechletResponse getRecipe(Intent intent) {
-        Slot itemSlot = intent.getSlot(ITEM_SLOT);
+    	Slot itemSlot = intent.getSlot(ITEM_SLOT);
         if (itemSlot != null && itemSlot.getValue() != null) {
             String itemName = itemSlot.getValue();
 

@@ -6,3 +6,14 @@ GetHolidaysIntent when will bart not run
 GetHolidaysIntent what are the holidays
 GetHolidaysIntent what the upcoming holidays are
 GetHolidaysIntent what the holidays are
+GetElevatorStatus what elevators are out
+GetElevatorStatus which elevators are out
+GetTrainTimesIntent when are the trains from {traincenter} 
+GetTrainTimesIntent which trains are leaving from {traincenter} 
+GetTrainTimesIntent what are the trains for {traincenter} 
+GetTrainTimesIntent List the trains for {traincenter} 
+GetTrainTimesIntent List the trains from {traincenter} 
+GetTrainTimesIntent trains for {traincenter} 
+
+
+

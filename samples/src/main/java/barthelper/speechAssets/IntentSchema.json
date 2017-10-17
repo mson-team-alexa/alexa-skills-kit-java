@@ -7,6 +7,18 @@
       "intent": "AMAZON.HelpIntent"
     },
     {
+    	"intent": "GetTrainTimesIntent",
+    "slots": [
+        {
+          "name": "traincenter",
+          "type": "LIST_OF_STATIONS"
+        }
+      ]
+      },
+    {
+    		" intent": "GetElevatorStatus"
+    },
+    {
       "intent": "AMAZON.StopIntent"
     },
     {
