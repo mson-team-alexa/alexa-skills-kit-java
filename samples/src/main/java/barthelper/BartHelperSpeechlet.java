@@ -55,7 +55,7 @@ public class BartHelperSpeechlet implements Speechlet {
     private static final int MAX_HOLIDAYS = 3;
 
     
-    HashMap<String, String> station_shortcodes = new HashMap<String, String>()
+	HashMap<String, String> station_shortcodes = new HashMap<String, String>()
     {{
     		put("12th street oakland city center", "12th");
         put("16th street mission", "16th");
@@ -191,7 +191,7 @@ public class BartHelperSpeechlet implements Speechlet {
     	
     	String command = "holiday";
     	String holidayURL = URL_PREFIX + "key=" + API_KEY + "&cmd=" + command;
-    	
+    	log.info("HashMap: " + station_shortcodes);
     	log.info("BART Holidays URL: " + holidayURL);
     	
     	URL url = new URL(holidayURL);
@@ -243,8 +243,8 @@ private SpeechletResponse getBARTTrainTimes(Intent intent) throws IOException, J
     if (itemSlot != null && itemSlot.getValue() != null) {
     	
         String stationName = itemSlot.getValue();
-    
-        String shortcode = station_shortcodes.get(stationName);
+        log.info("Station Name: " + stationName);
+        String shortcode = station_shortcodes.get(stationName.toLowerCase());
   
         String trainTimesURL = "http://bartjsonapi.elasticbeanstalk.com/api/departures/" + shortcode;
     	
@@ -279,7 +279,7 @@ private SpeechletResponse getBARTTrainTimes(Intent intent) throws IOException, J
 	    	
 	    	String platform = train_info.getString("platform");
 	    	
-	    speechOutput = speechOutput + "The train going to " + destination + " leaves in " + time_till_departure + " from platform " + platform;
+	    speechOutput = speechOutput + " The train going to " + destination + " leaves in " + time_till_departure + " minutes from platform " + platform + ".";
 	    	
 	    };
 	    
