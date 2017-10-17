@@ -2,12 +2,15 @@ package barthelper;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.amazon.speech.slu.Intent;
+import com.amazon.speech.slu.Slot;
 import com.amazon.speech.speechlet.IntentRequest;
 import com.amazon.speech.speechlet.LaunchRequest;
 import com.amazon.speech.speechlet.Session;
@@ -47,7 +50,62 @@ public class BartHelperSpeechlet implements Speechlet {
     
     private static final String API_KEY = "MW9S-E7SL-26DU-VV8V";
     
+    private static final String STATION_SLOT = "Station";
+    
     private static final int MAX_HOLIDAYS = 3;
+    
+    Map<String, String> station_shortcodes = new HashMap<String, String>()
+    {{
+    		put("12th street oakland city center", "12th");
+        put("16th street mission", "16th");
+        put("19th street oakland", "19th");
+        put("24th street mission", "24th");
+        put("ashby", "ashb");
+        put("balboa park", "balb");
+        put("bay fair", "bayf");
+        put("castro valley", "cast");
+        put("civic center", "civc");
+        put("coliseum", "cols");
+        put("colma", "colm");
+        put("concord", "conc");
+        put("daly city", "daly");
+        put("downtown berkeley", "dbrk");
+        put("dublin pleasanton", "dubl");
+        put("el cerrito del norte", "deln");
+        put("del norte", "deln");
+        put("el cerrito plaza", "plza");
+        put("embarcadero", "embr");
+        put("fremont", "frmt");
+        put("fruitvale", "ftvl");
+        put("glen park", "glen");
+        put("hayward", "hayw");
+        put("lafayette", "lafy");
+        put("lake merritt", "lake");
+        put("macarthur", "mcar");
+        put("millbrae", "mlbr");
+        put("montgomery street", "mont");
+        put("north berkeley", "nbrk");
+        put("north concord martinez", "ncon");
+        put("oakland airport", "oakl");
+        put("orinda", "orin");
+        put("pittsburg bay point", "pitt");
+        put("pleasant hill", "phil");
+        put("powell street", "powl");
+        put("richmond", "rich");
+        put("rockridge", "rock");
+        put("san bruno", "sbrn");
+        put("san francisco airport", "sfia");
+        put("san leandro", "sanl");
+        put("south hayward", "shay");
+        put("south san francisco", "ssan");
+        put("union city", "ucty");
+        put("walnut creek", "wcrk");
+        put("west dublin pleasanton", "wdub");
+        put("west oakland", "woak");
+    }};
+    
+    
+    
 
     @Override
     public void onSessionStarted(final SessionStartedRequest request, final Session session)
@@ -85,6 +143,18 @@ public class BartHelperSpeechlet implements Speechlet {
 				return getErrorResponse(intent);
 			} catch (JSONException e) {
 				log.error("Holidays JSON Error");
+				e.printStackTrace();
+				return getErrorResponse(intent);
+			}
+        } else if ("GetTrainTimes".equals(intentName)){
+        	try {
+				return getBARTTrainTimes(intent);
+			} catch (IOException e) {
+				log.error("Train Times IO Error");
+				e.printStackTrace();
+				return getErrorResponse(intent);
+			} catch (JSONException e) {
+				log.error("Train Times JSON Error");
 				e.printStackTrace();
 				return getErrorResponse(intent);
 			}
@@ -163,7 +233,73 @@ public class BartHelperSpeechlet implements Speechlet {
         return SpeechletResponse.newTellResponse(outputSpeech, card);
     	
 	}
+	
+private SpeechletResponse getBARTTrainTimes(Intent intent) throws IOException, JSONException {
+    	
+	Slot itemSlot = intent.getSlot(STATION_SLOT);
+	
+	String speechOutput = "";
+    if (itemSlot != null && itemSlot.getValue() != null) {
+    	
+        String stationName = itemSlot.getValue();
     
+        String shortcode = station_shortcodes.get(stationName);
+  
+        String trainTimesURL = "http://bartjsonapi.elasticbeanstalk.com/api/departures/" + shortcode;
+    	
+        log.info("BART Train Times URL: " + trainTimesURL);
+    	
+        URL url = new URL(trainTimesURL);
+        Scanner scan = new Scanner(url.openStream());
+        String trainTimesOutput = new String();
+	    	while (scan.hasNext()) {
+	    		trainTimesOutput += scan.nextLine();
+	    	}
+	    	scan.close();
+    	
+	    	// build a JSON object
+	    	JSONObject output = new JSONObject(trainTimesOutput);
+    	
+	    	//get the results
+	    	JSONArray etd = output.getJSONArray("etd");
+	    	
+	    
+    	
+	    for(int i=0; i < etd.length(); i++) {
+	    	JSONObject train = etd.getJSONObject(i);
+	    	String destination = train.getString("destination");
+	    	JSONArray departures = train.getJSONArray("estimate");
+	    	JSONObject train_info = departures.getJSONObject(0);
+	    	String time_till_departure = train_info.getString("minutes");
+	    	
+	    	if (time_till_departure == "Leaving") {
+	    		train_info = departures.getJSONObject(1);
+	    		time_till_departure = train_info.getString("minutes");
+	    	}
+	    	
+	    	String platform = train_info.getString("platform");
+	    	
+	    speechOutput = speechOutput + "The train going to " + destination + " leaves in " + time_till_departure + " from platform " + platform;
+	    	
+	    };
+	    
+    } else {
+    	
+    	speechOutput = "Sorry, I don't recognize that as a valid station name.";
+    	
+    	}
+    	
+    	PlainTextOutputSpeech outputSpeech = new PlainTextOutputSpeech();
+        outputSpeech.setText(speechOutput);
+
+        SimpleCard card = new SimpleCard();
+        card.setTitle("Upcoming Train Departures");
+        card.setContent(speechOutput);
+
+        return SpeechletResponse.newTellResponse(outputSpeech, card);
+    	
+	}
+	
 	/**
      * Creates a {@code SpeechletResponse} for the HelpIntent.
      *
