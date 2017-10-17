@@ -53,8 +53,9 @@ public class BartHelperSpeechlet implements Speechlet {
     private static final String STATION_SLOT = "Station";
     
     private static final int MAX_HOLIDAYS = 3;
+
     
-    Map<String, String> station_shortcodes = new HashMap<String, String>()
+    HashMap<String, String> station_shortcodes = new HashMap<String, String>()
     {{
     		put("12th street oakland city center", "12th");
         put("16th street mission", "16th");
@@ -264,7 +265,6 @@ private SpeechletResponse getBARTTrainTimes(Intent intent) throws IOException, J
 	    	JSONArray etd = output.getJSONArray("etd");
 	    	
 	    
-    	
 	    for(int i=0; i < etd.length(); i++) {
 	    	JSONObject train = etd.getJSONObject(i);
 	    	String destination = train.getString("destination");

@@ -100,10 +100,10 @@ public class SessionSpeechlet implements Speechlet {
     private SpeechletResponse getWelcomeResponse() {
         // Create the welcome message.
         String speechText =
-                "Welcome to the Alexa Skills Kit sample. Please tell me your favorite color by "
-                        + "saying, my favorite color is red";
+                "Welcome to the Sessions Skill. Please tell me your favorite color or name by "
+                        + "saying, my favorite color is red or by saying my name is Alexa.";
         String repromptText =
-                "Please tell me your favorite color by saying, my favorite color is red";
+                "Please tell me your favorite color by saying, my favorite color is red or your name by saying my name is Alexa.";
 
         return getSpeechletResponse(speechText, repromptText, true);
     }
@@ -185,7 +185,7 @@ public class SessionSpeechlet implements Speechlet {
 
         // Check to make sure user's favorite color is set in the session.
         if (StringUtils.isNotEmpty(favoriteColor)) {
-            speechText = String.format("Your name is %s. Goodbye.", favoriteColor);
+            speechText = String.format("Your name is %s. Anything else?", favoriteColor);
         } else {
             // Since the user's name is not set render an error message.
             speechText =
@@ -214,7 +214,7 @@ public class SessionSpeechlet implements Speechlet {
 
         // Check to make sure user's favorite color is set in the session.
         if (StringUtils.isNotEmpty(favoriteColor)) {
-            speechText = String.format("Your favorite color is %s. Goodbye.", favoriteColor);
+            speechText = String.format("Your favorite color is %s. Anything else?.", favoriteColor);
         } else {
             // Since the user's favorite color is not set render an error message.
             speechText =
@@ -250,7 +250,12 @@ public class SessionSpeechlet implements Speechlet {
             return SpeechletResponse.newAskResponse(speech, reprompt, card);
 
         } else {
-            return SpeechletResponse.newTellResponse(speech, card);
+            //return SpeechletResponse.newTellResponse(speech, card);
+            PlainTextOutputSpeech repromptSpeech = new PlainTextOutputSpeech();
+            repromptSpeech.setText("");
+	        	Reprompt reprompt = new Reprompt();
+	        	reprompt.setOutputSpeech(repromptSpeech);
+	        	return SpeechletResponse.newAskResponse(speech, reprompt, card);
         }
     }
 }
