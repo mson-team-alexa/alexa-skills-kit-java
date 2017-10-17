@@ -222,7 +222,7 @@ private SpeechletResponse getTrainTimes(Intent intent) throws IOException, JSONE
     		JSONObject destinations = etd.getJSONObject(i);
     		JSONArray times = destinations.getJSONArray("estimate");
     	 	JSONObject info = times.getJSONObject(0);
-    	 	speechOutput += "The train going to " + destinations.getString("destination") + " leaves in " + info.getString("minutes") + " minutes from platform " + info.getString("platform") + ".";
+    	 	speechOutput += "The train going to " + destinations.getString("destination") + " leaves in " + info.getString("minutes") + " minutes from platform " + info.getString("platform") + ",";
     	}
     	
          }
