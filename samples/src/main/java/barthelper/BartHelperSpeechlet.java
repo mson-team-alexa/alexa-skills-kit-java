@@ -270,65 +270,76 @@ public class BartHelperSpeechlet implements Speechlet {
 
 	private SpeechletResponse GetTrainTimes(Intent intent) throws IOException, JSONException {
 
+    
+    	
+   
+
 		 String command ="";
 		HashMap<String, String> hash = new HashMap<>();
 		 hash.put("12th street oakland city center", "12th");
 	     hash.put("16th street mission", "16th");
 	     hash.put("19th street mission", "19th");
 	     hash.put("24th street mission", "24th");
-	     hash.put("Ashby", "ashb");
-	     hash.put("Balboa park", "balb");
-	     hash.put("Bay fair", "bayf");
-	     hash.put("Castro valley", "cast");
-	     hash.put("Coliseum", "cols");
-	     hash.put("Colma", "colm");
-	     hash.put("Concord", "conc");
-	     hash.put("Daly city", "daly");
-	     hash.put("Downtown berkeley", "dbrk");
-	     hash.put("Dublin pleasanton", "dubl");
-	     hash.put("El cerrito del norte", "deln");
-	     hash.put("Del norte", "deln");
-	     hash.put("El cerrito plaza", "plza");
-	     hash.put("Embarcadero", "embr");
-	     hash.put("Fremont", "frmt");
-	     hash.put("Fruitvale", "ftvl");
-	     hash.put("Glen park", "glen");
-	     hash.put("Hayward", "hayw");
-	     hash.put("Lafayette", "lafy");
-	     hash.put("Lake merritt", "lake");
-	     hash.put("Macarthur", "mcar");
-	     hash.put("Millbrae", "mlbr");
-	     hash.put("Montgomery street", "mont");
-	     hash.put("North berkeley", "nbrk");
-	     hash.put("North concord martinez", "ncord");
-	     hash.put("Oakland airport", "oakl");
-	     hash.put("Orinda", "orin");
-	     hash.put("Pittsburg bay point", "pitt");
-	     hash.put("Pleasant hill", "phil");
-	     hash.put("Powell street", "powl");
-	     hash.put("Richmond", "rich");
-	     hash.put("Rockridge", "rock");
-	     hash.put("San bruno", "sbrn");
-	     hash.put("San francisco airport", "sfia");
-	     hash.put("San leandro", "sanl");
-	     hash.put("South hayward", "shay");
-	     hash.put("South san francisco", "ssan");
-	     hash.put("Union city", "ucty");
-	     hash.put("Walnut creek", "wcrk");
-	     hash.put("West dublin pleasanton", "wdub");
-	     hash.put("West oakland", "woak");
-	     hash.put("Civic center", "civc");
+	     hash.put("ashby", "ashb");
+	     hash.put("balboa park", "balb");
+	     hash.put("bay fair", "bayf");
+	     hash.put("castro valley", "cast");
+	     hash.put("coliseum", "cols");
+	     hash.put("colma", "colm");
+	     hash.put("concord", "conc");
+	     hash.put("daly city", "daly");
+	     hash.put("downtown berkeley", "dbrk");
+	     hash.put("dublin pleasanton", "dubl");
+	     hash.put("el cerrito del norte", "deln");
+	     hash.put("del norte", "deln");
+	     hash.put("el cerrito plaza", "plza");
+	     hash.put("embarcadero", "embr");
+	     hash.put("fremont", "frmt");
+	     hash.put("fruitvale", "ftvl");
+	     hash.put("glen park", "glen");
+	     hash.put("hayward", "hayw");
+	     hash.put("lafayette", "lafy");
+	     hash.put("lake merritt", "lake");
+	     hash.put("macarthur", "mcar");
+	     hash.put("millbrae", "mlbr");
+	     hash.put("montgomery street", "mont");
+	     hash.put("north berkeley", "nbrk");
+	     hash.put("north concord martinez", "ncord");
+	     hash.put("oakland airport", "oakl");
+	     hash.put("orinda", "orin");
+	     hash.put("pittsburg bay point", "pitt");
+	     hash.put("pleasant hill", "phil");
+	     hash.put("powell street", "powl");
+	     hash.put("richmond", "rich");
+	     hash.put("rockridge", "rock");
+	     hash.put("san bruno", "sbrn");
+	     hash.put("san francisco airport", "sfia");
+	     hash.put("san leandro", "sanl");
+	     hash.put("south hayward", "shay");
+	     hash.put("south san francisco", "ssan");
+	     hash.put("union city", "ucty");
+	     hash.put("walnut creek", "wcrk");
+	     hash.put("west dublin pleasanton", "wdub");
+	     hash.put("west oakland", "woak");
+	     hash.put("civic center", "civc");
+	     //dont capitalize 
 	     
 	     
-	     Slot itemSlot = intent.getSlot(ST_SLOT);
+     Slot itemSlot = intent.getSlot(ST_SLOT);
 	        if (itemSlot != null && itemSlot.getValue() != null) {
 	            String itemName = itemSlot.getValue();
-
 	             command = hash.get(itemName);
-	      
-	     
 	        }
-		String TrainTimesURL = URL_PREFIX3 + command;
+	        String tab = "";
+	        String key = "";
+	        for ( Map.Entry<String, String> entry : hash.entrySet()) {
+	             key = entry.getKey();
+	             tab = entry.getValue();
+	        }  
+	             command = hash.get(key);
+	        
+
+		String TrainTimesURL = URL_PREFIX3 + tab;
 		log.info("BART TrainTimes URL: " + TrainTimesURL);
 
 		URL url = new URL(TrainTimesURL);
