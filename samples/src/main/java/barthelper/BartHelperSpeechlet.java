@@ -96,7 +96,7 @@ public class BartHelperSpeechlet implements Speechlet {
             return getCancelResponse(intent);
             
             //GetTrainIntent code
-        } else if ("GetTrainTimeIntent" .equals(intentName)) {
+        } else if ("GetTrainTimeIntent".equals(intentName)) {
         	try {
 				return getTrainTime(intent);
 			} catch (IOException t) {
@@ -131,9 +131,12 @@ public class BartHelperSpeechlet implements Speechlet {
     
 private SpeechletResponse getTrainTime(Intent intent) throws IOException, JSONException {
     	
+	
     	String command = "train";
-    	String trainURL = URL_PREFIX + "key=" + API_KEY + "&cmd=" + command;
-    
+    //	String trainURL = URL_PREFIX + "key=" + API_KEY + "&cmd=" + command;
+    	
+    String stationCode = "civc";
+    String trainURL = "http://bartjsonapi.elasticbeanstalk.com/api/departures/" + stationCode;
     	
     	log.info("BART Departures URL: " + trainURL);
     
@@ -149,21 +152,41 @@ private SpeechletResponse getTrainTime(Intent intent) throws IOException, JSONEx
     	// build a JSON object
     	JSONObject output = new JSONObject(trainTimeOutput);
     	
-    	//get the results
-    	//JSONObject name = new JSONObject ("name");
     	JSONArray etd = output.getJSONArray ("etd");
-    JSONObject filler = etd.getJSONObject(0);
-    	JSONArray est = filler.getJSONArray("estimate");
+    	for (int i = 0; i < etd.length() ; i++)
+    	{
+    JSONObject filler = etd.getJSONObject(i);
+    String destination = filler.getString("destination");
+    log.info("destination:" + destination);
+    	}
+   
+    	JSONObject f = etd.getJSONObject(0);
+    	JSONArray est = f.getJSONArray ("estimate");
+    	for (int j = 0; j < est.length(); j++)
+    	{
+    		JSONObject fill = est.getJSONObject(j);
+    		
+    		String minutes = fill.getString("minutes");
+    		log.info("minutes:" + minutes);
+    		
+    		String platform = fill.getString("platform");
+    		log.info("platform:" + platform);
+    	}
+    	
+    	
+    //	JSONArray est = filler.getJSONArray("estimate");
     //	JSONObject f2 = estimate.getJSONObject(0);
     	
-    	JSONObject e = (JSONObject) etd.get(0);
-    	JSONObject t = (JSONObject) est.get(0);
+   JSONObject e = (JSONObject) etd.get(0);
+   JSONObject t = (JSONObject) est.get(0);
    
-    String speechOutput = "The train going to " + e.getString("destination") + " leaves in " + t.getString("minutes") + " from platform " + t.getString("platform") + "." ;
+   String speechOutput = "The train going to " + e.getString("destination") + " leaves in " + t.getString("minutes") + " from platform " + t.getString("platform") + "." ;
     
     PlainTextOutputSpeech outputSpeech = new PlainTextOutputSpeech();
     outputSpeech.setText(speechOutput);
     return SpeechletResponse.newTellResponse(outputSpeech);
+    
+    	//return null;
 }
 
     	
