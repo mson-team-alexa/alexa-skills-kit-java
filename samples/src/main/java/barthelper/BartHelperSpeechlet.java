@@ -275,8 +275,12 @@ public class BartHelperSpeechlet implements Speechlet {
    
 
 		 String command ="";
-		HashMap<String, String> hash = new HashMap<>();
-		 hash.put("12th street oakland city center", "12th");
+		HashMap<String, String> hash = new HashMap<String, String>();
+		 hash.put("12th st. oakland city center", "12th");
+	     hash.put("16th st. mission", "16th");
+	     hash.put("19th st. mission", "19th");
+	     hash.put("24th st. mission", "24th");
+	     hash.put("12th street oakland city center", "12th");
 	     hash.put("16th street mission", "16th");
 	     hash.put("19th street mission", "19th");
 	     hash.put("24th street mission", "24th");
@@ -298,7 +302,7 @@ public class BartHelperSpeechlet implements Speechlet {
 	     hash.put("fruitvale", "ftvl");
 	     hash.put("glen park", "glen");
 	     hash.put("hayward", "hayw");
-	     hash.put("lafayette", "lafy");
+	     hash.put("Lafayette", "lafy");
 	     hash.put("lake merritt", "lake");
 	     hash.put("macarthur", "mcar");
 	     hash.put("millbrae", "mlbr");
@@ -322,24 +326,21 @@ public class BartHelperSpeechlet implements Speechlet {
 	     hash.put("west dublin pleasanton", "wdub");
 	     hash.put("west oakland", "woak");
 	     hash.put("civic center", "civc");
-	     //dont capitalize 
 	     
 	     
      Slot itemSlot = intent.getSlot(ST_SLOT);
+     String itemName = "";
 	        if (itemSlot != null && itemSlot.getValue() != null) {
-	            String itemName = itemSlot.getValue();
+	             itemName = itemSlot.getValue();
 	             command = hash.get(itemName);
-	        }
-	        String tab = "";
-	        String key = "";
-	        for ( Map.Entry<String, String> entry : hash.entrySet()) {
-	             key = entry.getKey();
-	             tab = entry.getValue();
-	        }  
-	             command = hash.get(key);
-	        
+	             log.info("ItemName " + itemName);
+	             log.info("Command " + command);
 
-		String TrainTimesURL = URL_PREFIX3 + tab;
+	        }
+
+	         
+
+		String TrainTimesURL = URL_PREFIX3 + command;
 		log.info("BART TrainTimes URL: " + TrainTimesURL);
 
 		URL url = new URL(TrainTimesURL);
