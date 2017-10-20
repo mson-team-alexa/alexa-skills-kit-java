@@ -11,6 +11,24 @@
     },
     {
       "intent": "AMAZON.CancelIntent"
+    },
+    {
+   	  "intent": "GetElevatorStatus"
+    },
+    {
+      "intent": "WhatsMyStationIntent"
+    },
+    {
+      "intent": "MyStationIsIntent",
+      "slots": [
+        {
+          "name": "Station",
+          "type": "LIST_OF_STATIONS"
+        }
+      ]
+    },
+    {
+      "intent": "GetTrainTimesIntent"
     }
   ]
 }

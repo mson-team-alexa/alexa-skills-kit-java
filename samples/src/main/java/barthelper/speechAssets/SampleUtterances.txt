@@ -6,3 +6,5 @@ GetHolidaysIntent when will bart not run
 GetHolidaysIntent what are the holidays
 GetHolidaysIntent what the upcoming holidays are
 GetHolidaysIntent what the holidays are
+MyStationIsIntent my station is {Station}
+WhatsMyStationIntent what is my station

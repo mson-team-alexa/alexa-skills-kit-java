@@ -1,13 +1,17 @@
 package barthelper;
 
+
+import java.util.Map;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Scanner;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.amazon.speech.slu.Intent;
+import com.amazon.speech.slu.Slot;
 import com.amazon.speech.speechlet.IntentRequest;
 import com.amazon.speech.speechlet.LaunchRequest;
 import com.amazon.speech.speechlet.Session;
@@ -24,6 +28,8 @@ import com.amazon.speech.ui.SimpleCard;
 import com.amazonaws.util.json.JSONArray;
 import com.amazonaws.util.json.JSONException;
 import com.amazonaws.util.json.JSONObject;
+
+import session.SessionSpeechlet;
 
 /**
  * This sample shows how to create a Lambda function for handling Alexa Skill requests
@@ -45,9 +51,14 @@ public class BartHelperSpeechlet implements Speechlet {
 
     private static final String URL_PREFIX = "https://api.bart.gov/api/sched.aspx?json=y&";
     
+    private static final String URL_TRAIN = "http://bartjsonapi.elasticbeanstalk.com/api/departures/";
+    
     private static final String API_KEY = "MW9S-E7SL-26DU-VV8V";
     
     private static final int MAX_HOLIDAYS = 3;
+    
+    private static final String STATION_KEY = "STATION";
+    private static final String STATION_SLOT = "Station";
 
     @Override
     public void onSessionStarted(final SessionStartedRequest request, final Session session)
@@ -94,7 +105,25 @@ public class BartHelperSpeechlet implements Speechlet {
             return getStopResponse(intent);
         } else if ("AMAZON.CancelIntent".equals(intentName)) {
             return getCancelResponse(intent);
-        } else {
+        } else if ("WhatsMyStationIntent".equals(intentName)) {
+            return getStationFromSession(intent, session);
+        } else if ("MyStationIsIntent".equals(intentName)) {
+            return setStationInSession(intent, session);
+        } else if ("GetTrainTimesIntent".equals(intentName)) {
+        	try {
+				return getTrainTimes(intent);
+			} catch (IOException e) {
+				log.error("Train Times IO Error");
+				e.printStackTrace();
+				return getErrorResponse(intent);
+			} catch (JSONException e) {
+				log.error("Train Times JSON Error");
+				e.printStackTrace();
+				return getErrorResponse(intent);
+			}
+        }
+        
+        else {
             throw new SpeechletException("Invalid Intent");
         }
 		
@@ -108,7 +137,145 @@ public class BartHelperSpeechlet implements Speechlet {
 
         // any session cleanup logic would go here
     }
+     //***********************************************************************************************   
+private SpeechletResponse getTrainTimes(Intent intent) throws IOException, JSONException {
+    	
+    	String origin = "civc";
+    	String timeURL = URL_TRAIN + origin;
+    	
+    	log.info("BART Time URL: " + timeURL);
+    	
+    	URL url = new URL(timeURL);
+    	Scanner scan = new Scanner(url.openStream());
+    	String timeOutput = new String();
+    	while (scan.hasNext()) {
+    		timeOutput += scan.nextLine();
+    	}
+    	scan.close();
+    	
+    	// build a JSON object
+    	JSONObject output = new JSONObject(timeOutput);
+    	
+    	//get the results
+    	JSONObject root = output.getJSONObject("root");
+    	
+    	JSONObject station = root.getJSONObject("station");
+    	
+    	JSONArray etd = station.getJSONArray("etd");
+    	
+    	JSONObject list = etd.getJSONObject(0);
+    	
+    	JSONArray timesList = list.getJSONArray("estimate");
+    	
+    	String speechOutput = "The time estimates are: ";
+    	for (int i=0; i < MAX_HOLIDAYS; i++) {
+    		JSONObject o = (JSONObject) timesList.get(i);
+    		if (i == MAX_HOLIDAYS - 1) {
+        		speechOutput = speechOutput + "and " + o.getString("minutes") + " on " + o.getString("platform") + ".";
+    		} else {
+    			speechOutput = speechOutput + o.getString("minutes") + " on " + o.getString("platform") + ", ";
+    		}
+    	}
+    	
+    	PlainTextOutputSpeech outputSpeech = new PlainTextOutputSpeech();
+        outputSpeech.setText(speechOutput);
+
+        SimpleCard card = new SimpleCard();
+        card.setTitle("Upcoming BART Times");
+        card.setContent(speechOutput);
+
+        return SpeechletResponse.newTellResponse(outputSpeech, card);
+    	
+	}
     
+    
+  //*************************************************************************************************************  
+
+//LAB 7 STORING MY STATION**************************************************************************************************************
+	private SpeechletResponse setStationInSession(final Intent intent, final Session session) {
+	    // Get the slots from the intent.
+	    Map<String, Slot> slots = intent.getSlots();
+	
+	    // Get the station slot from the list of slots.
+	    Slot myStationSlot = slots.get(STATION_SLOT);
+	    String speechText, repromptText;
+	
+	    // Check for station and create output to user.
+	    if (myStationSlot != null) {
+	        // Store the user's station in the Session and create response.
+	        String myStation = myStationSlot.getValue();
+	        session.setAttribute(STATION_KEY, myStation);
+	        speechText =
+	                String.format("I now know that your station is %s. You can ask me your "
+	                        + "station by saying, what's my station?", myStation);
+	        repromptText =
+	                "You can ask me your station by saying, what's my station?";
+	
+	    } else {
+	        // Render an error since we don't know what the users favorite color is.
+	        speechText = "I'm not sure what your station is, please try again";
+	        repromptText =
+	                "I'm not sure what your station is. You can tell me your "
+	                        + "station by saying, my station is Civic Center";
+	    }
+	
+	    return getSpeechletResponse(speechText, repromptText, true);
+	}
+
+//==============
+	private SpeechletResponse getStationFromSession(final Intent intent, final Session session) {
+        String speechText;
+        boolean isAskResponse = false;
+
+        // Get the user's station from the session.
+        String myStation = (String) session.getAttribute(STATION_KEY);
+
+        // Check to make sure user's station is set in the session.
+        if (StringUtils.isNotEmpty(myStation)) {
+            speechText = String.format("Your station is %s. Goodbye.", myStation);
+        } else {
+            // Since the user's station is not set render an error message.
+            speechText =
+                    "I'm not sure what your station is. You can say, my station is "
+                            + "Civic Center";
+            isAskResponse = true;
+        }
+
+        return getSpeechletResponse(speechText, speechText, isAskResponse);
+    }
+//=================
+	private SpeechletResponse getSpeechletResponse(String speechText, String repromptText,
+            boolean isAskResponse) {
+        // Create the Simple card content.
+        SimpleCard card = new SimpleCard();
+        card.setTitle("Session");
+        card.setContent(speechText);
+
+        // Create the plain text output.
+        PlainTextOutputSpeech speech = new PlainTextOutputSpeech();
+        speech.setText(speechText);
+
+        if (isAskResponse) {
+            // Create reprompt
+            PlainTextOutputSpeech repromptSpeech = new PlainTextOutputSpeech();
+            repromptSpeech.setText(repromptText);
+            Reprompt reprompt = new Reprompt();
+            reprompt.setOutputSpeech(repromptSpeech);
+
+            return SpeechletResponse.newAskResponse(speech, reprompt, card);
+
+        } else {
+            return SpeechletResponse.newTellResponse(speech, card);
+        }
+    }
+
+
+
+
+
+
+
+//**************************************************************************************************************
     /**
      * Creates a {@code SpeechletResponse} for the GetHolidaysIntent.
      *
