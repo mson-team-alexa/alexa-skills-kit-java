@@ -2,8 +2,10 @@ package barthelper;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Map;
 import java.util.Scanner;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,7 +51,6 @@ public class BartHelperSpeechlet implements Speechlet {
     private static final String URL_PREFIX = "https://api.bart.gov/api/sched.aspx?json=y&";
     
     private static final String TRAIN_URL_PREFIX = "http://bartjsonapi.elasticbeanstalk.com/api/departures/";
-    //private static final String TRAIN_URL_PREFIX = "https://api.bart.gov/api/etd.aspx?json=y&";
 
     private static final String API_KEY = "MW9S-E7SL-26DU-VV8V";
     
@@ -57,6 +58,11 @@ public class BartHelperSpeechlet implements Speechlet {
     
     public static final String STATION_NAMES = "StationName";
 
+    private static final String HOME_KEY = "HOME";
+    
+    private static final String HOME_SLOT = "Home";
+    
+    private String Home;
     @Override
     public void onSessionStarted(final SessionStartedRequest request, final Session session)
             throws SpeechletException {
@@ -98,7 +104,7 @@ public class BartHelperSpeechlet implements Speechlet {
 			}
         	
         }
-        if ("GetTrainTimes".equals(intentName)) {
+        else if ("GetTrainTimes".equals(intentName)) {
         	try {
 				return getTrainTimes(intent);
 			} catch (IOException e) {
@@ -112,6 +118,26 @@ public class BartHelperSpeechlet implements Speechlet {
 			}
         	
         }
+        else if ("GetTrainTimesFromHome".equals(intentName)) {
+        	try {
+				return getTrainTimesFromHome(intent,session);
+			} catch (IOException e) {
+				log.error("Trains IO Error");
+				e.printStackTrace();
+				return getErrorResponse(intent);
+			} catch (JSONException e) {
+				log.error("Trains JSON Error");
+				e.printStackTrace();
+				return getErrorResponse(intent);
+			}
+        	
+        }
+        else if ("MyHomeIs".equals(intentName)) {
+        		return setHomeInSession(intent, session);
+        }
+        else if ("WhatsMyHome".equals(intentName)) {
+        		return getHomeFromSession(intent, session);
+        }
         else if ("AMAZON.HelpIntent".equals(intentName)) {
             return getHelpResponse(intent);
         } else if ("AMAZON.StopIntent".equals(intentName)) {
@@ -122,6 +148,54 @@ public class BartHelperSpeechlet implements Speechlet {
             throw new SpeechletException("Invalid Intent");
         }
 		
+    }
+    
+    private SpeechletResponse getHomeFromSession(final Intent intent, final Session session) {
+        String speechText;
+        boolean isAskResponse = false;
+
+        String myHome = (String) session.getAttribute(HOME_KEY);
+
+        if (StringUtils.isNotEmpty(myHome)) {
+            speechText = String.format("Your home is near %s.", myHome);
+            Home = myHome;
+            isAskResponse = true;
+        } else {
+            speechText =
+                    "I'm not sure where your home is. You can say, my home is "
+                            + " ";
+            Home = null;
+            isAskResponse = true;
+        }
+
+        return getSpeechletResponse(speechText, speechText, isAskResponse);
+    }
+    
+    private SpeechletResponse setHomeInSession(final Intent intent, final Session session) {
+        // Get the slots from the intent.
+        Map<String, Slot> slots = intent.getSlots();
+
+        Slot myHomeSlot = slots.get(HOME_SLOT);
+        String speechText, repromptText;
+
+        if (myHomeSlot != null) {
+            String myHome = myHomeSlot.getValue();
+            session.setAttribute(HOME_KEY, myHome);
+            speechText =
+                    String.format("I now know that your your home is near %s. You can ask me the location "
+                            + "of your home by saying, where's my home", myHome);
+            repromptText =
+                    "You can ask me where your home is by saying, where's my home?";
+
+        } else {
+
+            speechText = "I'm not sure where your home is, please try again";
+            repromptText =
+                    "I'm not sure where your home is. You can tell me "
+                            + "by saying, my home is ";
+        }
+
+        return getSpeechletResponse(speechText, repromptText, true);
     }
     
     @Override
@@ -240,6 +314,71 @@ private SpeechletResponse getTrainTimes(Intent intent) throws IOException, JSONE
      
      
 	}
+
+private SpeechletResponse getTrainTimesFromHome(final Intent intent, final Session session) throws IOException, JSONException {
+	//String speechText;
+    //boolean isAskResponse = false;
+    String speechOutput = "";
+
+    String myHome = (String) session.getAttribute(HOME_KEY);
+
+    if (StringUtils.isNotEmpty(myHome)) {
+        speechOutput = String.format("Your home is near %s.", myHome);
+        //isAskResponse = true;
+    
+
+    
+	
+	
+	/* Slot stationsSlot = intent.getSlot(STATION_NAMES);
+    if (stationsSlot != null &&stationsSlot.getValue() != null) {
+        String stationName = stationsSlot.getValue();
+    */
+  
+        	String station = Stations.get(myHome);
+    
+       	 	String trainURL = TRAIN_URL_PREFIX + station;
+   	
+       	 	log.info("Train Times URL: " + trainURL);
+   	
+       	 	URL url = new URL(trainURL);
+       	 	Scanner scan = new Scanner(url.openStream());
+       	 	String trainOutput = new String();
+       	 	while (scan.hasNext()) {
+       	 		trainOutput += scan.nextLine();
+       	 	}
+       	 	scan.close();
+   	
+
+   	
+       	 	JSONObject output = new JSONObject(trainOutput);
+       	 	JSONArray etd = output.getJSONArray("etd");
+
+       	 	
+   	
+   	for (int i=0; i < etd.length(); i++) {
+   		JSONObject destinations = etd.getJSONObject(i);
+   		JSONArray times = destinations.getJSONArray("estimate");
+   	 	JSONObject info = times.getJSONObject(0);
+   	 	speechOutput += "The train going to " + destinations.getString("destination") + " leaves in " + info.getString("minutes") + " minutes from platform " + info.getString("platform") + ",";
+   	}
+        
+    }
+    else {
+        speechOutput =
+                "I'm not sure where your home is. You can say, my home is "
+                        + " ";
+    }
+   	PlainTextOutputSpeech outputSpeech = new PlainTextOutputSpeech();
+       outputSpeech.setText(speechOutput);
+
+       SimpleCard card = new SimpleCard();
+       card.setTitle("Train Times");
+       card.setContent(speechOutput);
+       //return getSpeechletResponse(speechOutput, speechOutput, true);
+       return SpeechletResponse.newTellResponse(outputSpeech, card);
+
+	}
     
 	/**
      * Creates a {@code SpeechletResponse} for the HelpIntent.
@@ -312,6 +451,30 @@ private SpeechletResponse getTrainTimes(Intent intent) throws IOException, JSONE
         return newAskResponse(speechOutput, false, repromptText, false);
     }
 
+    private SpeechletResponse getSpeechletResponse(String speechText, String repromptText,
+            boolean isAskResponse) {
+        // Create the Simple card content.
+        SimpleCard card = new SimpleCard();
+        card.setTitle("Session");
+        card.setContent(speechText);
+
+        // Create the plain text output.
+        PlainTextOutputSpeech speech = new PlainTextOutputSpeech();
+        speech.setText(speechText);
+
+        if (isAskResponse) {
+            // Create reprompt
+            PlainTextOutputSpeech repromptSpeech = new PlainTextOutputSpeech();
+            repromptSpeech.setText(repromptText);
+            Reprompt reprompt = new Reprompt();
+            reprompt.setOutputSpeech(repromptSpeech);
+
+            return SpeechletResponse.newAskResponse(speech, reprompt, card);
+
+        } else {
+            return SpeechletResponse.newTellResponse(speech, card);
+        }
+    }
     
     /**
      * Wrapper for creating the Ask response from the input strings.
