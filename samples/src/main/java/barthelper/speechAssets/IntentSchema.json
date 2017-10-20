@@ -19,6 +19,18 @@
     		" intent": "GetElevatorStatus"
     },
     {
+      "intent": "MystationIsIntent",
+      "slots": [
+        {
+         "name": "traincenter",
+          "type": "LIST_OF_STATIONS"
+        }
+      ]
+    },
+    {
+      "intent": "WhatsMystationIntent"
+    },
+    {
       "intent": "AMAZON.StopIntent"
     },
     {
@@ -26,3 +38,4 @@
     }
   ]
 }
+

@@ -13,6 +13,25 @@ import java.util.Scanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.amazon.speech.slu.Intent;
+import com.amazon.speech.slu.Slot;
+import com.amazon.speech.speechlet.IntentRequest;
+import com.amazon.speech.speechlet.LaunchRequest;
+import com.amazon.speech.speechlet.Session;
+import com.amazon.speech.speechlet.SessionEndedRequest;
+import com.amazon.speech.speechlet.SessionStartedRequest;
+import com.amazon.speech.speechlet.Speechlet;
+import com.amazon.speech.speechlet.SpeechletException;
+import com.amazon.speech.speechlet.SpeechletResponse;
+import com.amazon.speech.ui.PlainTextOutputSpeech;
+import com.amazon.speech.ui.Reprompt;
+import com.amazon.speech.ui.SimpleCard;
+import java.util.Map;
+
 import com.amazon.speech.slu.Intent;
 import com.amazon.speech.slu.Slot;
 import com.amazon.speech.speechlet.IntentRequest;
@@ -32,23 +51,7 @@ import com.amazonaws.util.json.JSONArray;
 import com.amazonaws.util.json.JSONException;
 import com.amazonaws.util.json.JSONObject;
 
-import minecrafthelper.Recipes;
 
-/**
- * This sample shows how to create a Lambda function for handling Alexa Skill
- * requests leverage an external API.
- * 
- * This Skill retrieves information about the Bay Area Rapid Transit (BART)
- * System.
- * 
- * Following could be an example of an interaction with Alexa:
- * 
- * <p>
- * User: "Alexa, ask BART Helper what the upcoming holidays are."
- * <p>
- * Alexa:"The upcoming 3 holidays are..."
- * 
- */
 
 public class BartHelperSpeechlet implements Speechlet {
 
@@ -69,6 +72,7 @@ public class BartHelperSpeechlet implements Speechlet {
 
 
 	private static final int MAX_HOLIDAYS = 3;
+   
 
 	@Override
 	public void onSessionStarted(final SessionStartedRequest request, final Session session) throws SpeechletException {
@@ -88,12 +92,15 @@ public class BartHelperSpeechlet implements Speechlet {
 	public SpeechletResponse onIntent(final IntentRequest request, final Session session) throws SpeechletException {
 		log.info("onIntent requestId={}, sessionId={}", request.getRequestId(), session.getSessionId());
 
-		Intent intent = request.getIntent();
-		String intentName = intent.getName();
-
-		if ("GetTrainTimesIntent".equals(intentName)) {
+		 Intent intent = request.getIntent();
+	      String intentName = (intent != null) ? intent.getName() : null;
+	           if ("MystationIsIntent".equals(intentName)) {
+	        		return setNameInSession(intent, session);
+	        	} 
+	      
+	        	else if ("GetTrainTimesIntent".equals(intentName)) {
 			try {
-				return GetTrainTimes(intent);
+				return GetTrainTimes(intent, session);
 			} catch (IOException e) {
 				log.error("Departure IO Error");
 				e.printStackTrace();
@@ -104,6 +111,7 @@ public class BartHelperSpeechlet implements Speechlet {
 				e.printStackTrace();
 				return getErrorResponse(intent);
 			}}
+	       
 			else if ("GetHolidaysIntent".equals(intentName)) {
 			try {
 				return getBARTHolidays(intent);
@@ -115,19 +123,20 @@ public class BartHelperSpeechlet implements Speechlet {
 				log.error("Holidays JSON Error");
 				e.printStackTrace();
 				return getErrorResponse(intent);
-			}
-		} else if ("GetElevatorStatus".equals(intentName)) {
-			try {
-				return getElevatorStatus(intent);
-			} catch (IOException e) {
-				log.error("Elevator IO Error");
-				e.printStackTrace();
-				return getErrorResponse(intent);
-			} catch (JSONException e) {
-				log.error("Elevator JSON Error");
-				e.printStackTrace();
-				return getErrorResponse(intent);
 			}}
+	      
+//		} else if ("GetElevatorStatus".equals(intentName)) {
+//			try {
+//				return getElevatorStatus(intent);
+//			} catch (IOException e) {
+//				log.error("Elevator IO Error");
+//				e.printStackTrace();
+//				return getErrorResponse(intent);
+//			} catch (JSONException e) {
+//				log.error("Elevator JSON Error");
+//				e.printStackTrace();
+//				return getErrorResponse(intent);
+//			}}
 		 
 		 else if ("AMAZON.HelpIntent".equals(intentName)) {
 			return getHelpResponse(intent);
@@ -138,8 +147,11 @@ public class BartHelperSpeechlet implements Speechlet {
 		} else {
 			throw new SpeechletException("Invalid Intent");
 		}
+		
+     
 
 	}
+	
 
 	@Override
 	public void onSessionEnded(final SessionEndedRequest request, final Session session) throws SpeechletException {
@@ -155,6 +167,10 @@ public class BartHelperSpeechlet implements Speechlet {
 	 *            intent for the request
 	 * @return SpeechletResponse spoken and visual response for the given intent
 	 */
+
+	    
+//	    private SpeechletResponse getNameFromSession(final Intent intent, final Session session) {
+//	       	    }
 	private SpeechletResponse getBARTHolidays(Intent intent) throws IOException, JSONException {
 
 		String command = "holiday";
@@ -223,52 +239,100 @@ public class BartHelperSpeechlet implements Speechlet {
 		return newAskResponse(speechOutput, false, repromptText, false);
 	}
 
-	private SpeechletResponse getElevatorStatus(Intent intent) throws IOException, JSONException {
+//	private SpeechletResponse getElevatorStatus(Intent intent) throws IOException, JSONException {
+//
+//		String command = "elev";
+//		String elevatorURL = URL_PREFIX2 + "key=" + API_KEY2 + "&cmd=" + command;
+//		log.info("BART elevators URL: " + elevatorURL);
+//
+//		URL url = new URL(elevatorURL);
+//		Scanner scan = new Scanner(url.openStream());
+//		String ElevOutput = new String();
+//		while (scan.hasNext()) {
+//			ElevOutput += scan.nextLine();
+//		}
+//		scan.close();
+//
+//		// build a JSON object
+//		JSONObject output = new JSONObject(ElevOutput);
+//
+//		// get the results
+//		JSONObject boot = output.getJSONObject("root");
+//
+//		JSONArray elevators = boot.getJSONArray("bsa");
+//
+//		JSONObject list = elevators.getJSONObject(0);
+//
+//		JSONArray elevatorList = list.getJSONArray("description");
+//
+//		String speechOutput = "The elevators that are out: " ;
+//		for (int i = 0; i < elevatorList.length(); i++) {
+//			JSONObject o = (JSONObject) elevatorList.get(i);
+//
+//			speechOutput = speechOutput + o.getString("#cdata-section") + ".";
+//		}
+//
+//		PlainTextOutputSpeech outputSpeech = new PlainTextOutputSpeech();
+//		outputSpeech.setText(speechOutput);
+//
+//		SimpleCard card = new SimpleCard();
+//		card.setTitle("Elevators Out");
+//		card.setContent(speechOutput);
+//
+//		return SpeechletResponse.newTellResponse(outputSpeech, card);
+//
+//	}
 
-		String command = "elev";
-		String elevatorURL = URL_PREFIX2 + "key=" + API_KEY2 + "&cmd=" + command;
-		log.info("BART elevators URL: " + elevatorURL);
+	  private SpeechletResponse setNameInSession(final Intent intent, final Session session) {
+	        // Get the slots from the intent.
+	        Map<String, Slot> slots = intent.getSlots();
 
-		URL url = new URL(elevatorURL);
-		Scanner scan = new Scanner(url.openStream());
-		String ElevOutput = new String();
-		while (scan.hasNext()) {
-			ElevOutput += scan.nextLine();
-		}
-		scan.close();
+	        // Get the color slot from the list of slots.
+	        Slot nameSlot = slots.get(ST_SLOT);
+	        String speechText, repromptText;
 
-		// build a JSON object
-		JSONObject output = new JSONObject(ElevOutput);
+	        // Check for favorite color and create output to user.
+	        if (nameSlot != null) {
+	            // Store the user's favorite color in the Session and create response.
+	            String name = nameSlot.getValue();
+	            session.setAttribute(ST_KEY, name);
+	            speechText =
+	                    String.format("I now know that your Station is %s. You can ask me your "
+	                            + "Station by saying, what's my Station?", name);
+	            repromptText =
+	                    "You can ask me your Station by saying, what's my Station?";
 
-		// get the results
-		JSONObject boot = output.getJSONObject("root");
+	        } else {
+	            // Render an error since we don't know what the users favorite color is.
+	            speechText = "I'm not sure what your Station is, please try again";
+	            repromptText =
+	                    "I'm not sure what your Station is. You can tell me your Station "
+	                            + "by saying, my Station is lafayette";
+	        }
 
-		JSONArray elevators = boot.getJSONArray("bsa");
+	        return getSpeechletResponse(speechText, repromptText, true);
+	    }
+	  private SpeechletResponse getNameFromSession(final Intent intent, final Session session) {
+	        String speechText;
+	        boolean isAskResponse = false;
 
-		JSONObject list = elevators.getJSONObject(0);
+	        // Get the user's favorite color from the session.
+	        String favoriteColor = (String) session.getAttribute(ST_KEY);
 
-		JSONArray elevatorList = list.getJSONArray("description");
+	        // Check to make sure user's favorite color is set in the session.
+	        if (StringUtils.isNotEmpty(favoriteColor)) {
+	            speechText = String.format("Your name is %s. Goodbye.", favoriteColor);
+	        } else {
+	            // Since the user's name is not set render an error message.
+	            speechText =
+	                    "I'm not sure what your name is. You can say, my name is "
+	                            + "Alexa";
+	            isAskResponse = true;
+	        }
 
-		String speechOutput = "The elevators that are out: " ;
-		for (int i = 0; i < elevatorList.length(); i++) {
-			JSONObject o = (JSONObject) elevatorList.get(i);
-
-			speechOutput = speechOutput + o.getString("#cdata-section") + ".";
-		}
-
-		PlainTextOutputSpeech outputSpeech = new PlainTextOutputSpeech();
-		outputSpeech.setText(speechOutput);
-
-		SimpleCard card = new SimpleCard();
-		card.setTitle("Elevators Out");
-		card.setContent(speechOutput);
-
-		return SpeechletResponse.newTellResponse(outputSpeech, card);
-
-	}
-
-
-	private SpeechletResponse GetTrainTimes(Intent intent) throws IOException, JSONException {
+	        return getSpeechletResponse(speechText, speechText, isAskResponse);
+	    }
+	private SpeechletResponse GetTrainTimes(Intent intent, final Session session) throws IOException, JSONException {
 
     
     	
@@ -326,15 +390,33 @@ public class BartHelperSpeechlet implements Speechlet {
 	     hash.put("west dublin pleasanton", "wdub");
 	     hash.put("west oakland", "woak");
 	     hash.put("civic center", "civc");
-	     
-	     
-     Slot itemSlot = intent.getSlot(ST_SLOT);
+	     Map<String, Slot> slots = intent.getSlots();
+
+	        // Get the color slot from the list of slots.
+	        Slot itemSlot = slots.get(ST_SLOT);
+
+	        // Check for favorite color and create output to user.
+	        if (itemSlot != null) {
+	            // Store the user's favorite color in the Session and create response.
+	            String namle = itemSlot.getValue();
+	            session.setAttribute(ST_KEY, namle);
+	            
+	        }
+
+
+	        // Get the user's favorite color from the session.
+	        String favoriteColor = (String) session.getAttribute(ST_KEY);
+
+	      
+
+    
      String itemName = "";
 	        if (itemSlot != null && itemSlot.getValue() != null) {
 	             itemName = itemSlot.getValue();
-	             command = hash.get(itemName);
+	             command = hash.get(favoriteColor);
 	             log.info("ItemName " + itemName);
 	             log.info("Command " + command);
+	           
 
 	        }
 
@@ -357,7 +439,6 @@ public class BartHelperSpeechlet implements Speechlet {
 		JSONArray name = etd.getJSONArray("etd");
 		
 
-//somehow traverse the file online to get what you need
 
 		JSONObject destination = name.getJSONObject(0);
 
@@ -397,6 +478,7 @@ public class BartHelperSpeechlet implements Speechlet {
 
 		return SpeechletResponse.newTellResponse(outputSpeech, card);
 
+	
 	
 	}
 	
@@ -474,6 +556,7 @@ public class BartHelperSpeechlet implements Speechlet {
 	 */
 	private SpeechletResponse newAskResponse(String stringOutput, boolean isOutputSsml, String repromptText,
 			boolean isRepromptSsml) {
+		
 		OutputSpeech outputSpeech, repromptOutputSpeech;
 		if (isOutputSsml) {
 			outputSpeech = new SsmlOutputSpeech();
@@ -493,6 +576,35 @@ public class BartHelperSpeechlet implements Speechlet {
 		Reprompt reprompt = new Reprompt();
 		reprompt.setOutputSpeech(repromptOutputSpeech);
 		return SpeechletResponse.newAskResponse(outputSpeech, reprompt);
-	}
 
+
+		}
+    private SpeechletResponse getSpeechletResponse(String speechText, String repromptText,
+            boolean isAskResponse) {
+        // Create the Simple card content.
+        SimpleCard card = new SimpleCard();
+        card.setTitle("Session");
+        card.setContent(speechText);
+
+        // Create the plain text output.
+        PlainTextOutputSpeech speech = new PlainTextOutputSpeech();
+        speech.setText(speechText);
+
+        if (isAskResponse) {
+            // Create reprompt
+            PlainTextOutputSpeech repromptSpeech = new PlainTextOutputSpeech();
+            repromptSpeech.setText(repromptText);
+            Reprompt reprompt = new Reprompt();
+            reprompt.setOutputSpeech(repromptSpeech);
+
+            return SpeechletResponse.newAskResponse(speech, reprompt, card);
+
+        } else {
+            return SpeechletResponse.newTellResponse(speech, card);
+        }
+    }
 }
+
+
+
+

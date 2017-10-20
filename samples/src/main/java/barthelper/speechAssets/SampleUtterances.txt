@@ -14,6 +14,13 @@ GetTrainTimesIntent what are the trains for {traincenter}
 GetTrainTimesIntent List the trains for {traincenter} 
 GetTrainTimesIntent List the trains from {traincenter} 
 GetTrainTimesIntent trains for {traincenter} 
-
-
-
+MystationIsIntent  my station is {traincenter}
+WhatsMystationIntent whats my station
+WhatsMystationIntent what is my station
+WhatsMystationIntent say my station
+WhatsMystationIntent tell me my station
+WhatsMystationIntent whats my station
+WhatsMystationIntent what is my station
+WhatsMystationIntent say my station
+WhatsMystationIntent tell me my station
+WhatsMystationIntent tell me what my station is

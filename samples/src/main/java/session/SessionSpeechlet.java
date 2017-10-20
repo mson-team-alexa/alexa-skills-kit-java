@@ -1,10 +1,7 @@
 /**
     Copyright 2014-2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-
     Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the License. A copy of the License is located at
-
         http://aws.amazon.com/apache2.0/
-
     or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
 package session;
@@ -38,6 +35,10 @@ public class SessionSpeechlet implements Speechlet {
 
     private static final String COLOR_KEY = "COLOR";
     private static final String COLOR_SLOT = "Color";
+    
+    private static final String NAME_SLOT = "Name";
+    private static final String NAME_KEY = "NAME";
+    
 
     @Override
     public void onSessionStarted(final SessionStartedRequest request, final Session session)
@@ -71,7 +72,11 @@ public class SessionSpeechlet implements Speechlet {
             return setColorInSession(intent, session);
         } else if ("WhatsMyColorIntent".equals(intentName)) {
             return getColorFromSession(intent, session);
-        } else {
+        } else if ("WhatsMyNameIntent".equals(intentName)) {
+        		return getNameFromSession(intent, session);
+        	} else if ("MyNameIsIntent".equals(intentName)) {
+        		return setNameInSession(intent, session);
+        	} else {
             throw new SpeechletException("Invalid Intent");
         }
     }
@@ -136,6 +141,57 @@ public class SessionSpeechlet implements Speechlet {
         }
 
         return getSpeechletResponse(speechText, repromptText, true);
+    }
+    
+    private SpeechletResponse setNameInSession(final Intent intent, final Session session) {
+        // Get the slots from the intent.
+        Map<String, Slot> slots = intent.getSlots();
+
+        // Get the color slot from the list of slots.
+        Slot nameSlot = slots.get(NAME_SLOT);
+        String speechText, repromptText;
+
+        // Check for favorite color and create output to user.
+        if (nameSlot != null) {
+            // Store the user's favorite color in the Session and create response.
+            String name = nameSlot.getValue();
+            session.setAttribute(NAME_KEY, name);
+            speechText =
+                    String.format("I now know that your name is %s. You can ask me your "
+                            + "name by saying, what's my name?", name);
+            repromptText =
+                    "You can ask me your name by saying, what's my name?";
+
+        } else {
+            // Render an error since we don't know what the users favorite color is.
+            speechText = "I'm not sure what your name is, please try again";
+            repromptText =
+                    "I'm not sure what your name is. You can tell me your name "
+                            + "by saying, my name is Alexa";
+        }
+
+        return getSpeechletResponse(speechText, repromptText, true);
+    }
+    
+    private SpeechletResponse getNameFromSession(final Intent intent, final Session session) {
+        String speechText;
+        boolean isAskResponse = false;
+
+        // Get the user's favorite color from the session.
+        String favoriteColor = (String) session.getAttribute(NAME_KEY);
+
+        // Check to make sure user's favorite color is set in the session.
+        if (StringUtils.isNotEmpty(favoriteColor)) {
+            speechText = String.format("Your name is %s. Goodbye.", favoriteColor);
+        } else {
+            // Since the user's name is not set render an error message.
+            speechText =
+                    "I'm not sure what your name is. You can say, my name is "
+                            + "Alexa";
+            isAskResponse = true;
+        }
+
+        return getSpeechletResponse(speechText, speechText, isAskResponse);
     }
 
     /**
