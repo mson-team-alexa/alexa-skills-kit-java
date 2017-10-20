@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,6 +54,10 @@ public class BartHelperSpeechlet implements Speechlet {
     private static final String STATION_SLOT = "Station";
     
     private static final int MAX_HOLIDAYS = 3;
+    
+    private static final String HOME_SLOT = "Home";
+    
+    private static final String HOME_KEY = "HOME";
 
     
 	HashMap<String, String> station_shortcodes = new HashMap<String, String>()
@@ -159,6 +164,20 @@ public class BartHelperSpeechlet implements Speechlet {
 				e.printStackTrace();
 				return getErrorResponse(intent);
 			}
+        } else if(("setHomeIntent").equals(intentName)) {
+        		return setHomeIntent(intent, session);
+        } else if(("getTrainTimesFromHomeIntent").equals(intentName)) {
+        		try {
+					return getTrainTimesFromHome(intent, session);
+				} catch (IOException e) {
+					log.error("Train Times IO Error");
+					e.printStackTrace();
+					return getErrorResponse(intent);
+				} catch (JSONException e) {
+					log.error("Train Times JSON Error");
+					e.printStackTrace();
+					return getErrorResponse(intent);
+				}
         } else if ("AMAZON.HelpIntent".equals(intentName)) {
             return getHelpResponse(intent);
         } else if ("AMAZON.StopIntent".equals(intentName)) {
@@ -235,6 +254,36 @@ public class BartHelperSpeechlet implements Speechlet {
     	
 	}
 	
+	private SpeechletResponse setHomeIntent(final Intent intent, final Session session) {
+        // Get the slots from the intent.
+        Map<String, Slot> slots = intent.getSlots();
+
+        // Get the color slot from the list of slots.
+        Slot homeSlot = slots.get(HOME_SLOT);
+        String speechText, repromptText;
+
+        // Check for favorite color and create output to user.
+        if (homeSlot != null) {
+            // Store the user's favorite color in the Session and create response.
+            String home = homeSlot.getValue();
+            session.setAttribute(HOME_KEY, home);
+            speechText =
+                    String.format("Your home station is now set to %s. You can now ask for directions from your home station.", home);
+            repromptText =
+                    "You can now ask for directions from your home station.";
+
+        } else {
+            // Render an error since we don't know what the users favorite color is.
+            speechText = "I'm not sure what your home station is. You can tell me your home station "
+                    + "by saying, set my home station to Ashby.";
+            repromptText =
+                    "I'm not sure what your home station is. You can tell me your home station "
+                            + "by saying, set my home station to Ashby.";
+        }
+
+        return getSpeechletResponse(speechText, repromptText, true);
+    }
+	
 private SpeechletResponse getBARTTrainTimes(Intent intent) throws IOException, JSONException {
     	
 	Slot itemSlot = intent.getSlot(STATION_SLOT);
@@ -286,6 +335,73 @@ private SpeechletResponse getBARTTrainTimes(Intent intent) throws IOException, J
     } else {
     	
     	speechOutput = "Sorry, I don't recognize that as a valid station name.";
+    	
+    	}
+    	
+    	PlainTextOutputSpeech outputSpeech = new PlainTextOutputSpeech();
+        outputSpeech.setText(speechOutput);
+
+        SimpleCard card = new SimpleCard();
+        card.setTitle("Upcoming Train Departures");
+        card.setContent(speechOutput);
+
+        return SpeechletResponse.newTellResponse(outputSpeech, card);
+    	
+	}
+	
+
+private SpeechletResponse getTrainTimesFromHome(Intent intent, Session session) throws IOException, JSONException {
+	
+	
+	String homeStation = (String) session.getAttribute(HOME_KEY);
+	
+	String speechOutput = "";
+    if (StringUtils.isNotEmpty(homeStation)) {
+    	
+        log.info("Home Station Name: " + homeStation);
+        String shortcode = station_shortcodes.get(homeStation.toLowerCase());
+  
+        String trainTimesURL = "http://bartjsonapi.elasticbeanstalk.com/api/departures/" + shortcode;
+    	
+        log.info("BART Train Times URL: " + trainTimesURL);
+    	
+        URL url = new URL(trainTimesURL);
+        Scanner scan = new Scanner(url.openStream());
+        String trainTimesOutput = new String();
+	    	while (scan.hasNext()) {
+	    		trainTimesOutput += scan.nextLine();
+	    	}
+	    	scan.close();
+    	
+	    	// build a JSON object
+	    	JSONObject output = new JSONObject(trainTimesOutput);
+    	
+	    	//get the results
+	    	JSONArray etd = output.getJSONArray("etd");
+	    	
+	    
+	    for(int i=0; i < etd.length(); i++) {
+	    	JSONObject train = etd.getJSONObject(i);
+	    	String destination = train.getString("destination");
+	    	JSONArray departures = train.getJSONArray("estimate");
+	    	JSONObject train_info = departures.getJSONObject(0);
+	    	String time_till_departure = train_info.getString("minutes");
+	    	
+	    	if (time_till_departure == "Leaving") {
+	    		train_info = departures.getJSONObject(1);
+	    		time_till_departure = train_info.getString("minutes");
+	    	}
+	    	
+	    	String platform = train_info.getString("platform");
+	    	
+	    speechOutput = speechOutput + " The train going to " + destination + " leaves in " + time_till_departure + " minutes from platform " + platform + ".";
+	    	
+	    };
+	    
+    } else {
+    	
+    	
+    	return setHomeIntent(intent, session);
     	
     	}
     	
@@ -406,6 +522,36 @@ private SpeechletResponse getBARTTrainTimes(Intent intent) throws IOException, J
         Reprompt reprompt = new Reprompt();
         reprompt.setOutputSpeech(repromptOutputSpeech);
         return SpeechletResponse.newAskResponse(outputSpeech, reprompt);
+    }
+    
+    private SpeechletResponse getSpeechletResponse(String speechText, String repromptText,
+            boolean isAskResponse) {
+        // Create the Simple card content.
+        SimpleCard card = new SimpleCard();
+        card.setTitle("Session");
+        card.setContent(speechText);
+
+        // Create the plain text output.
+        PlainTextOutputSpeech speech = new PlainTextOutputSpeech();
+        speech.setText(speechText);
+
+        if (isAskResponse) {
+            // Create reprompt
+            PlainTextOutputSpeech repromptSpeech = new PlainTextOutputSpeech();
+            repromptSpeech.setText(repromptText);
+            Reprompt reprompt = new Reprompt();
+            reprompt.setOutputSpeech(repromptSpeech);
+
+            return SpeechletResponse.newAskResponse(speech, reprompt, card);
+
+        } else {
+            //return SpeechletResponse.newTellResponse(speech, card);
+            PlainTextOutputSpeech repromptSpeech = new PlainTextOutputSpeech();
+            repromptSpeech.setText("");
+	        	Reprompt reprompt = new Reprompt();
+	        	reprompt.setOutputSpeech(repromptSpeech);
+	        	return SpeechletResponse.newAskResponse(speech, reprompt, card);
+        }
     }
 
 }
