@@ -157,7 +157,7 @@ public class BartHelperSpeechlet implements Speechlet {
         String myHome = (String) session.getAttribute(HOME_KEY);
 
         if (StringUtils.isNotEmpty(myHome)) {
-            speechText = String.format("Your home is near %s.", myHome);
+            speechText = String.format("Your home station is %s.", myHome);
             Home = myHome;
             isAskResponse = true;
         } else {
@@ -182,16 +182,16 @@ public class BartHelperSpeechlet implements Speechlet {
             String myHome = myHomeSlot.getValue();
             session.setAttribute(HOME_KEY, myHome);
             speechText =
-                    String.format("I now know that your your home is near %s. You can ask me the location "
+                    String.format("I now know that your home station %s. You can ask me the location "
                             + "of your home by saying, where's my home", myHome);
             repromptText =
                     "You can ask me where your home is by saying, where's my home?";
 
         } else {
 
-            speechText = "I'm not sure where your home is, please try again";
+            speechText = "I'm not sure where your home station is, please try again";
             repromptText =
-                    "I'm not sure where your home is. You can tell me "
+                    "I'm not sure where your home station is. You can tell me "
                             + "by saying, my home is ";
         }
 
@@ -316,24 +316,14 @@ private SpeechletResponse getTrainTimes(Intent intent) throws IOException, JSONE
 	}
 
 private SpeechletResponse getTrainTimesFromHome(final Intent intent, final Session session) throws IOException, JSONException {
-	//String speechText;
-    //boolean isAskResponse = false;
+
     String speechOutput = "";
 
     String myHome = (String) session.getAttribute(HOME_KEY);
 
     if (StringUtils.isNotEmpty(myHome)) {
-        speechOutput = String.format("Your home is near %s.", myHome);
-        //isAskResponse = true;
-    
-
-    
-	
-	
-	/* Slot stationsSlot = intent.getSlot(STATION_NAMES);
-    if (stationsSlot != null &&stationsSlot.getValue() != null) {
-        String stationName = stationsSlot.getValue();
-    */
+        speechOutput = String.format("Your home station is %s", myHome);
+   
   
         	String station = Stations.get(myHome);
     
@@ -375,7 +365,6 @@ private SpeechletResponse getTrainTimesFromHome(final Intent intent, final Sessi
        SimpleCard card = new SimpleCard();
        card.setTitle("Train Times");
        card.setContent(speechOutput);
-       //return getSpeechletResponse(speechOutput, speechOutput, true);
        return SpeechletResponse.newTellResponse(outputSpeech, card);
 
 	}
