@@ -8,19 +8,12 @@ GetHolidaysIntent what the upcoming holidays are
 GetHolidaysIntent what the holidays are
 GetElevatorStatus what elevators are out
 GetElevatorStatus which elevators are out
-GetTrainTimesIntent when are the trains from {traincenter} 
-GetTrainTimesIntent which trains are leaving from {traincenter} 
-GetTrainTimesIntent what are the trains for {traincenter} 
-GetTrainTimesIntent List the trains for {traincenter} 
-GetTrainTimesIntent List the trains from {traincenter} 
-GetTrainTimesIntent trains for {traincenter} 
-MystationIsIntent  my station is {traincenter}
-WhatsMystationIntent whats my station
-WhatsMystationIntent what is my station
-WhatsMystationIntent say my station
-WhatsMystationIntent tell me my station
-WhatsMystationIntent whats my station
-WhatsMystationIntent what is my station
-WhatsMystationIntent say my station
-WhatsMystationIntent tell me my station
-WhatsMystationIntent tell me what my station is
+GetTrainTimesIntent when are the trains from 
+GetTrainTimesIntent which trains are leaving from 
+GetTrainTimesIntent what are the trains for  
+GetTrainTimesIntent List the trains for 
+GetTrainTimesIntent List the trains from 
+GetTrainTimesIntent trains for {traincenter}
+MyStationIsIntent my station is {traincenter}
+WhatsMyStationIntent what is my station
+

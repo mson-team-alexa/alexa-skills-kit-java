@@ -88,31 +88,19 @@ public class BartHelperSpeechlet implements Speechlet {
 		return getWelcomeResponse();
 	}
 
+
+
 	@Override
 	public SpeechletResponse onIntent(final IntentRequest request, final Session session) throws SpeechletException {
 		log.info("onIntent requestId={}, sessionId={}", request.getRequestId(), session.getSessionId());
 
 		 Intent intent = request.getIntent();
 	      String intentName = (intent != null) ? intent.getName() : null;
-	           if ("MystationIsIntent".equals(intentName)) {
-	        		return setNameInSession(intent, session);
-	        	} 
 	      
-	        	else if ("GetTrainTimesIntent".equals(intentName)) {
-			try {
-				return GetTrainTimes(intent, session);
-			} catch (IOException e) {
-				log.error("Departure IO Error");
-				e.printStackTrace();
-				return getErrorResponse(intent);
-			} catch (JSONException e) {
-				log.error("Departure JSON Error");
-				System.out.println(URL_PREFIX3);
-				e.printStackTrace();
-				return getErrorResponse(intent);
-			}}
+	    		
+	    	
 	       
-			else if ("GetHolidaysIntent".equals(intentName)) {
+			 if ("GetHolidaysIntent".equals(intentName)) {
 			try {
 				return getBARTHolidays(intent);
 			} catch (IOException e) {
@@ -137,6 +125,25 @@ public class BartHelperSpeechlet implements Speechlet {
 //				e.printStackTrace();
 //				return getErrorResponse(intent);
 //			}}
+			 if ("WhatsMyStationIntent".equals(intentName)) {
+		    	    return getStationFromSession(intent, session);
+		    	} else if ("MyStationIsIntent".equals(intentName)) {
+		    	    return setStationInSession(intent, session);
+		    	} else if ("GetTrainTimesIntent".equals(intentName)) {
+		    		try {
+		    				return GetTrainTimes(intent);
+		    			} catch (IOException e) {
+		    				log.error("Train Times IO Error");
+		    				e.printStackTrace();
+		    				return getErrorResponse(intent);
+		    			} catch (JSONException e) {
+		    				log.error("Train Times JSON Error");
+		    				e.printStackTrace();
+		    				return getErrorResponse(intent);
+		    			}
+		    	}
+
+		   
 		 
 		 else if ("AMAZON.HelpIntent".equals(intentName)) {
 			return getHelpResponse(intent);
@@ -283,56 +290,66 @@ public class BartHelperSpeechlet implements Speechlet {
 //
 //	}
 
-	  private SpeechletResponse setNameInSession(final Intent intent, final Session session) {
-	        // Get the slots from the intent.
-	        Map<String, Slot> slots = intent.getSlots();
-
-	        // Get the color slot from the list of slots.
-	        Slot nameSlot = slots.get(ST_SLOT);
-	        String speechText, repromptText;
-
-	        // Check for favorite color and create output to user.
-	        if (nameSlot != null) {
-	            // Store the user's favorite color in the Session and create response.
-	            String name = nameSlot.getValue();
-	            session.setAttribute(ST_KEY, name);
-	            speechText =
-	                    String.format("I now know that your Station is %s. You can ask me your "
-	                            + "Station by saying, what's my Station?", name);
-	            repromptText =
-	                    "You can ask me your Station by saying, what's my Station?";
-
-	        } else {
-	            // Render an error since we don't know what the users favorite color is.
-	            speechText = "I'm not sure what your Station is, please try again";
-	            repromptText =
-	                    "I'm not sure what your Station is. You can tell me your Station "
-	                            + "by saying, my Station is lafayette";
-	        }
-
-	        return getSpeechletResponse(speechText, repromptText, true);
+	private SpeechletResponse setStationInSession(final Intent intent, final Session session) {
+	    // Get the slots from the intent.
+	    Map<String, Slot> slots = intent.getSlots();
+	
+	    // Get the station slot from the list of slots.
+	    Slot myStationSlot = slots.get(ST_SLOT);
+	    String speechText, repromptText;
+	
+	    // Check for station and create output to user.
+	    if (myStationSlot != null) {
+	        // Store the user's station in the Session and create response.
+	        String myStation = myStationSlot.getValue();
+	        session.setAttribute(ST_KEY, myStation);
+	        speechText =
+	                String.format("I now know that your station is %s. You can ask me your "
+	                        + "station by saying, what's my station?", myStation);
+	        repromptText =
+	                "You can ask me your station by saying, what's my station?";
+	
+	    } else {
+	        // Render an error since we don't know what the users favorite color is.
+	        speechText = "I'm not sure what your station is, please try again";
+	        repromptText =
+	                "I'm not sure what your station is. You can tell me your "
+	                        + "station by saying, my station is Civic Center";
 	    }
-	  private SpeechletResponse getNameFromSession(final Intent intent, final Session session) {
-	        String speechText;
-	        boolean isAskResponse = false;
+	
+	    return getSpeechletResponse(speechText, repromptText, true);
+	}
 
-	        // Get the user's favorite color from the session.
-	        String favoriteColor = (String) session.getAttribute(ST_KEY);
+	String myStation = "";
+	private SpeechletResponse getStationFromSession(final Intent intent, final Session session) {
+       String speechText;
+       boolean isAskResponse = false;
 
-	        // Check to make sure user's favorite color is set in the session.
-	        if (StringUtils.isNotEmpty(favoriteColor)) {
-	            speechText = String.format("Your name is %s. Goodbye.", favoriteColor);
-	        } else {
-	            // Since the user's name is not set render an error message.
-	            speechText =
-	                    "I'm not sure what your name is. You can say, my name is "
-	                            + "Alexa";
-	            isAskResponse = true;
-	        }
 
-	        return getSpeechletResponse(speechText, speechText, isAskResponse);
-	    }
-	private SpeechletResponse GetTrainTimes(Intent intent, final Session session) throws IOException, JSONException {
+
+       // Get the user's station from the session.
+        myStation = (String) session.getAttribute(ST_KEY);
+
+
+
+       // Check to make sure user's station is set in the session.
+       if (StringUtils.isNotEmpty(myStation)) {
+           speechText = String.format("Your station is %s. Goodbye.", myStation);
+       } else {
+           // Since the user's station is not set render an error message.
+           speechText =
+                   "I'm not sure what your station is. You can say, my station is "
+                           + "lafayette";
+           isAskResponse = true;
+       }
+
+
+
+       return getSpeechletResponse(speechText, speechText, isAskResponse);
+   }
+
+
+	private SpeechletResponse GetTrainTimes(Intent intent ) throws IOException, JSONException {
 
     
     	
@@ -396,16 +413,13 @@ public class BartHelperSpeechlet implements Speechlet {
 	        Slot itemSlot = slots.get(ST_SLOT);
 
 	        // Check for favorite color and create output to user.
-	        if (itemSlot != null) {
-	            // Store the user's favorite color in the Session and create response.
-	            String namle = itemSlot.getValue();
-	            session.setAttribute(ST_KEY, namle);
+	    
 	            
-	        }
+	        
 
 
 	        // Get the user's favorite color from the session.
-	        String favoriteColor = (String) session.getAttribute(ST_KEY);
+	        
 
 	      
 
@@ -413,9 +427,10 @@ public class BartHelperSpeechlet implements Speechlet {
      String itemName = "";
 	        if (itemSlot != null && itemSlot.getValue() != null) {
 	             itemName = itemSlot.getValue();
-	             command = hash.get(favoriteColor);
+	             command = hash.get(itemName);
 	             log.info("ItemName " + itemName);
 	             log.info("Command " + command);
+	             log.info("stat: "+ myStation);
 	           
 
 	        }

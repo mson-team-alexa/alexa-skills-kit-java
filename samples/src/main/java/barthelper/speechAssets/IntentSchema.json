@@ -6,30 +6,34 @@
     {
       "intent": "AMAZON.HelpIntent"
     },
-    {
-    	"intent": "GetTrainTimesIntent",
-    "slots": [
-        {
-          "name": "traincenter",
-          "type": "LIST_OF_STATIONS"
-        }
-      ]
-      },
+   
     {
     		" intent": "GetElevatorStatus"
     },
+    
     {
-      "intent": "MystationIsIntent",
-      "slots": [
-        {
+     "intent": "WhatsMyStationIntent"
+   },
+   {
+     "intent": "MyStationIsIntent",
+     "slots": [
+       {
          "name": "traincenter",
-          "type": "LIST_OF_STATIONS"
-        }
-      ]
-    },
-    {
-      "intent": "WhatsMystationIntent"
-    },
+         "type": "LIST_OF_STATIONS"
+       }
+     ]
+   },
+   {
+     "intent": "GetTrainTimesIntent",
+     "slots": [
+       {
+         "name": "traincenter",
+         "type": "LIST_OF_STATIONS"
+       }
+     ]
+   },
+ 
+    
     {
       "intent": "AMAZON.StopIntent"
     },
@@ -39,3 +43,6 @@
   ]
 }
 
+
+
+   
