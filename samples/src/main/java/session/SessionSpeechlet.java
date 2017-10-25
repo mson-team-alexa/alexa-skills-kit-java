@@ -1,5 +1,5 @@
 /**
-    Copyright 2014-2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+                             Copyright 2014-2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
     Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the License. A copy of the License is located at
 
@@ -40,7 +40,7 @@ public class SessionSpeechlet implements Speechlet {
 	private static final String COLOR_SLOT = "Color";
 
 	private static final String LANG_KEY = "LANG";
-	private static final String LANG_SLOT = "Lang";
+	private static final String LANG_SLOT = "Language";
 
 	@Override
 	public void onSessionStarted(final SessionStartedRequest request, final Session session) throws SpeechletException {
@@ -72,11 +72,13 @@ public class SessionSpeechlet implements Speechlet {
             return getColorFromSession(intent, session);   
         } else if ("MyLangIsIntent".equals(intentName)) {
             return setLangInSession(intent, session); 
+        } else if ("WhatsMyLangIntent".equals(intentName)){ 
+        	return getLangFromSession(intent, session);
         }else {
             throw new SpeechletException("Invalid Intent");
+            }
         }
-        }//else if ("WhatsMyLangIntent".equals(intentName)) {
-                //return getLangFromSession(intent, session);
+        
        
         
         
@@ -145,6 +147,7 @@ public class SessionSpeechlet implements Speechlet {
 		Slot favoriteLangSlot = slots.get(LANG_SLOT);
 		String speechText, repromptText;
 
+		log.info("favoriteLangSlot: " + favoriteLangSlot);
 		// Check for favorite color and create output to user.
 		if (favoriteLangSlot != null) {
 			// Store the user's favorite color in the Session and create response.
@@ -191,15 +194,15 @@ public class SessionSpeechlet implements Speechlet {
 		return getSpeechletResponse(speechText, speechText, isAskResponse);
 	}
 
-	//private SpeechletResponse getLangFromSession(final Intent intent, final Session session) {
-		//String speechText;
-		//boolean isAskRespons = false;
+	private SpeechletResponse getLangFromSession(final Intent intent, final Session session) {
+		String speechText;
+		boolean isAskResponse = false;
 
-		// Get the user's favorite color from the session.
-		//String Lang = (String) session.getAttribute(LANG_KEY);
+		//Get the user's favorite color from the session.
+		String favoriteLang = (String) session.getAttribute(LANG_KEY);
 
-		// Check to make sure user's favorite color is set in the session.
-		/*if (StringUtils.isNotEmpty(favoriteLang)) {
+		//Check to make sure user's favorite color is set in the session.
+		if (StringUtils.isNotEmpty(favoriteLang)) {
 			speechText = String.format("Your favorite color is %s. Goodbye.", favoriteLang);
 		} else {
 			// Since the user's favorite color is not set render an error message.
