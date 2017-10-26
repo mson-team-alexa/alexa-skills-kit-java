@@ -72,7 +72,6 @@ public class SpaceGeekSpeechlet implements Speechlet {
         return getNewFactResponse();
     }
 
-	
     @Override
     public SpeechletResponse onIntent(final IntentRequest request, final Session session)
             throws SpeechletException {
