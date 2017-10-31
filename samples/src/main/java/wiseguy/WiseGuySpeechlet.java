@@ -94,6 +94,7 @@ public class WiseGuySpeechlet implements Speechlet {
         JOKE_LIST.add(new Joke("Atch", "I didn't know you had a cold!", "I didn't know you had a cold!"));
         JOKE_LIST.add(new Joke("Owls", "Yes, they do.", "Yes, they do."));
         JOKE_LIST.add(new Joke("Berry", "Berry nice to meet you.", "Berry nice to meet you."));
+        JOKE_LIST.add(new Joke("Cows go", "no silly cows go <break time=\"0.3s\" />moo.", "no silly cows go moo"));
     }
 
     @Override
@@ -195,7 +196,7 @@ public class WiseGuySpeechlet implements Speechlet {
         String repromptText = "You can ask, who's there";
 
         // / Select a random joke and store it in the session variables
-        int jokeID = (int) Math.floor(Math.random() * JOKE_LIST.size());
+       int jokeID = (int) Math.floor(Math.random() * JOKE_LIST.size());
 
         // The stage variable tracks the phase of the dialogue.
         // When this function completes, it will be on stage 1.
