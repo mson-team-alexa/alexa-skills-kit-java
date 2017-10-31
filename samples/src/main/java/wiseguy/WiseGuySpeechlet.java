@@ -61,6 +61,8 @@ public class WiseGuySpeechlet implements Speechlet {
     /**
      * Session attribute to store the stage the joke is at.
      */
+    private static final String SESSION_LIM = "lim";
+    
     private static final String SESSION_STAGE = "stage";
 
     /**
@@ -125,7 +127,10 @@ public class WiseGuySpeechlet implements Speechlet {
 
         if ("TellMeAJokeIntent".equals(intentName)) {
             return handleTellMeAJokeIntent(session);
-        } else if ("WhosThereIntent".equals(intentName)) {
+        } else if ("TellMeALimIntent".equals(intentName)) {
+        		return handleTellMeALimIntent(session);
+        }
+        else if ("WhosThereIntent".equals(intentName)) {
             return handleWhosThereIntent(session);
         } else if ("SetupNameWhoIntent".equals(intentName)) {
             return handleSetupNameWhoIntent(session);
@@ -295,7 +300,7 @@ public class WiseGuySpeechlet implements Speechlet {
             }
         } else {
             speechOutput =
-                    "Sorry, I couldn't correctly retrieve the joke. You can say, tell me a joke";
+                    "Sorry, I couldn't correctly retrieve the joke. You can say, tell me a joke or tell me a limerick";
             repromptText = "You can say, tell me a joke";
             card.setContent(speechOutput);
             SpeechletResponse response = newAskResponse(speechOutput, false,
@@ -303,8 +308,30 @@ public class WiseGuySpeechlet implements Speechlet {
             response.setCard(card);
             return response;
         }
-    }
+  }
 
+    private SpeechletResponse handleTellMeALimIntent (final Session session) {
+    		
+    		String speechOutput = " A painter, who lived in Great Britain,\n" + 
+    				"Interrupted two girls with their knittin'\n" + 
+    				"He said, with a sigh,\n" + 
+    				"\"That park bench--well I\n" + 
+    				"Just painted it, right where you're sittin.'\"" /* || 
+    				"A silly young man from Clyde \n "
+    				"In a funeral procession was spied; \n"
+    				"When asked, Who is dead? \n"
+    				"He giggled and said, \n"
+    				"I dont know; I just came for the ride." */ ;
+    
+    		SimpleCard card = new SimpleCard();
+            card.setTitle("Wise Guy");
+            PlainTextOutputSpeech outputSpeech = new PlainTextOutputSpeech();
+            outputSpeech.setText(speechOutput);
+    		card.setContent(speechOutput);
+    		 return SpeechletResponse.newTellResponse(outputSpeech);
+    		 
+    }
+    		
     /**
      * Wrapper for creating the Ask response from the input strings.
      * 
