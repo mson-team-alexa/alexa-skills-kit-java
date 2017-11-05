@@ -68,10 +68,9 @@ public class MinecraftSpeechlet implements Speechlet {
                 session.getSessionId());
 
         String speechOutput =
-                "Welcome to the Minecraft Helper. You can ask a question like, "
-                        + "what's the recipe for a chest?  or How can I make a time machine..." 
-                	       + "I have also been upgraded with a new feature... " 
-                        + "I can tell you some of those cheats and console commands, too." 
+                "Welcome to the Minecraft Helper. Here you can ask for a recipe for an object that you would craft. You can ask a question like, "
+                        + "what's the recipe for dirt?  or How can I make a time machine..." 
+                	  
                 	       +" Now, what can I help you with?";
         // If the user either does not reply to the welcome message or says
         // something that is not understood, they will be prompted again with this text.
@@ -103,9 +102,12 @@ public class MinecraftSpeechlet implements Speechlet {
             return getHelp();
         } else if ("AMAZON.StopIntent".equals(intentName)) {
             PlainTextOutputSpeech outputSpeech = new PlainTextOutputSpeech();
-            outputSpeech.setText("Goodbye");
+            outputSpeech.setText("Would you like to ask another question?");
+            
 
             return SpeechletResponse.newTellResponse(outputSpeech);
+
+          
         } else if ("AMAZON.CancelIntent".equals(intentName)) {
             PlainTextOutputSpeech outputSpeech = new PlainTextOutputSpeech();
             outputSpeech.setText("Goodbye");
@@ -148,8 +150,13 @@ public class MinecraftSpeechlet implements Speechlet {
                 SimpleCard card = new SimpleCard();
                 card.setTitle("Recipe for " + itemName);
                 card.setContent(recipe);
+                PlainTextOutputSpeech repromptOutputSpeech = new PlainTextOutputSpeech();
+                repromptOutputSpeech.setText("Would you like to ask another question or say cancel");
+                Reprompt reprompt = new Reprompt();
+                reprompt.setOutputSpeech(repromptOutputSpeech);
 
-                return SpeechletResponse.newTellResponse(outputSpeech, card);
+                return SpeechletResponse.newAskResponse(outputSpeech, reprompt,card);
+
             } else {
                 // We don't have a recipe, so keep the session open and ask the user for another
                 // item.

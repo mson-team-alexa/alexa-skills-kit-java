@@ -94,8 +94,30 @@ public class WiseGuySpeechlet implements Speechlet {
         JOKE_LIST.add(new Joke("Atch", "I didn't know you had a cold!", "I didn't know you had a cold!"));
         JOKE_LIST.add(new Joke("Owls", "Yes, they do.", "Yes, they do."));
         JOKE_LIST.add(new Joke("Berry", "Berry nice to meet you.", "Berry nice to meet you."));
-    }
+        JOKE_LIST.add(new Joke("Cows go", "No, silly. Cows go <break time=\"0.5s\" /> moo <break time=\"0.5s\" />.", "No, silly. Cows go moo."));
 
+    }
+    private static final ArrayList<CJoke> CJokeL = new ArrayList<CJoke>();
+    static {
+        CJokeL.add(new CJoke("A guy walks into a bar and asks for 1.014 root beers " + 
+        		"The bartender says, “I’ll have to charge you extra, that’s a root beer float”"
+        		+ "So the guy says, “In that case, better make it a double.”"));
+    }
+    private static final ArrayList<CJoke> story = new ArrayList<CJoke>();
+    static {
+        story.add(new CJoke("<emphasis level=\"moderate\"> A Fox one day spied a beautiful bunch of ripe grapes hanging from a vine trained along the branches of a tree. The grapes seemed ready to burst with juice, and the Fox's mouth watered as he gazed longingly at them.\n" + 
+        		"\n" + 
+        		" The bunch hung from a high branch, and the Fox had to jump for it. The first time he jumped he missed it by a long way. So he walked off a short distance and took a running leap at it, only to fall short once more. Again and again he tried, but in vain.\n" + 
+        		"\n" + 
+        		"    Now he sat down and looked at the grapes in disgust.\n" + 
+        		"\n" + 
+        		"    \"What a fool I am,\" he said. \"Here I am wearing myself out to get a bunch of sour grapes that are not worth gaping for.\"\n" + 
+        		"\n" + 
+        		"    And off he walked very, very scornfully. </emphasis>"
+     + "<emphasis level=\"strong\">There are many who pretend to despise and belittle that which is beyond their reach.</emphasis>"));
+    }
+    
+ 
     @Override
     public void onSessionStarted(final SessionStartedRequest request, final Session session)
             throws SpeechletException {
@@ -125,9 +147,17 @@ public class WiseGuySpeechlet implements Speechlet {
 
         if ("TellMeAJokeIntent".equals(intentName)) {
             return handleTellMeAJokeIntent(session);
-        } else if ("WhosThereIntent".equals(intentName)) {
+        } 
+        
+        else  if ("TellMeTheFoxIntent".equals(intentName)) {
+            return handleTellMeFoxIntent(session);}
+        else  if ("TellMeAJokeLIntent".equals(intentName)) {
+            return handleTellMeAJokeLIntent(session);}
+        else if ("WhosThereIntent".equals(intentName)) {
             return handleWhosThereIntent(session);
-        } else if ("SetupNameWhoIntent".equals(intentName)) {
+            
+        }
+        else if ("SetupNameWhoIntent".equals(intentName)) {
             return handleSetupNameWhoIntent(session);
         } else if ("AMAZON.HelpIntent".equals(intentName)) {
             String speechOutput = "";
@@ -195,7 +225,7 @@ public class WiseGuySpeechlet implements Speechlet {
         String repromptText = "You can ask, who's there";
 
         // / Select a random joke and store it in the session variables
-        int jokeID = (int) Math.floor(Math.random() * JOKE_LIST.size());
+       int jokeID =11; //(int) Math.floor(Math.random() * JOKE_LIST.size());
 
         // The stage variable tracks the phase of the dialogue.
         // When this function completes, it will be on stage 1.
@@ -213,7 +243,61 @@ public class WiseGuySpeechlet implements Speechlet {
         response.setCard(card);
         return response;
     }
+    private SpeechletResponse handleTellMeAJokeLIntent(final Session session) {
+        String speechOutput = "";
 
+        String repromptText = "You can say, whats another joke";
+
+
+        // The stage variable tracks the phase of the dialogue.
+        // When this function completes, it will be on stage 1.
+        speechOutput = "A guy walks into a bar and asks for 1.014 root beers.\n" + 
+        		"The bartender says, “I’ll have to charge you extra, that’s a root beer float”.\n" + 
+        		"So the guy says, “In that case, better make it a double.”";
+
+        // Create the Simple card content.
+        SimpleCard card = new SimpleCard();
+        card.setTitle("Wise Guy");
+        card.setContent(speechOutput);
+
+        SpeechletResponse response = newAskResponse(speechOutput, false,
+                repromptText, false);
+        response.setCard(card);
+        return response;
+    }
+    private SpeechletResponse handleTellMeFoxIntent(final Session session) {
+        String speechOutput = "";
+        String speechOutput1 = "";
+
+        String repromptText = "You can say,tell me the story";
+
+
+        // The stage variable tracks the phase of the dialogue.
+        // When this function completes, it will be on stage 1.
+       
+        speechOutput = "A Fox one day spied a beautiful bunch of ripe grapes hanging from a vine trained along the branches of a tree. The grapes seemed ready to burst with juice, and the Fox's mouth watered as he gazed longingly at them.\n" + 
+        		"\n" + 
+        		"The bunch hung from a high branch, and the Fox had to jump for it. The first time he jumped he missed it by a long way. So he walked off a short distance and took a running leap at it, only to fall short once more. Again and again he tried, but in vain.\n" + 
+        		"\n" + 
+        		"Now he sat down and looked at the grapes in disgust.\n" + 
+        		"\n" + 
+        		"\"What a fool I am,\" he said. \"Here I am wearing myself out to get a bunch of sour grapes that are not worth gaping for.\"\n" + 
+        		"\n" + 
+        		"And off he walked very, very scornfully.";
+        
+         speechOutput1 = "There are many who pretend to despise and belittle that which is beyond their reach.";
+
+SsmlOutputSpeech  outputSpeech = new SsmlOutputSpeech();
+outputSpeech.setSsml("<speak><emphasis = \"moderate\">" + speechOutput + "</emphasis></speak>");
+
+        // Create the Simple card content.
+        SimpleCard card = new SimpleCard();
+        card.setTitle("Wise Guy");
+        card.setContent(speechOutput);
+
+        return SpeechletResponse.newTellResponse(outputSpeech, card);
+
+    }
     /**
      * Responds to the user saying "Who's there".
      *
@@ -351,6 +435,15 @@ public class WiseGuySpeechlet implements Speechlet {
             this.setup = setup;
             this.speechPunchline = speechPunchline;
             this.cardPunchline = cardPunchline;
+        }
+    }
+    private static class CJoke {
+
+        private final String speechPunchlinea;
+       
+
+        CJoke( String speechPunchline) {
+            this.speechPunchlinea = speechPunchline;
         }
     }
 }

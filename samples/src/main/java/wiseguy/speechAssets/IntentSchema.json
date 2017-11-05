@@ -3,8 +3,14 @@
     {
       "intent": "TellMeAJokeIntent"
     },
+     {
+      "intent": "TellMeAJokeLIntent"
+    },
     {
       "intent": "WhosThereIntent"
+    },
+    {
+      "intent": "TellMeTheFoxIntent"
     },
     {
       "intent": "SetupNameWhoIntent",

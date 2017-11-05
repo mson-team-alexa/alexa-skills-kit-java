@@ -24,9 +24,11 @@ TellMeAJokeIntent if it can tell me a knock knock joke
 TellMeAJokeIntent will it tell me a knock knock joke
 TellMeAJokeIntent can it tell me a knock knock joke
 TellMeAJokeIntent to tell me a knock knock joke
-
+TellMeAJokeLIntent tell me a nerdy joke
+TellMeTheFoxIntent tell me the story The Fox and The Grapes
 WhosThereIntent who is there
 WhosThereIntent who's there
+WhosThereIntent who's there?
 WhosThereIntent who there
 WhosThereIntent who is this
 WhosThereIntent who's this
