@@ -38,6 +38,9 @@ public class SessionSpeechlet implements Speechlet {
 
     private static final String COLOR_KEY = "COLOR";
     private static final String COLOR_SLOT = "Color";
+    
+    private static final String FLOWER_KEY = "FLOWER";
+    private static final String FLOWER_SLOT = "Flower";
 
     @Override
     public void onSessionStarted(final SessionStartedRequest request, final Session session)
@@ -71,6 +74,10 @@ public class SessionSpeechlet implements Speechlet {
             return setColorInSession(intent, session);
         } else if ("WhatsMyColorIntent".equals(intentName)) {
             return getColorFromSession(intent, session);
+        } else if ("MyFlowerIsIntent".equals(intentName)) {
+        	return setFlowerInSession(intent, session);
+        } else if ("WhatsMyFlowerIntent".equals(intentName)) {
+        	return getFlowerFromSession(intent, session);
         } else {
             throw new SpeechletException("Invalid Intent");
         }
@@ -137,6 +144,36 @@ public class SessionSpeechlet implements Speechlet {
 
         return getSpeechletResponse(speechText, repromptText, true);
     }
+    
+    private SpeechletResponse setFlowerInSession(final Intent intent, final Session session) {
+        // Get the slots from the intent.
+        Map<String, Slot> slots = intent.getSlots();
+
+        // Get the color slot from the list of slots.
+        Slot favoriteFlowerSlot = slots.get(FLOWER_SLOT);
+        String speechText, repromptText;
+
+        // Check for favorite color and create output to user.
+        if (favoriteFlowerSlot != null) {
+            // Store the user's favorite color in the Session and create response.
+            String favoriteFlower = favoriteFlowerSlot.getValue();
+            session.setAttribute(FLOWER_KEY, favoriteFlower);
+            speechText =
+                    String.format("I now know that your favorite flower is %s. You can ask me your "
+                            + "favorite flower by saying, what's my favorite flower?", favoriteFlower);
+            repromptText =
+                    "You can ask me your favorite flower by saying, what's my favorite flower?";
+
+        } else {
+            // Render an error since we don't know what the users favorite color is.
+            speechText = "I'm not sure what your favorite flower is, please try again";
+            repromptText =
+                    "I'm not sure what your favorite flower is. You can tell me your favorite "
+                            + "flower by saying, my favorite flower is a daisy";
+        }
+
+        return getSpeechletResponse(speechText, repromptText, true);
+    }
 
     /**
      * Creates a {@code SpeechletResponse} for the intent and get the user's favorite color from the
@@ -161,6 +198,27 @@ public class SessionSpeechlet implements Speechlet {
             speechText =
                     "I'm not sure what your favorite color is. You can say, my favorite color is "
                             + "red";
+            isAskResponse = true;
+        }
+
+        return getSpeechletResponse(speechText, speechText, isAskResponse);
+    }
+    
+    private SpeechletResponse getFlowerFromSession(final Intent intent, final Session session) {
+        String speechText;
+        boolean isAskResponse = false;
+
+        // Get the user's favorite color from the session.
+        String favoriteFlower = (String) session.getAttribute(FLOWER_KEY);
+
+        // Check to make sure user's favorite color is set in the session.
+        if (StringUtils.isNotEmpty(favoriteFlower)) {
+            speechText = String.format("Your favorite flower is %s. Goodbye.", favoriteFlower);
+        } else {
+            // Since the user's favorite color is not set render an error message.
+            speechText =
+                    "I'm not sure what your favorite flower is. You can say, my favorite flower is "
+                            + "a daisy";
             isAskResponse = true;
         }
 
