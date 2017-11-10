@@ -49,6 +49,8 @@ public class MinecraftSpeechlet implements Speechlet {
      */
     private static final String ITEM_SLOT = "Item";
     private static final String WOOD_SLOT = "Wood";
+    private static final String FUNNY_SLOT = "Funny";
+
 
     @Override
     public void onSessionStarted(final SessionStartedRequest request, final Session session)
@@ -89,7 +91,8 @@ public class MinecraftSpeechlet implements Speechlet {
             return getRecipe(intent);
         }else if ("WoodIntent".equals(intentName)) {
         	return getWood(intent);
-        	
+        }else if ("FunnyIntent".equals(intentName)) {
+        	return getFunny(intent);
         } else if ("AMAZON.HelpIntent".equals(intentName)) {
             return getHelp();
         } else if ("AMAZON.StopIntent".equals(intentName)) {
@@ -179,6 +182,39 @@ public class MinecraftSpeechlet implements Speechlet {
                 // item.
                 String speechOutput =
                         "I'm sorry, I currently do not know the location for " + woodName
+                                + ". What else can I help with?";
+                String repromptSpeech = "What else can I help with?";
+                return newAskResponse(speechOutput, repromptSpeech);
+            }
+        } else {
+            // There was no item in the intent so return the help prompt.
+            return getHelp();
+        }
+    }
+    
+    private SpeechletResponse getFunny(Intent intent) {
+        Slot funnySlot = intent.getSlot(FUNNY_SLOT);
+        if (funnySlot != null && funnySlot.getValue() != null) {
+            String funnyName = funnySlot.getValue();
+
+            // Get the location for the item
+            String funny = Locations.get(funnyName);
+
+            if (funny != null) {
+                // If we have the location, return it to the user.
+                PlainTextOutputSpeech outputSpeech = new PlainTextOutputSpeech();
+                outputSpeech.setText(funny);
+
+                SimpleCard card = new SimpleCard();
+                card.setTitle("Location for " + funnyName);
+                card.setContent(funny);
+
+                return SpeechletResponse.newTellResponse(outputSpeech, card);
+            } else {
+                // We don't have a recipe, so keep the session open and ask the user for another
+                // item.
+                String speechOutput =
+                        "I'm sorry, I currently do not know the funny for " + funnyName
                                 + ". What else can I help with?";
                 String repromptSpeech = "What else can I help with?";
                 return newAskResponse(speechOutput, repromptSpeech);
