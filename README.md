@@ -35,6 +35,7 @@ Here are a few direct links to our documentation:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 ##Ajaz
 =======
 =======
@@ -42,6 +43,8 @@ Here are a few direct links to our documentation:
 =======
 >>>>>>> amzn/master
 
+=======
+>>>>>>> amzn/master
 =======
 >>>>>>> amzn/master
 ## Sample Skills
