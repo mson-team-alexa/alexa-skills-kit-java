@@ -97,6 +97,26 @@ public class WiseGuySpeechlet implements Speechlet {
         JOKE_LIST.add(new Joke("Owls", "Yes, they do.", "Yes, they do."));
         JOKE_LIST.add(new Joke("Berry", "Berry nice to meet you.", "Berry nice to meet you."));
     }
+    
+    private static final ArrayList<Lim> LIM_LIST = new ArrayList<Lim>();
+    
+    static {
+    		LIM_LIST.add(new Lim("A painter, who lived in Great Britain,\n" + 
+    				"Interrupted two girls with their knittin'\n" + 
+    				"He said, with a sigh,\n" + 
+    				"That park bench--well I\n" + 
+    				"Just painted it, right where you're sittin'"));
+    		LIM_LIST.add(new Lim( "A silly young man from Clyde \n" +
+    				"In a funeral procession was spied; \n " +
+    				"When asked, Who is dead? \n" +
+    				"He giggled and said, \n" +
+    				"I don't know; I just came for the ride."));
+    		LIM_LIST.add(new Lim("There was an old fellow named Green,\n" + 
+    				"Who grew so abnormally lean,\n" + 
+    				"And flat, and compressed,\n" + 
+    				"That his back touched his chest,\n" + 
+    				"And sideways he couldn't be seen.\n"));	
+    }
 
     @Override
     public void onSessionStarted(final SessionStartedRequest request, final Session session)
@@ -312,23 +332,18 @@ public class WiseGuySpeechlet implements Speechlet {
 
     private SpeechletResponse handleTellMeALimIntent (final Session session) {
     		
-    		String speechOutput = " A painter, who lived in Great Britain,\n" + 
-    				"Interrupted two girls with their knittin'\n" + 
-    				"He said, with a sigh,\n" + 
-    				"\"That park bench--well I\n" + 
-    				"Just painted it, right where you're sittin.'\"" /* || 
-    				"A silly young man from Clyde \n "
-    				"In a funeral procession was spied; \n"
-    				"When asked, Who is dead? \n"
-    				"He giggled and said, \n"
-    				"I dont know; I just came for the ride." */ ;
-    
-    		SimpleCard card = new SimpleCard();
+    			int index = (int)Math.floor((Math.random() * LIM_LIST.size()));
+    			
+    			Lim output = LIM_LIST.get(index);
+    			
+    			String speech Output = output.returnLim();
+    			
+    			SimpleCard card = new SimpleCard();
             card.setTitle("Wise Guy");
             PlainTextOutputSpeech outputSpeech = new PlainTextOutputSpeech();
             outputSpeech.setText(speechOutput);
-    		card.setContent(speechOutput);
-    		 return SpeechletResponse.newTellResponse(outputSpeech);
+    			card.setContent(speechOutput);
+    		 	return SpeechletResponse.newTellResponse(outputSpeech);
     		 
     }
     		
@@ -378,6 +393,18 @@ public class WiseGuySpeechlet implements Speechlet {
             this.setup = setup;
             this.speechPunchline = speechPunchline;
             this.cardPunchline = cardPunchline;
+        }
+    }
+    
+    private static class Lim {
+
+        private final String setup;
+        Lim(String setup) {
+            this.setup = setup;
+        }
+        
+        public String returnLim() {
+        		return setup;
         }
     }
 }
