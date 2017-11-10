@@ -88,15 +88,23 @@ public class WiseGuySpeechlet implements Speechlet {
         JOKE_LIST.add(new Joke("Little old lady", "I didn't know you could yodel!", "I didn't know you could yodel!"));
         JOKE_LIST.add(new Joke("A broken pencil", "Never mind. It's pointless.", "Never mind. It's pointless."));
         JOKE_LIST.add(new Joke("Snow", "Snow use. I forgot.", "Snow use. I forgot."));
-        JOKE_LIST.add(new Joke("Boo", "Aww <break time=\"0.3s\" /> it's okay <break time=\"0.3s\" /> don't cry.", "Aww, it's okay, don't cry."));
+        JOKE_LIST.add(new Joke("Boo", "<emphasis level=\"strong\">Aww <break time=\"0.3s\" /> it's okay <break time=\"0.3s\" /> don't cry.</empahsis>", "Aww, it's okay, don't cry."));
         JOKE_LIST.add(new Joke("Woo", "Don't get so excited, it's just a joke.", "Don't get so excited, it's just a joke."));
         JOKE_LIST.add(new Joke("Spell", "<say-as interpret-as=\"characters\">who</say-as>", "w.h.o"));
         JOKE_LIST.add(new Joke("Atch", "I didn't know you had a cold!", "I didn't know you had a cold!"));
         JOKE_LIST.add(new Joke("Owls", "Yes, they do.", "Yes, they do."));
         JOKE_LIST.add(new Joke("Berry", "Berry nice to meet you.", "Berry nice to meet you."));
-        JOKE_LIST.add(new Joke("Cows go", "no silly cows go <break time=\"0.3s\" />moo.", "no silly cows go moo"));
+        JOKE_LIST.add(new Joke("Cows go", "no silly cows go <break time=\"0.3s\" /><audio src=\"https://s3.amazonaws.com/cschool0/moo.mp3\"/>.", "no silly cows go moo"));
     }
-
+    
+    private static final ArrayList<Pun> PUN_LIST = new ArrayList<Pun>(); 
+    
+    static {
+        PUN_LIST.add(new Pun("Why do fugitives wear leather? It's made of hide."));
+        PUN_LIST.add(new Pun("Why are balloons do balloons get the job done? They rise to the occasion"));
+        PUN_LIST.add(new Pun("Why do spiders live in silicon valley? They're web designers "));
+        PUN_LIST.add(new Pun("Why does your dog have on a muzzle? He plays  a little ruff "));
+    }
     @Override
     public void onSessionStarted(final SessionStartedRequest request, final Session session)
             throws SpeechletException {
@@ -128,7 +136,12 @@ public class WiseGuySpeechlet implements Speechlet {
             return handleTellMeAJokeIntent(session);
         } else if ("WhosThereIntent".equals(intentName)) {
             return handleWhosThereIntent(session);
-        } else if ("SetupNameWhoIntent".equals(intentName)) {
+        }else if ("FoxIntent".equals(intentName)) {
+            return handleFoxIntent(session);
+        } else if ("PunIntent".equals(intentName)) {
+            return handlePunIntent(session);
+        }
+        else if ("SetupNameWhoIntent".equals(intentName)) {
             return handleSetupNameWhoIntent(session);
         } else if ("AMAZON.HelpIntent".equals(intentName)) {
             String speechOutput = "";
@@ -181,7 +194,67 @@ public class WiseGuySpeechlet implements Speechlet {
 
         // any session cleanup logic would go here
     }
+   // FOX AND THE GRAPES STORY
+    private SpeechletResponse handleFoxIntent(final Session session) {
+        String speechOutput = "";
 
+        // Reprompt speech will be triggered if the user doesn't respond.
+        String repromptText = "You can ask me to tell the story of the fox and the grapes";
+
+        // / Select a random joke and store it in the session variables
+        SsmlOutputSpeech outputSpeech = new SsmlOutputSpeech();
+        
+        
+        speechOutput = "A Fox one day spied a beautiful bunch of ripe grapes hanging from a vine trained along the branches of a tree. "
+        		+ "The grapes seemed ready to burst with juice, and the Fox's mouth watered as he gazed longingly at them. " 
+
+ 		+ "The bunch hung from a high branch, and the Fox had to jump for it. The first time "
+ 		+ "he jumped he missed it by a long way. So he walked off a short distance and took a running leap at it,"
+ 		+ " only to fall short once more. Again and again he tried, but in vain. "
+
+		+ "Now he sat down and looked at the grapes in disgust. \"What a fool I am,\" he said. \"Here I am wearing myself out to get a bunch "
+		+ "of sour grapes that are not worth gaping for.\" And off he walked very, very scornfully. ";
+
+        String moral = "There are many who pretend to despise and belittle that which is beyond their reach. ";
+        outputSpeech.setSsml("<speak><prosody pitch=\"low\">"+speechOutput+"</prosody>"+moral+"</speak>");
+
+        // Create the Simple card content.
+        SimpleCard card = new SimpleCard();
+        card.setTitle("Wise Guy");
+        card.setContent(speechOutput + moral);
+
+        SpeechletResponse response = SpeechletResponse.newTellResponse(outputSpeech, card);
+        response.setCard(card);
+        return response;
+    }
+    
+    
+    
+    
+    
+    private SpeechletResponse handlePunIntent(final Session session) {
+        String speechOutput = "";
+
+        // Reprompt speech will be triggered if the user doesn't respond.
+        String repromptText = "You can ask, tell me a pun";
+
+        // / Select a random joke and store it in the session variables
+       int punID = (int) Math.floor(Math.random() * PUN_LIST.size());
+
+        speechOutput = PUN_LIST.get(punID).speechPunchline;
+
+        // Create the Simple card content.
+        SimpleCard card = new SimpleCard();
+        card.setTitle("Wise Guy");
+        card.setContent(speechOutput);
+
+        SpeechletResponse response = newAskResponse(speechOutput, false,
+                repromptText, false);
+        response.setCard(card);
+        return response;
+    }
+    
+    
     /**
      * Selects a joke randomly and starts it off by saying "Knock knock".
      *
@@ -196,13 +269,13 @@ public class WiseGuySpeechlet implements Speechlet {
         String repromptText = "You can ask, who's there";
 
         // / Select a random joke and store it in the session variables
-       int jokeID = (int) Math.floor(Math.random() * JOKE_LIST.size());
-
+        //int jokeID = (int) Math.floor(Math.random() * JOKE_LIST.size());
+        int jokeID = 5;
         // The stage variable tracks the phase of the dialogue.
         // When this function completes, it will be on stage 1.
         session.setAttribute(SESSION_STAGE, KNOCK_KNOCK_STAGE);
         session.setAttribute(SESSION_JOKE_ID, jokeID);
-        speechOutput = "Knock knock!";
+        speechOutput = "Ask me about puns. Otherwise knock knock!";
 
         // Create the Simple card content.
         SimpleCard card = new SimpleCard();
@@ -227,6 +300,7 @@ public class WiseGuySpeechlet implements Speechlet {
         if (session.getAttributes().containsKey(SESSION_STAGE)) {
             if ((Integer) session.getAttribute(SESSION_STAGE) == KNOCK_KNOCK_STAGE) {
                 // Retrieve the joke's setup text.
+               // int jokeID = (Integer) session.getAttribute(SESSION_JOKE_ID);
                 int jokeID = (Integer) session.getAttribute(SESSION_JOKE_ID);
                 speechOutput = JOKE_LIST.get(jokeID).setup;
 
@@ -353,5 +427,20 @@ public class WiseGuySpeechlet implements Speechlet {
             this.speechPunchline = speechPunchline;
             this.cardPunchline = cardPunchline;
         }
+     
+    }
+    
+    private static class Pun {
+
+
+        private final String speechPunchline;
+
+
+        Pun(String speechPunchline) {
+            
+            this.speechPunchline = speechPunchline;
+ 
+        }
+     
     }
 }
