@@ -26,8 +26,9 @@ public class StoryTellerSpeechlet implements Speechlet {
      * Custom Slot key for the name of the story requested by the user
      */
     private static final String CUSTOM_SLOT_STORY_NAME = "StoryName";
-
-        
+    
+    
+   
     @Override
     public void onSessionStarted(final SessionStartedRequest request, final Session session)
             throws SpeechletException {
@@ -161,6 +162,8 @@ public class StoryTellerSpeechlet implements Speechlet {
             // get the story content for the corresponding story
             storyContent = Stories.getFableWithName(storyName).getStoryContent();
 	        
+            session.setAttribute("title", storyName);
+            
             // create an appropriate SSML response
 	        SsmlOutputSpeech outputSpeech = new SsmlOutputSpeech();
 	        outputSpeech.setSsml(storyContent);
@@ -197,13 +200,20 @@ public class StoryTellerSpeechlet implements Speechlet {
     	String storyMoral = ""; 
         
     	// get the name of the story from the custom slot (within the JSON request)
-        Slot storySlot = intent.getSlot(CUSTOM_SLOT_STORY_NAME);
+    	String name = (String) session.getAttribute("title");
+    		
+    	/*
+    	Slot storySlot = intent.getSlot(CUSTOM_SLOT_STORY_NAME);
         
         if (storySlot != null && storySlot.getValue() != null) {
             String storyName = storySlot.getValue();
-                       
-            // get the story content for the corresponding story
-            storyMoral = Stories.getFableWithName(storyName).getStoryMoral();
+             */
+    	if (name != null)
+    	{
+    		
+    	
+            //get the story content for the corresponding story
+            storyMoral = Stories.getFableWithName(name).getStoryMoral();
 	        
             // create an appropriate SSML response
 	        SsmlOutputSpeech outputSpeech = new SsmlOutputSpeech();
