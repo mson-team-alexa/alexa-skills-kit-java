@@ -82,7 +82,7 @@ public class WiseGuySpeechlet implements Speechlet {
      */
     private static final ArrayList<Joke> JOKE_LIST = new ArrayList<Joke>();
 
-    static {
+    static {/*
         JOKE_LIST.add(new Joke("To", "Correct grammar is <break time=\"0.2s\" /> to whom.", "Correct grammar is 'to whom'."));
         JOKE_LIST.add(new Joke("Beets!", "Beats me!", "Beats me!"));
         JOKE_LIST.add(new Joke("Little old lady", "I didn't know you could yodel!", "I didn't know you could yodel!"));
@@ -93,7 +93,8 @@ public class WiseGuySpeechlet implements Speechlet {
         JOKE_LIST.add(new Joke("Spell", "<say-as interpret-as=\"characters\">who</say-as>", "w.h.o"));
         JOKE_LIST.add(new Joke("Atch", "I didn't know you had a cold!", "I didn't know you had a cold!"));
         JOKE_LIST.add(new Joke("Owls", "Yes, they do.", "Yes, they do."));
-        JOKE_LIST.add(new Joke("Berry", "Berry nice to meet you.", "Berry nice to meet you."));
+        JOKE_LIST.add(new Joke("Berry", "Berry nice to meet you.", "Berry nice to meet you."));*/
+        JOKE_LIST.add(new Joke("Cows go", "No, silly. Cows go <break time=\"0.5s\"/> moo", "No, silly. Cows go moo"));
     }
 
     @Override

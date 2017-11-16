@@ -75,10 +75,16 @@ public class StoryTellerSpeechlet implements Speechlet {
             outputSpeech.setText("Goodbye");
             return SpeechletResponse.newTellResponse(outputSpeech);
             
-        } else {
+        } else if ("TellMeTheMoralOfThisIntent".equals(intentName)) {
+        		return handleTellMeTheMoralOfThisIntent(intent, session);
+        }
+        
+        else {
             throw new SpeechletException("Invalid Intent");
         }
     }
+    
+
     
     /**
      * Creates and returns a {@code SpeechletResponse} with a welcome message.
@@ -157,6 +163,7 @@ public class StoryTellerSpeechlet implements Speechlet {
         
         if (storySlot != null && storySlot.getValue() != null) {
             String storyName = storySlot.getValue();
+            session.setAttribute("StoryName",storyName);
 
             // get the story content for the corresponding story
             storyContent = Stories.getFableWithName(storyName).getStoryContent();
@@ -225,5 +232,37 @@ public class StoryTellerSpeechlet implements Speechlet {
         	return response;
         }
     }
+private SpeechletResponse handleTellMeTheMoralOfThisIntent(Intent intent, final Session session) {
+    	
+    	String storyMoral = ""; 
+        
+    	// get the name of the story from the custom slot (within the JSON request)
+        boolean storySlot = session.getAttributes().containsKey("StoryName");
+        
+        if (storySlot) {
+            //String storyName = session.getAttributes().getAttribute("StoryName");
+            // get the story content for the corresponding story
+            storyMoral = Stories.getFableWithName(session.getAttributes().get("StoryName").toString()).getStoryMoral();
+            // create an appropriate SSML response
+	        SsmlOutputSpeech outputSpeech = new SsmlOutputSpeech();
+	        outputSpeech.setSsml(storyMoral);
+	
+	        Reprompt reprompt = new Reprompt();
+	        reprompt.setOutputSpeech(null);
+	        SpeechletResponse response = SpeechletResponse.newAskResponse(outputSpeech, reprompt);
+	        return response;
+	        
+        } else {
+        	
+        	// if the story requested by the user could not be found, create an appropriate response
+        	PlainTextOutputSpeech outputSpeech = new PlainTextOutputSpeech();
+        	outputSpeech.setText("Sorry, I couldn't find the moral of the story you requested. Please try naming another story.");
+        	Reprompt reprompt = new Reprompt();
+        	reprompt.setOutputSpeech(outputSpeech);
+        	SpeechletResponse response = SpeechletResponse.newAskResponse(outputSpeech, reprompt);
+        	return response;
+        }
+    }
+    
     
 }
