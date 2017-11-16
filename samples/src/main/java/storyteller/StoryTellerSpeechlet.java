@@ -26,6 +26,8 @@ public class StoryTellerSpeechlet implements Speechlet {
      * Custom Slot key for the name of the story requested by the user
      */
     private static final String CUSTOM_SLOT_STORY_NAME = "StoryName";
+    
+    private static final String SESSION_STORY_ID = "StoryId";
 
         
     @Override
@@ -157,6 +159,8 @@ public class StoryTellerSpeechlet implements Speechlet {
         
         if (storySlot != null && storySlot.getValue() != null) {
             String storyName = storySlot.getValue();
+            
+            session.setAttribute(SESSION_STORY_ID, storyName);
 
             // get the story content for the corresponding story
             storyContent = Stories.getFableWithName(storyName).getStoryContent();
@@ -197,11 +201,10 @@ public class StoryTellerSpeechlet implements Speechlet {
     	String storyMoral = ""; 
         
     	// get the name of the story from the custom slot (within the JSON request)
-        Slot storySlot = intent.getSlot(CUSTOM_SLOT_STORY_NAME);
         
-        if (storySlot != null && storySlot.getValue() != null) {
-            String storyName = storySlot.getValue();
-                       
+        if (session.getAttribute(SESSION_STORY_ID) != null) {
+            String storyName = (String) session.getAttribute(SESSION_STORY_ID);
+             
             // get the story content for the corresponding story
             storyMoral = Stories.getFableWithName(storyName).getStoryMoral();
 	        
@@ -216,6 +219,7 @@ public class StoryTellerSpeechlet implements Speechlet {
 	        
         } else {
         	
+
         	// if the story requested by the user could not be found, create an appropriate response
         	PlainTextOutputSpeech outputSpeech = new PlainTextOutputSpeech();
         	outputSpeech.setText("Sorry, I couldn't find the moral of the story you requested. Please try naming another story.");
