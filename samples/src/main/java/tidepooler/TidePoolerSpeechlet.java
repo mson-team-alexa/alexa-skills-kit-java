@@ -396,7 +396,9 @@ public class TidePoolerSpeechlet implements Speechlet {
             URL url = new URL(ENDPOINT + queryString);
             inputStream = new InputStreamReader(url.openStream(), Charset.forName("US-ASCII"));
             bufferedReader = new BufferedReader(inputStream);
-            while ((line = bufferedReader.readLine()) != null) {
+            line = bufferedReader.readLine();
+            log.info(line); 
+            while (line.length() == 0) {
                 builder.append(line);
             }
         } catch (IOException e) {

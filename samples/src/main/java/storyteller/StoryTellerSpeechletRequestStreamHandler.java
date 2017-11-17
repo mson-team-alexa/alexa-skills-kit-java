@@ -32,7 +32,7 @@ public class StoryTellerSpeechletRequestStreamHandler extends SpeechletRequestSt
          * Alexa Skill and put the relevant Application Ids in this Set.
          */
         supportedApplicationIds = new HashSet<String>();
-        // supportedApplicationIds.add("amzn1.echo-sdk-ams.app.[unique-value-here]");
+        supportedApplicationIds.add("amzn1.ask.skill.0f5e5280-277a-4192-8108-84eba2609ccc");
     }
 
     public StoryTellerSpeechletRequestStreamHandler() {
