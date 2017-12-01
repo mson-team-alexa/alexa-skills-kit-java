@@ -325,13 +325,14 @@ public class StoryTellerSpeechlet implements Speechlet {
                         	SpeechletResponse response = SpeechletResponse.newAskResponse(outputSpeech, reprompt);
                         	return response;
                 		}
-        				PlainTextOutputSpeech outputSpeech = new PlainTextOutputSpeech();
+        				
+        				/* PlainTextOutputSpeech outputSpeech = new PlainTextOutputSpeech();
                     	outputSpeech.setText("Sorry, I can only tell the moral after I say the story. " + 
         				"And I have not yet told you that story. If you want to hear it, just say tell me the story of blah blah blah.");
                     	Reprompt reprompt = new Reprompt();
                     	reprompt.setOutputSpeech(outputSpeech);
                     	SpeechletResponse response = SpeechletResponse.newAskResponse(outputSpeech, reprompt);
-                    	return response;
+                    	return response;*/
         			}
 	
         			
@@ -363,6 +364,8 @@ public class StoryTellerSpeechlet implements Speechlet {
         	SpeechletResponse response = SpeechletResponse.newAskResponse(outputSpeech, reprompt);
         	return response;
         }
+        
+        return null;
     }
     
 }
