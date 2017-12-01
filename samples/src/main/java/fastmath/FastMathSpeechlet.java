@@ -29,4 +29,30 @@ import com.amazon.speech.ui.SsmlOutputSpeech;
 import com.amazon.speech.ui.Reprompt;
 import com.amazon.speech.ui.SimpleCard;
 
+ private static final String SLOT_Int1 = "IntegerOne";
+ private static final String SLOT_Int2 = "IntegerTwo";
+ private static final String SESSION_Gamemode = "Gamemode";
+ private static final String SESSION_Survival = "Survival";
+ 
+public void onSessionStarted (final SessionStartedRequest request, final Session session)
+            throws SpeechletException {
+        log.info("onSessionStarted requestId={}, sessionId={}", request.getRequestId(),
+                session.getSessionId());
+    }
+    @Override
+public SpeechletResponse onLaunch(final LaunchRequest request, final Session session)
+            throws SpeechletException {
+        log.info("onLaunch requestId={}, sessionId={}", request.getRequestId(),
+                session.getSessionId());
 
+        return getGamemode();
+    }
+	
+	private SpeechletResponse getWelcomeResponse() {
+        String speechOutput = "Welcome to Fast Maths, would you like to play speed, survival, or pratice?"
+        String repromptText = "What game do you want to play?"
+								+ "If you find yourself having trouble pratcice is a great way to hone your skills!"
+                
+
+        return newAskResponse(speechOutput, false, repromptText, false);
+    }
