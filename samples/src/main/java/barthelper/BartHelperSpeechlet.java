@@ -51,7 +51,7 @@ public class BartHelperSpeechlet implements Speechlet {
 
     private static final String URL_PREFIX = "https://api.bart.gov/api/sched.aspx?json=y&";
     
-    private static final String URL_TRAIN = "http://bartjsonapi.elasticbeanstalk.com/api/departures/";
+    private static final String URL_TRAIN = "http://bartjsonapi.elasticbeanstalk.com/api/departures/civc";
     
     private static final String API_KEY = "MW9S-E7SL-26DU-VV8V";
     
@@ -137,11 +137,11 @@ public class BartHelperSpeechlet implements Speechlet {
 
         // any session cleanup logic would go here
     }
-     //***********************************************************************************************   
+     //PROJECT CODE***********************************************************************************************   
 private SpeechletResponse getTrainTimes(Intent intent) throws IOException, JSONException {
     	
     	String origin = "civc";
-    	String timeURL = URL_TRAIN + origin;
+    	String timeURL = URL_TRAIN;
     	
     	log.info("BART Time URL: " + timeURL);
     	
@@ -157,25 +157,36 @@ private SpeechletResponse getTrainTimes(Intent intent) throws IOException, JSONE
     	JSONObject output = new JSONObject(timeOutput);
     	
     	//get the results
-    	JSONObject root = output.getJSONObject("root");
     	
-    	JSONObject station = root.getJSONObject("station");
+    	JSONArray etd = output.getJSONArray("etd");
     	
-    	JSONArray etd = station.getJSONArray("etd");
-    	
-    	JSONObject list = etd.getJSONObject(0);
-    	
-    	JSONArray timesList = list.getJSONArray("estimate");
-    	
-    	String speechOutput = "The time estimates are: ";
-    	for (int i=0; i < MAX_HOLIDAYS; i++) {
-    		JSONObject o = (JSONObject) timesList.get(i);
-    		if (i == MAX_HOLIDAYS - 1) {
-        		speechOutput = speechOutput + "and " + o.getString("minutes") + " on " + o.getString("platform") + ".";
-    		} else {
-    			speechOutput = speechOutput + o.getString("minutes") + " on " + o.getString("platform") + ", ";
-    		}
+    	for(int i =0; i<etd.length(); i++){
+    		JSONObject destinationInfo = etd.getJSONObject(i);
+    		String destination = destinationInfo.getString("destination");
+    		log.info("destination: " + destination);
     	}
+    	
+    /*
+    	JSONObject dest = etd.getJSONObject(0);
+    	
+    	JSONArray estimate = dest.getJSONArray("estimate");
+    	
+    	for (int x=0; x<estimate.length(); x++){
+    		JSONObject minuteInfo = estimate.getJSONObject(x);
+    		String minutes = minuteInfo.getString("minutes");
+    		log.info("minutes: " + minutes);
+    		
+    		String platform = minuteInfo.getString("platform");
+    		log.info("platform: " + platform);    		
+    	}
+    	
+    	JSONObject d = (JSONObject)etd.get(0);
+    	JSONObject time = (JSONObject)estimate.get(0);
+    	
+    	
+    	
+    	String speechOutput = "The train going to " + d.getString("destination") + " leaves in " + time.getString("minutes") + "minutes";
+    	
     	
     	PlainTextOutputSpeech outputSpeech = new PlainTextOutputSpeech();
         outputSpeech.setText(speechOutput);
@@ -185,10 +196,11 @@ private SpeechletResponse getTrainTimes(Intent intent) throws IOException, JSONE
         card.setContent(speechOutput);
 
         return SpeechletResponse.newTellResponse(outputSpeech, card);
-    	
+        */
+    	return null;
 	}
     
-    
+   
   //*************************************************************************************************************  
 
 //LAB 7 STORING MY STATION**************************************************************************************************************
