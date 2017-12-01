@@ -325,7 +325,6 @@ public class StoryTellerSpeechlet implements Speechlet {
                         	SpeechletResponse response = SpeechletResponse.newAskResponse(outputSpeech, reprompt);
                         	return response;
                 		}
-        			}else {
         				PlainTextOutputSpeech outputSpeech = new PlainTextOutputSpeech();
                     	outputSpeech.setText("Sorry, I can only tell the moral after I say the story. " + 
         				"And I have not yet told you that story. If you want to hear it, just say tell me the story of blah blah blah.");
@@ -335,6 +334,8 @@ public class StoryTellerSpeechlet implements Speechlet {
                     	return response;
         			}
 	
+        			
+        			
         	}else {
         		PlainTextOutputSpeech outputSpeech = new PlainTextOutputSpeech();
             	outputSpeech.setText("You have not asked me to tell a story!");
