@@ -1,6 +1,7 @@
 
 package storyteller;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +27,7 @@ public class StoryTellerSpeechlet implements Speechlet {
      * Custom Slot key for the name of the story requested by the user
      */
     private static final String CUSTOM_SLOT_STORY_NAME = "StoryName";
+    private static final String STORYNAME_KEY = "STORYNAME";
 
         
     @Override
@@ -157,6 +159,7 @@ public class StoryTellerSpeechlet implements Speechlet {
         
         if (storySlot != null && storySlot.getValue() != null) {
             String storyName = storySlot.getValue();
+            session.setAttribute(STORYNAME_KEY, storyName);
 
             // get the story content for the corresponding story
             storyContent = Stories.getFableWithName(storyName).getStoryContent();
@@ -195,16 +198,13 @@ public class StoryTellerSpeechlet implements Speechlet {
     private SpeechletResponse handleTellMeTheMoralIntent(Intent intent, final Session session) {
     	
     	String storyMoral = ""; 
-        
-    	// get the name of the story from the custom slot (within the JSON request)
-        Slot storySlot = intent.getSlot(CUSTOM_SLOT_STORY_NAME);
-        
-        if (storySlot != null && storySlot.getValue() != null) {
-            String storyName = storySlot.getValue();
-                       
-            // get the story content for the corresponding story
-            storyMoral = Stories.getFableWithName(storyName).getStoryMoral();
-	        
+    	// Get the user's story name from the session.
+        String storyName = (String) session.getAttribute(STORYNAME_KEY);
+
+        // Check to make sure user's story is set in the session.
+        if (StringUtils.isNotEmpty(storyName)) {
+        	storyMoral = Stories.getFableWithName(storyName).getStoryMoral();
+ 	        
             // create an appropriate SSML response
 	        SsmlOutputSpeech outputSpeech = new SsmlOutputSpeech();
 	        outputSpeech.setSsml(storyMoral);
@@ -213,17 +213,38 @@ public class StoryTellerSpeechlet implements Speechlet {
 	        reprompt.setOutputSpeech(null);
 	        SpeechletResponse response = SpeechletResponse.newAskResponse(outputSpeech, reprompt);
 	        return response;
-	        
         } else {
-        	
-        	// if the story requested by the user could not be found, create an appropriate response
-        	PlainTextOutputSpeech outputSpeech = new PlainTextOutputSpeech();
-        	outputSpeech.setText("Sorry, I couldn't find the moral of the story you requested. Please try naming another story.");
-        	Reprompt reprompt = new Reprompt();
-        	reprompt.setOutputSpeech(outputSpeech);
-        	SpeechletResponse response = SpeechletResponse.newAskResponse(outputSpeech, reprompt);
-        	return response;
+        	 Slot storySlot = intent.getSlot(CUSTOM_SLOT_STORY_NAME);
+             
+             if (storySlot != null && storySlot.getValue() != null) {
+                 storyName = storySlot.getValue();
+                            
+                 // get the story content for the corresponding story
+                 storyMoral = Stories.getFableWithName(storyName).getStoryMoral();
+     	        
+                 // create an appropriate SSML response
+     	        SsmlOutputSpeech outputSpeech = new SsmlOutputSpeech();
+     	        outputSpeech.setSsml(storyMoral);
+     	
+     	        Reprompt reprompt = new Reprompt();
+     	        reprompt.setOutputSpeech(null);
+     	        SpeechletResponse response = SpeechletResponse.newAskResponse(outputSpeech, reprompt);
+     	        return response;
+     	        
+             } else {
+             	
+             	// if the story requested by the user could not be found, create an appropriate response
+             	PlainTextOutputSpeech outputSpeech = new PlainTextOutputSpeech();
+             	outputSpeech.setText("Sorry, I couldn't find the moral of the story you requested. Please try naming another story.");
+             	Reprompt reprompt = new Reprompt();
+             	reprompt.setOutputSpeech(outputSpeech);
+             	SpeechletResponse response = SpeechletResponse.newAskResponse(outputSpeech, reprompt);
+             	return response;
+             }
         }
+
+        
+        
     }
     
 }
