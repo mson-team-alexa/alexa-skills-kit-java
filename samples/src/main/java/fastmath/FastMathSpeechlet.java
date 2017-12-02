@@ -49,10 +49,9 @@ public SpeechletResponse onLaunch(final LaunchRequest request, final Session ses
     }
 	
 	private SpeechletResponse getWelcomeResponse() {
-        String speechOutput = "Welcome to Fast Maths, would you like to play speed, survival, or pratice?"
+        String speechOutput = "Welcome to Fast Maths, would you like to play speed, survival, or pratice?";
         String repromptText = "What game do you want to play?"
-								+ "If you find yourself having trouble pratcice is a great way to hone your skills!"
+								+ "If you find yourself having trouble practice is a great way to hone your skills!"
                 
-
         return newAskResponse(speechOutput, false, repromptText, false);
     }
