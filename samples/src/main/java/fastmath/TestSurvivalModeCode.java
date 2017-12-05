@@ -9,6 +9,7 @@
  */
 package fastmath;
 
+
 import java.util.Map;
 import java.util.Random;
 import java.util.ArrayList;
@@ -41,6 +42,8 @@ public class TestSurvivalModeCode implements Speechlet {
     private static final String HAVE_ANSWER_ID = "HaveAnswerID";
     private static final String ANSWERS_WRONG_ID = "AnswersWrongID";
     private static final String CURRENT_LEVEL_ID = "CurrentLevelID";
+    private static final String ASK_QUESTION_TIME_ID = "AskQuestionID";
+    private static final String ANSWER_QUESTION_TIME_ID = "AnswerQuestionID";
     private static final int MAX_ANSWERS_WRONG = 5;
     
     private static Random RAND = new Random();
@@ -93,6 +96,8 @@ public class TestSurvivalModeCode implements Speechlet {
     }
 
 
+ 
+    
     private SpeechletResponse getWelcomeResponse() {
         // Create the welcome message.
         String speechText =
@@ -132,6 +137,9 @@ public class TestSurvivalModeCode implements Speechlet {
     			
     			return que;
     		}
+    	case 2:
+    		
+    		
     	default:
     		return null;
     	}
@@ -140,7 +148,7 @@ public class TestSurvivalModeCode implements Speechlet {
     private SpeechletResponse setUpSurvivalStage(final Intent intent, final Session session) {
         // Get the slots from the intent.
     	
-    	
+    	if(session.)
     	
         Map<String, Slot> slots = intent.getSlots();
 
