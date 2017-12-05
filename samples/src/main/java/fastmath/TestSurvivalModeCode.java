@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import java.time.Duration;
+import java.time.Instant;
 
 import com.amazon.speech.slu.Intent;
 import com.amazon.speech.slu.Slot;
@@ -39,11 +41,25 @@ public class TestSurvivalModeCode implements Speechlet {
     private static final Logger log = LoggerFactory.getLogger(TestSurvivalModeCode.class);
 
     private static final String BEGIN_ID = "BeginID";
+    
     private static final String HAVE_ANSWER_ID = "HaveAnswerID";
+    private static final int HAVE_ANSWER = 0;
+    private static final int DO_NOT_HAVE_ANSWER = 1;
+    
+    private static final int CORRECT_ANSWER_TO_BEAT_LEVEL = 5;
+    
+    private static final String ANSWERS_CORRECT_ID = "AnswersCorrectID";
+    
     private static final String ANSWERS_WRONG_ID = "AnswersWrongID";
+    
+    private static final String CURRENT_QUESTION_ID = "CurrentQuestionID";
+    
     private static final String CURRENT_LEVEL_ID = "CurrentLevelID";
+    
     private static final String ASK_QUESTION_TIME_ID = "AskQuestionID";
+    
     private static final String ANSWER_QUESTION_TIME_ID = "AnswerQuestionID";
+    
     private static final int MAX_ANSWERS_WRONG = 5;
     
     private static Random RAND = new Random();
@@ -148,9 +164,52 @@ public class TestSurvivalModeCode implements Speechlet {
     private SpeechletResponse setUpSurvivalStage(final Intent intent, final Session session) {
         // Get the slots from the intent.
     	
-    	if(session.getAttributes().containsKey("HaveAnswerID")) {
-    		if(session.getAttribute("HaveAnswerID").equals(obj)) {
+    	String speechText, repromptText;
+    	
+    	if(session.getAttributes().containsKey(HAVE_ANSWER_ID)) {
+    		
+    		if((Integer)session.getAttribute(HAVE_ANSWER_ID) == HAVE_ANSWER) {
     			
+    			int answer = 0;
+    			
+    			if(session.getAttributes().containsKey(ASK_QUESTION_TIME_ID)) {
+    				
+    				Instant now = Instant.now();
+    				Duration timeElapsed = Duration.between((Instant)session.getAttribute(ASK_QUESTION_TIME_ID), now);
+    				
+    				if(timeElapsed.toMillis() < 8000) {
+    					
+    					Question que = (Question)session.getAttribute(CURRENT_QUESTION_ID)
+    					
+    					if(que.checkAnswer(answer)) {
+    						
+    						if(session.getAttributes().containsKey(ANSWERS_CORRECT_ID)) {
+    							
+    							if((Integer)session.getAttribute(ANSWERS_CORRECT_ID) == 4) {
+    								
+    								session.setAttribute(CURRENT_LEVEL_ID, 2);
+    								
+    							}else {
+    								
+    								int answersCorrectBefore = (Integer)session.getAttribute(ANSWERS_CORRECT_ID);
+    								
+    								session.setAttribute(ANSWERS_CORRECT_ID, answersCorrectBefore + 1);
+    								
+    								speechText = "Congratulations! You got the question correct. Let's continue to the next one."
+    							}
+    							
+    						}else {
+    							session.setAttribute(ANSWERS_CORRECT_ID, 1);
+    						}
+    						
+    					}else {
+    						
+    					}
+    					
+    				}else {
+    						
+    				}
+    			}
     		}
     	}
     	
@@ -159,7 +218,7 @@ public class TestSurvivalModeCode implements Speechlet {
         // Get the color slot from the list of slots.
         Slot favoriteColorSlot = slots.get(COLOR_SLOT);
         
-        String speechText, repromptText;
+        
 
         speechText 
         
