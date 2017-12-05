@@ -148,7 +148,11 @@ public class TestSurvivalModeCode implements Speechlet {
     private SpeechletResponse setUpSurvivalStage(final Intent intent, final Session session) {
         // Get the slots from the intent.
     	
-    	if(session.)
+    	if(session.getAttributes().containsKey("HaveAnswerID")) {
+    		if(session.getAttribute("HaveAnswerID").equals(obj)) {
+    			
+    		}
+    	}
     	
         Map<String, Slot> slots = intent.getSlots();
 
