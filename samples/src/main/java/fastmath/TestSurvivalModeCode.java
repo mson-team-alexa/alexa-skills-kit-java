@@ -142,9 +142,12 @@ public class TestSurvivalModeCode implements Speechlet {
 
 
     private SpeechletResponse handleAnswerModeResponse(final Intent intent, final Session session) {
+    	
     	Slot GamemodeSlot = intent.getSlot("GameMode");
     	
-    	String repromptText, speechText = "";
+    	String speechText = "";
+    	
+    	String repromptText = "";
     	
     	if(GamemodeSlot != null && GamemodeSlot.getValue() != null) {
     		
@@ -158,7 +161,10 @@ public class TestSurvivalModeCode implements Speechlet {
     						"If you spend more than eight seconds, the question will be counted wrong. " +
     						"You can have at most 5 questions wrong. " + 
     						"Ready to start the game? Say Begin or Continue to proceed. ";
+    			
     			repromptText = "Ready to start the game? Say Begin or Continue to go ahead. ";
+    			
+    			session.setAttribute(STAGE_ID, ASK_ANSWER_STAGE);
     			
     			break;
     		
@@ -173,10 +179,19 @@ public class TestSurvivalModeCode implements Speechlet {
     		}
     		
     		return getSpeechletResponse(speechText, repromptText, true);
+    	}else {
+    		return getHelp();
     	}
             
     }
-    	
+    
+    private SpeechletResponse getHelp() {
+        String speechOutput =
+                "You can ask to play Survival, Practice and Time Trial mode. Which mode would you want to play with?";
+        String repromptText =
+                "You can ask to play Survival, Practice and Time Trial mode. Which mode would you want to play with?";
+        return newAskResponse(speechOutput,true, repromptText, false);
+    }
     
     private Question generateQuestion(int level) {
     	switch(level) {
@@ -206,14 +221,12 @@ public class TestSurvivalModeCode implements Speechlet {
     			return que;
     		}
     		
-    		break;
     		
     	case 2:
-    		break;
+    		return null;
     		
     	default:
     		return null;
-    		break;
     	}
     }
     
@@ -224,12 +237,14 @@ public class TestSurvivalModeCode implements Speechlet {
     	
     	String speechText, repromptText;
     	
+    	speechText = "";
+    	
     	if((Integer)session.getAttribute(STAGE_ID) == ASK_MODE_STAGE) {
     		speechText = "You have to choose which mode you want to play before you enter the play mode!" +
     				"There are three choices: Survival, practice and Time Trial. What is your choice? ";
     	}
     	
-    	if(session.getAttributes().containsKey(HAVE_ANSWER_ID) && speechText != null) {
+    	if(session.getAttributes().containsKey(HAVE_ANSWER_ID) && speechText == "") {
     		
     		if((Integer)session.getAttribute(HAVE_ANSWER_ID) == HAVE_ANSWER) {
     			
@@ -462,18 +477,15 @@ public class TestSurvivalModeCode implements Speechlet {
 			Instant nowA = Instant.now();
 			
 			session.setAttribute(ASK_QUESTION_TIME_ID, nowA);
-			
-			
-			
+
     	}
     	
-        
-        // Get the color slot from the list of slots.
-        Slot favoriteColorSlot = slots.get(COLOR_SLOT);
-        
         if((Integer)session.getAttribute(HAVE_ANSWER_ID) == ASK_QUESTION) {
         	repromptText = "Would you want to play again? ";
-        }else {
+        }else if((Integer)session.getAttribute(STAGE_ID) == ASK_MODE_STAGE) {
+        	repromptText = "Please choose the mode you want to play";
+        }
+        else {
         	repromptText = "You have exceeded the maximum amount of time to answer the question. Say \'continue\' or \'next question\' to continue";
         }
 
@@ -489,7 +501,7 @@ public class TestSurvivalModeCode implements Speechlet {
 
         String repromptText = "What would you like to play?";
 
-        return newAskResponse(speechOutput, false, repromptText, false);
+        return newAskResponse(speechOutput, false, repromptText, true);
 	}
 	
 	private SpeechletResponse newAskResponse(String stringOutput, boolean isOutputSsml,
@@ -513,7 +525,7 @@ public class TestSurvivalModeCode implements Speechlet {
         Reprompt reprompt = new Reprompt();
         reprompt.setOutputSpeech(repromptOutputSpeech);
         return SpeechletResponse.newAskResponse(outputSpeech, reprompt);
-    }G
+    }
 	/**
      * Creates a {@code SpeechletResponse} when there is an error of any kind.
      *

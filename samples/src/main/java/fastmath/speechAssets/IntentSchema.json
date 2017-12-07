@@ -17,7 +17,7 @@
           "type": "AMAZON.NUMBER"
         }
       ]
-    }
+    },
     {
       "intent": "AMAZON.HelpIntent"
     },
