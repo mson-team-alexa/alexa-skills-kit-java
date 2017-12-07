@@ -14,6 +14,14 @@ public class Question {
 		
 	}
 	
+	public String getQuestion() {
+		return QUESTION_SPEECH;
+	}
+	
+	public float getAnswer() {
+		return ANSWER;
+	}
+	
 	public boolean checkAnswer(float answer) {
 		return answer == ANSWER;
 	}

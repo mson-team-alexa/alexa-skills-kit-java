@@ -29,9 +29,11 @@ import com.amazon.speech.speechlet.SessionStartedRequest;
 import com.amazon.speech.speechlet.Speechlet;
 import com.amazon.speech.speechlet.SpeechletException;
 import com.amazon.speech.speechlet.SpeechletResponse;
+import com.amazon.speech.ui.OutputSpeech;
 import com.amazon.speech.ui.PlainTextOutputSpeech;
 import com.amazon.speech.ui.Reprompt;
 import com.amazon.speech.ui.SimpleCard;
+import com.amazon.speech.ui.SsmlOutputSpeech;
 
 /**
  * This sample shows how to create a simple speechlet for handling intent requests and managing
@@ -40,11 +42,13 @@ import com.amazon.speech.ui.SimpleCard;
 public class TestSurvivalModeCode implements Speechlet {
     private static final Logger log = LoggerFactory.getLogger(TestSurvivalModeCode.class);
 
-    private static final String BEGIN_ID = "BeginID";
+    private static final String STAGE_ID = "StageID";
+    private static final int ASK_MODE_STAGE = 0;
+    private static final int ASK_ANSWER_STAGE = 1;
     
     private static final String HAVE_ANSWER_ID = "HaveAnswerID";
     private static final int HAVE_ANSWER = 0;
-    private static final int DO_NOT_HAVE_ANSWER = 1;
+    private static final int ASK_QUESTION = 1;
     
     private static final int CORRECT_ANSWER_TO_BEAT_LEVEL = 5;
     
@@ -79,6 +83,9 @@ public class TestSurvivalModeCode implements Speechlet {
             throws SpeechletException {
         log.info("onLaunch requestId={}, sessionId={}", request.getRequestId(),
                 session.getSessionId());
+        
+        session.setAttribute(STAGE_ID, ASK_MODE_STAGE);
+        
         return getWelcomeResponse();
     }
 
@@ -94,10 +101,16 @@ public class TestSurvivalModeCode implements Speechlet {
 
         // Note: If the session is started with an intent, no welcome message will be rendered;
         // rather, the intent specific response will be returned.
-        if ("SurvivalMode".equals(intentName)) {
+        if ("AnswerModeIntent".equals(intentName)) {
+            return handleAnswerModeResponse(intent, session);
+        } else if ("GiveAnswerIntent".equals(intentName)) {
             return setUpSurvivalStage(intent, session);
-        } else if ("SurvivalModeLevel2".equals(intentName)) {
-            return getColorFromSession(intent, session);
+        }else if ("AMAZON.HelpIntent".equals(intentName)) {
+            return getHelpResponse(intent);
+        } else if ("AMAZON.StopIntent".equals(intentName)) {
+            return getStopResponse(intent);
+        } else if ("AMAZON.CancelIntent".equals(intentName)) {
+            return getCancelResponse(intent);
         } else {
             throw new SpeechletException("Invalid Intent");
         }
@@ -121,11 +134,50 @@ public class TestSurvivalModeCode implements Speechlet {
                 "Practice, Survival or Time Trial. Now, which one would you like to play?";
         String repromptText =
                 "Please tell me the game mode that you would like to try.";
+        
+        
 
         return getSpeechletResponse(speechText, repromptText, true);
     }
 
 
+    private SpeechletResponse handleAnswerModeResponse(final Intent intent, final Session session) {
+    	Slot GamemodeSlot = intent.getSlot("GameMode");
+    	
+    	String repromptText, speechText = "";
+    	
+    	if(GamemodeSlot != null && GamemodeSlot.getValue() != null) {
+    		
+    		String modeSlot = GamemodeSlot.getValue();
+
+    		switch(modeSlot) {
+    		case "Survival":
+    			speechText = "Welcome to Survival Mode! Here you will be challenged with questions according to the level you are in. " +
+    						"If you get five answers correct at your current level, you will advance to next level. " +
+    						"For each question, you have at most eight seconds to answer. " +
+    						"If you spend more than eight seconds, the question will be counted wrong. " +
+    						"You can have at most 5 questions wrong. " + 
+    						"Ready to start the game? Say Begin or Continue to proceed. ";
+    			repromptText = "Ready to start the game? Say Begin or Continue to go ahead. ";
+    			
+    			break;
+    		
+    		case "Practice":
+    			break;
+    		
+    		case "Time Trial":
+    			break;
+    		
+    		default:
+    			break;
+    		}
+    		
+    		return getSpeechletResponse(speechText, repromptText, true);
+    	}
+            
+    }
+    	
+    
     private Question generateQuestion(int level) {
     	switch(level) {
     	case 1:
@@ -153,33 +205,48 @@ public class TestSurvivalModeCode implements Speechlet {
     			
     			return que;
     		}
-    	case 2:
     		
+    		break;
+    		
+    	case 2:
+    		break;
     		
     	default:
     		return null;
+    		break;
     	}
     }
+    
+    
     
     private SpeechletResponse setUpSurvivalStage(final Intent intent, final Session session) {
         // Get the slots from the intent.
     	
     	String speechText, repromptText;
     	
-    	if(session.getAttributes().containsKey(HAVE_ANSWER_ID)) {
+    	if((Integer)session.getAttribute(STAGE_ID) == ASK_MODE_STAGE) {
+    		speechText = "You have to choose which mode you want to play before you enter the play mode!" +
+    				"There are three choices: Survival, practice and Time Trial. What is your choice? ";
+    	}
+    	
+    	if(session.getAttributes().containsKey(HAVE_ANSWER_ID) && speechText != null) {
     		
     		if((Integer)session.getAttribute(HAVE_ANSWER_ID) == HAVE_ANSWER) {
     			
-    			int answer = 0;
+    			Slot answerSlot = intent.getSlot("Answer");
+    			
+    			float answer = Float.parseFloat(answerSlot.getValue());
+    			
+    			int level = (Integer)session.getAttribute(CURRENT_LEVEL_ID);
     			
     			if(session.getAttributes().containsKey(ASK_QUESTION_TIME_ID)) {
     				
     				Instant now = Instant.now();
     				Duration timeElapsed = Duration.between((Instant)session.getAttribute(ASK_QUESTION_TIME_ID), now);
-    				
+    		
     				if(timeElapsed.toMillis() < 8000) {
     					
-    					Question que = (Question)session.getAttribute(CURRENT_QUESTION_ID)
+    					Question que = (Question)session.getAttribute(CURRENT_QUESTION_ID);
     					
     					if(que.checkAnswer(answer)) {
     						
@@ -187,86 +254,300 @@ public class TestSurvivalModeCode implements Speechlet {
     							
     							if((Integer)session.getAttribute(ANSWERS_CORRECT_ID) == 4) {
     								
-    								session.setAttribute(CURRENT_LEVEL_ID, 2);
+    								if((Integer)session.getAttribute(CURRENT_LEVEL_ID) == 5) {
+    									
+    									speechText = "Wow! You are amazing! You just beat the hardest mathematic game in the history! " + 
+    												"According to whoever's statistics, only 5 percent of our players can get through the game! " + 
+    												"Congratulations! You are welcome to try the game again at any time! ";
+    									
+    									session.setAttribute(STAGE_ID, ASK_MODE_STAGE);
+    								}else {
+    									speechText = "Great Job! You have beaten Level " + level + ". " +
+    											"Now you will be challenged with questions from " + (level + 1) + ". " + 
+    											"Prepare for it! Here is your question: ";
     								
+    								session.setAttribute(CURRENT_LEVEL_ID, level + 1);
+    								
+    								Question queN = generateQuestion((Integer)session.getAttribute(CURRENT_LEVEL_ID));
+    								
+    								speechText += queN.getQuestion();
+    								
+    								session.setAttribute(CURRENT_QUESTION_ID, queN);
+    								
+    								Instant nowA = Instant.now();
+    								
+    			    				session.setAttribute(ASK_QUESTION_TIME_ID, nowA);
+    								}
+
     							}else {
-    								
     								int answersCorrectBefore = (Integer)session.getAttribute(ANSWERS_CORRECT_ID);
     								
     								session.setAttribute(ANSWERS_CORRECT_ID, answersCorrectBefore + 1);
     								
-    								speechText = "Congratulations! You got the question correct. Let's continue to the next one."
+    								speechText = "Congratulations! You got the question correct. Let's continue to the next one.";
+    								
+    								Question queN = generateQuestion((Integer)session.getAttribute(CURRENT_LEVEL_ID));
+    								
+    								speechText += queN.getQuestion();
+    								
+    								session.setAttribute(CURRENT_QUESTION_ID, queN);
+    								
+    								Instant nowA = Instant.now();
+    								
+    			    				session.setAttribute(ASK_QUESTION_TIME_ID, nowA);
     							}
     							
     						}else {
     							session.setAttribute(ANSWERS_CORRECT_ID, 1);
+    							
+    							speechText = "Great first try! Let's continue to the next question.";
+    							
+    							Question queN = generateQuestion(1);
+    							
+    							session.setAttribute(CURRENT_QUESTION_ID, queN);
+    							
+    							speechText += queN.getQuestion();
+    							
+								Instant nowA = Instant.now();
+								
+			    				session.setAttribute(ASK_QUESTION_TIME_ID, nowA);
     						}
     						
     					}else {
+    						
+    						if(session.getAttributes().containsKey(ANSWERS_WRONG_ID)) {
+    							int answersWrong = (Integer)session.getAttribute(ANSWERS_WRONG_ID);
+    							
+    							if(answersWrong == 4) {
+    								speechText = "Ah! Sorry, you have used all five chances of wrong answers. Try again!";
+    								
+    								session.setAttribute(HAVE_ANSWER_ID, ASK_QUESTION);
+    								
+    								session.setAttribute(ANSWERS_WRONG_ID, 0);
+    								
+    								session.setAttribute(ANSWERS_CORRECT_ID, 0);
+    								
+    								session.setAttribute(CURRENT_QUESTION_ID, null);
+    								
+    								session.setAttribute(CURRENT_LEVEL_ID, 1);
+    								
+    							}else {
+    								session.setAttribute(ANSWERS_WRONG_ID, answersWrong + 1);
+    								
+    								speechText = "Sorry, you got the answer Wrong. " +
+    										"The question is " + que.getQuestion() +
+    										"And the correct answer is " + que.getAnswer() + ". " +
+    										"Better luck next Time! Here is the next question: ";
+    								
+    								Question queN = generateQuestion((Integer)session.getAttribute(CURRENT_LEVEL_ID));
+    								
+    								speechText += queN.getQuestion();
+        							
+        							session.setAttribute(CURRENT_QUESTION_ID, queN);
+        							
+    								Instant nowA = Instant.now();
+    								
+    			    				session.setAttribute(ASK_QUESTION_TIME_ID, nowA);
+    							}   							
+    						}else {
+    							session.setAttribute(ANSWERS_WRONG_ID, 1);
+    							
+    							speechText = "Sorry, you got the answer Wrong. " +
+    										"The question is " + que.getQuestion() +
+    										"And the correct answer is " + que.getAnswer() + ". " +
+    										"Better luck next Time! Here is the next question: ";
+    							
+    							Question queN = generateQuestion(1);
+    							
+    							speechText += queN.getQuestion();
+    							
+    							session.setAttribute(CURRENT_QUESTION_ID, queN);
+    							
+								Instant nowA = Instant.now();
+								
+			    				session.setAttribute(ASK_QUESTION_TIME_ID, nowA);
+    						}
     						
     					}
     					
     				}else {
     						
+    					Question que = (Question)session.getAttribute(CURRENT_QUESTION_ID);
+    					
+    					if(session.getAttributes().containsKey(ANSWERS_WRONG_ID)) {
+							int answersWrong = (Integer)session.getAttribute(ANSWERS_WRONG_ID);
+							
+							if(answersWrong == 4) {
+								speechText = "Ah! Sorry, you have used all five chances of wrong answers. Try again!";
+								
+								session.setAttribute(HAVE_ANSWER_ID, ASK_QUESTION);
+								
+								session.setAttribute(ANSWERS_WRONG_ID, 0);
+								
+								session.setAttribute(ANSWERS_CORRECT_ID, 0);
+								
+								session.setAttribute(CURRENT_QUESTION_ID, null);
+								
+								session.setAttribute(CURRENT_LEVEL_ID, 1);
+								//End Game
+								//Initialize all Session Components
+								
+							}else {
+								session.setAttribute(ANSWERS_WRONG_ID, answersWrong + 1);
+								
+								speechText = "The question you missed is " + que.getQuestion() +
+										"And the correct answer is " + que.getAnswer() + ". " +
+										"Better luck next Time! Here is the next question: ";
+								
+								Question queN = generateQuestion((Integer)session.getAttribute(CURRENT_LEVEL_ID));
+								
+								session.setAttribute(CURRENT_QUESTION_ID, queN);
+								
+								speechText += queN.getQuestion();
+								
+								Instant nowA = Instant.now();
+								
+			    				session.setAttribute(ASK_QUESTION_TIME_ID, nowA);
+							}   							
+						}else {
+							session.setAttribute(ANSWERS_WRONG_ID, 1);
+							
+							speechText = "The question you missed is " + que.getQuestion() +
+										"And the correct answer is " + que.getAnswer() + ". " +
+										"Better luck next Time! Here is the next question: ";
+							
+							Question queN = generateQuestion(1);
+							
+							session.setAttribute(CURRENT_QUESTION_ID, queN);
+							
+							speechText += queN.getQuestion();
+							
+							Instant nowA = Instant.now();
+							
+		    				session.setAttribute(ASK_QUESTION_TIME_ID, nowA);
+						}
+    					
     				}
     			}
+    		}else {
+    			session.setAttribute(HAVE_ANSWER_ID, HAVE_ANSWER);
+        		
+        		Question que = generateQuestion(1);
+        		
+        		session.setAttribute(CURRENT_QUESTION_ID, que);
+        		
+        		session.setAttribute(CURRENT_LEVEL_ID, 1);
+        		
+        		speechText = "You first question is: ";
+        		
+        		speechText += que.getQuestion();
+        		
+				Instant nowA = Instant.now();
+				
+				session.setAttribute(ASK_QUESTION_TIME_ID, nowA);
     		}
+    	}else {
+    		session.setAttribute(HAVE_ANSWER_ID, HAVE_ANSWER);
+    		
+    		Question que = generateQuestion(1);
+    		
+    		session.setAttribute(CURRENT_LEVEL_ID, 1);
+    		
+    		session.setAttribute(CURRENT_QUESTION_ID, que);
+    		
+    		speechText = "Your first question is: ";
+    		
+    		speechText += que.getQuestion();
+    		
+			Instant nowA = Instant.now();
+			
+			session.setAttribute(ASK_QUESTION_TIME_ID, nowA);
+			
+			
+			
     	}
     	
-        Map<String, Slot> slots = intent.getSlots();
-
+        
         // Get the color slot from the list of slots.
         Slot favoriteColorSlot = slots.get(COLOR_SLOT);
         
-        
-
-        speechText 
-        
-        // Check for favorite color and create output to user.
-        if (favoriteColorSlot != null) {
-            // Store the user's favorite color in the Session and create response.
-            String favoriteColor = favoriteColorSlot.getValue();
-            session.setAttribute(COLOR_KEY, favoriteColor);
-            speechText =
-                    String.format("I now know that your favorite color is %s. You can ask me your "
-                            + "favorite color by saying, what's my favorite color?", favoriteColor);
-            repromptText =
-                    "You can ask me your favorite color by saying, what's my favorite color?";
-
-        } else {
-            // Render an error since we don't know what the users favorite color is.
-            speechText = "I'm not sure what your favorite color is, please try again";
-            repromptText =
-                    "I'm not sure what your favorite color is. You can tell me your favorite "
-                            + "color by saying, my favorite color is red";
+        if((Integer)session.getAttribute(HAVE_ANSWER_ID) == ASK_QUESTION) {
+        	repromptText = "Would you want to play again? ";
+        }else {
+        	repromptText = "You have exceeded the maximum amount of time to answer the question. Say \'continue\' or \'next question\' to continue";
         }
 
         return getSpeechletResponse(speechText, repromptText, true);
     }
     
-    private 
+	private SpeechletResponse getHelpResponse(Intent intent) {
+    	String speechOutput =
+                "With Fast math, you can get"
+                        + " a better idea of how good you can do with your math skills."
+                        + " Have fun! ";
+                        
 
-    
-    private SpeechletResponse getColorFromSession(final Intent intent, final Session session) {
-        String speechText;
-        boolean isAskResponse = false;
+        String repromptText = "What would you like to play?";
 
-        // Get the user's favorite color from the session.
-        String favoriteColor = (String) session.getAttribute(COLOR_KEY);
-
-        // Check to make sure user's favorite color is set in the session.
-        if (StringUtils.isNotEmpty(favoriteColor)) {
-            speechText = String.format("Your favorite color is %s. Goodbye.", favoriteColor);
+        return newAskResponse(speechOutput, false, repromptText, false);
+	}
+	
+	private SpeechletResponse newAskResponse(String stringOutput, boolean isOutputSsml,
+            String repromptText, boolean isRepromptSsml) {
+        OutputSpeech outputSpeech, repromptOutputSpeech;
+        if (isOutputSsml) {
+            outputSpeech = new SsmlOutputSpeech();
+            ((SsmlOutputSpeech) outputSpeech).setSsml(stringOutput);
         } else {
-            // Since the user's favorite color is not set render an error message.
-            speechText =
-                    "I'm not sure what your favorite color is. You can say, my favorite color is "
-                            + "red";
-            isAskResponse = true;
+            outputSpeech = new PlainTextOutputSpeech();
+            ((PlainTextOutputSpeech) outputSpeech).setText(stringOutput);
         }
 
-        return getSpeechletResponse(speechText, speechText, isAskResponse);
-    }
+        if (isRepromptSsml) {
+            repromptOutputSpeech = new SsmlOutputSpeech();
+            ((SsmlOutputSpeech) repromptOutputSpeech).setSsml(repromptText);
+        } else {
+            repromptOutputSpeech = new PlainTextOutputSpeech();
+            ((PlainTextOutputSpeech) repromptOutputSpeech).setText(repromptText);
+        }
+        Reprompt reprompt = new Reprompt();
+        reprompt.setOutputSpeech(repromptOutputSpeech);
+        return SpeechletResponse.newAskResponse(outputSpeech, reprompt);
+    }G
+	/**
+     * Creates a {@code SpeechletResponse} when there is an error of any kind.
+     *
+     * @return SpeechletResponse spoken and visual response for the given intent
+     */
+	private SpeechletResponse getErrorResponse(Intent intent) {
+    	
+    	PlainTextOutputSpeech outputSpeech = new PlainTextOutputSpeech();
+        outputSpeech.setText("I'm sorry... the fast math game seems to be down right now."
+        						+ " Please try again later.");
+
+        return SpeechletResponse.newTellResponse(outputSpeech);
+		
+	}
+
+	/**
+     * Creates a {@code SpeechletResponse} for the CancelIntent.
+     *
+     * @return SpeechletResponse spoken and visual response for the given intent
+     */
+	private SpeechletResponse getCancelResponse(Intent intent) {
+    	PlainTextOutputSpeech outputSpeech = new PlainTextOutputSpeech();
+        outputSpeech.setText("Goodbye, have a good day.");
+
+        return SpeechletResponse.newTellResponse(outputSpeech);
+	}
+
+	private SpeechletResponse getStopResponse(Intent intent) {
+    	
+    	PlainTextOutputSpeech outputSpeech = new PlainTextOutputSpeech();
+        outputSpeech.setText("Goodbye, have a good day.");
+
+        return SpeechletResponse.newTellResponse(outputSpeech);
+	}
 
     
     private SpeechletResponse getSpeechletResponse(String speechText, String repromptText,
@@ -281,7 +562,6 @@ public class TestSurvivalModeCode implements Speechlet {
         speech.setText(speechText);
 
         if (isAskResponse) {
-            // Create reprompt
             PlainTextOutputSpeech repromptSpeech = new PlainTextOutputSpeech();
             repromptSpeech.setText(repromptText);
             Reprompt reprompt = new Reprompt();

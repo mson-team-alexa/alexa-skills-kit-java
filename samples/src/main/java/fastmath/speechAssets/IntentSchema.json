@@ -1,8 +1,31 @@
 {
   "intents": [
     {
-      
+      "intent": "AnswerModeIntent",
+      "slots": [
+        {
+          "name" : "GameMode",
+          "type": "LIST_OF_GAME_MODES"
+        }
+      ]
     },
-   
+    {
+      "intent": "GiveAnswerIntent",
+      "slots": [
+        {
+          "name" : "Answer",
+          "type": "AMAZON.NUMBER"
+        }
+      ]
+    }
+    {
+      "intent": "AMAZON.HelpIntent"
+    },
+    {
+      "intent": "AMAZON.StopIntent"
+    },
+    {
+      "intent": "AMAZON.CancelIntent"
+    }
   ]
 }
