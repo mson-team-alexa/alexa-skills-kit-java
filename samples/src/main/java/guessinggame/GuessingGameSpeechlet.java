@@ -1,4 +1,16 @@
 package guessinggame;
+<<<<<<< Updated upstream
+=======
+/**
+Copyright 2014-2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the License. A copy of the License is located at
+
+    http://aws.amazon.com/apache2.0/
+
+or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+*/
+>>>>>>> Stashed changes
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +27,7 @@ import com.amazon.speech.speechlet.SpeechletResponse;
 import com.amazon.speech.ui.PlainTextOutputSpeech;
 import com.amazon.speech.ui.Reprompt;
 import com.amazon.speech.ui.SimpleCard;
+<<<<<<< Updated upstream
 
 /**
  * This sample shows how to create a simple speechlet for handling speechlet requests.
@@ -95,3 +108,135 @@ public class GuessingGameSpeechlet implements Speechlet {
     }
 }
 
+=======
+import com.amazon.speech.ui.SsmlOutputSpeech;
+
+/**
+* This sample shows how to create a simple speechlet for handling speechlet requests.
+*/
+public class GuessingGameSpeechlet implements Speechlet {
+private static final Logger log = LoggerFactory.getLogger(GuessingGameSpeechlet.class);
+
+@Override
+public void onSessionStarted(final SessionStartedRequest request, final Session session)
+        throws SpeechletException {
+    log.info("onSessionStarted requestId={}, sessionId={}", request.getRequestId(),
+            session.getSessionId());
+    // any initialization logic goes here
+}
+
+@Override
+public SpeechletResponse onLaunch(final LaunchRequest request, final Session session)
+        throws SpeechletException {
+    log.info("onLaunch requestId={}, sessionId={}", request.getRequestId(),
+            session.getSessionId());
+    return getWelcomeResponse();
+}
+
+@Override
+public SpeechletResponse onIntent(final IntentRequest request, final Session session)
+        throws SpeechletException {
+    log.info("onIntent requestId={}, sessionId={}", request.getRequestId(),
+            session.getSessionId());
+
+    Intent intent = request.getIntent();
+    String intentName = (intent != null) ? intent.getName() : null;
+
+    //change based on intents
+    if ("PlayGameIntent".equals(intentName)) {
+        return playGameResponse();
+    } else if ("AMAZON.HelpIntent".equals(intentName)) {
+        return getHelpResponse();
+    } else {
+        throw new SpeechletException("Invalid Intent");
+    }
+}
+
+@Override
+public void onSessionEnded(final SessionEndedRequest request, final Session session)
+        throws SpeechletException {
+    log.info("onSessionEnded requestId={}, sessionId={}", request.getRequestId(),
+            session.getSessionId());
+    // any cleanup logic goes here
+}
+
+/**
+ * Creates and returns a {@code SpeechletResponse} with a welcome message.
+ *
+ * @return SpeechletResponse spoken and visual response for the given intent
+ */
+private SpeechletResponse getWelcomeResponse() {
+    String speechText = "Welcome to the Alexa Skills Kit, you can say hello";
+
+    // Create the Simple card content.
+    SimpleCard card = new SimpleCard();
+    card.setTitle("HelloWorld");
+    card.setContent(speechText);
+
+    // Create the plain text output.
+    PlainTextOutputSpeech speech = new PlainTextOutputSpeech();
+    speech.setText(speechText);
+
+    // Create reprompt
+    Reprompt reprompt = new Reprompt();
+    reprompt.setOutputSpeech(speech);
+
+    return SpeechletResponse.newAskResponse(speech, reprompt, card);
+}
+
+/**
+ * Creates a {@code SpeechletResponse} for the hello intent.
+ *
+ * @return SpeechletResponse spoken and visual response for the given intent
+ */
+private SpeechletResponse getHelloResponse() {
+    String speechText = "Hello world";
+
+    // Create the Simple card content.
+    SimpleCard card = new SimpleCard();
+    card.setTitle("HelloWorld");
+    card.setContent(speechText);
+
+    // Create the plain text output.
+    PlainTextOutputSpeech speech = new PlainTextOutputSpeech();
+    speech.setText(speechText);
+
+    return SpeechletResponse.newTellResponse(speech, card);
+}
+
+/**
+ * Creates a {@code SpeechletResponse} for the help intent.
+ *
+ * @return SpeechletResponse spoken and visual response for the given intent
+ */
+private SpeechletResponse getHelpResponse() {
+    String speechText = "You can say hello to me!";
+
+    // Create the Simple card content.
+    SimpleCard card = new SimpleCard();
+    card.setTitle("HelloWorld");
+    card.setContent(speechText);
+
+    // Create the plain text output.
+    PlainTextOutputSpeech speech = new PlainTextOutputSpeech();
+    speech.setText(speechText);
+
+    // Create reprompt
+    Reprompt reprompt = new Reprompt();
+    reprompt.setOutputSpeech(speech);
+
+    return SpeechletResponse.newAskResponse(speech, reprompt, card);
+}
+
+private SpeechletResponse playGameResponse() {
+    String speechText = "<speak> Welcome to the Animal Sound Guessing Game"
+    		+ " <audio src=\"https://s3.amazonaws.com/final-project-mson/EuzargZH-cat-meow-2-cat-stevens-2034822903.mp3\" /> </speak>";
+    
+    // Create the plain text output.
+    SsmlOutputSpeech outputSpeech = new SsmlOutputSpeech();
+    outputSpeech.setSsml(speechText);
+
+    return SpeechletResponse.newTellResponse(outputSpeech);
+}
+}
+>>>>>>> Stashed changes

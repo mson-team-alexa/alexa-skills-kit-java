@@ -1,7 +1,11 @@
 {
   "intents": [
     {
+<<<<<<< Updated upstream
       "intent": "PLAYGAMEINTENT"
+=======
+      "intent": “PlayGameIntent”
+>>>>>>> Stashed changes
     },
     {
       "intent": "AMAZON.HelpIntent"

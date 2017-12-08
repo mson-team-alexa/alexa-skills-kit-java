@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 GetHolidaysIntent what are the bart holidays
 GetHolidaysIntent holidays
 GetHolidaysIntent not running
@@ -6,3 +7,6 @@ GetHolidaysIntent when will bart not run
 GetHolidaysIntent what are the holidays
 GetHolidaysIntent what the upcoming holidays are
 GetHolidaysIntent what the holidays are
+=======
+PlayGameIntent let's play
+>>>>>>> Stashed changes
