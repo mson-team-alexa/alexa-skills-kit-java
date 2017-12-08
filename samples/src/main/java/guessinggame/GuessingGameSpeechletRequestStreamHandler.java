@@ -1,4 +1,4 @@
-package barthelper;
+package guessinggame;
 
 import java.util.HashSet;
 import java.util.Set;
