@@ -69,7 +69,7 @@ public class FastMathSpeechlet implements Speechlet {
     private static Random RAND = new Random();
 
 	private Object _;
-
+ 
     @Override
     public void onSessionStarted(final SessionStartedRequest request, final Session session)
             throws SpeechletException {
@@ -299,7 +299,7 @@ public class FastMathSpeechlet implements Speechlet {
     								
     								session.setAttribute(ANSWERS_CORRECT_ID, answersCorrectBefore + 1);
     								
-    								speechText = "Congratulations! You got the question correct. Let's continue to the next one.";
+    								speechText = "<audio src=\"https://s3.amazonaws.com/cschool0/correct.mp3\"/>Congratulations! You got the question correct. Let's continue to the next one.";
     								
     								Question queN = generateQuestion((Integer)session.getAttribute(CURRENT_LEVEL_ID));
     								
@@ -349,7 +349,7 @@ public class FastMathSpeechlet implements Speechlet {
     							}else {
     								session.setAttribute(ANSWERS_WRONG_ID, answersWrong + 1);
     								
-    								speechText = "Sorry, you got the answer Wrong. " +
+    								speechText = "<audio src=\"https://s3.amazonaws.com/cschool0/incorrect.mp3\"/>Sorry, you got the answer Wrong. " +
     										"The question is " + que.getQuestion() +
     										"And the correct answer is " + que.getAnswer() + ". " +
     										"Better luck next Time! Here is the next question: ";
