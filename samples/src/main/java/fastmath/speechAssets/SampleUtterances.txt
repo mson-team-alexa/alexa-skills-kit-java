@@ -4,6 +4,7 @@ GiveAnswerIntent I think the answer is {Answer}
 GiveAnswerIntent I believe the Answer is {Answer}
 GiveAnswerIntent I choose {Answer}
 GiveAnswerIntent My answer is {Answer}
+GiveAnswerIntent Continue
 AnswerModeIntent {GameMode}
 AnswerModeIntent I want to play {GameMode}
 AnswerModeIntent I want to play with {GameMode}

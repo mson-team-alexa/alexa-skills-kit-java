@@ -9,7 +9,7 @@
  */
 package fastmath;
 
-
+import java.util.*;
 import java.util.Map;
 import java.util.Random;
 import java.util.ArrayList;
@@ -17,7 +17,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.time.Duration;
-import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import com.amazon.speech.slu.Intent;
 import com.amazon.speech.slu.Slot;
@@ -45,10 +46,13 @@ public class FastMathSpeechlet implements Speechlet {
     private static final String STAGE_ID = "StageID";
     private static final int ASK_MODE_STAGE = 0;
     private static final int ASK_ANSWER_STAGE = 1;
+    private static final int CONFIRM_STAGE = 2;
     
     private static final String HAVE_ANSWER_ID = "HaveAnswerID";
     private static final int HAVE_ANSWER = 0;
     private static final int ASK_QUESTION = 1;
+    
+    private static final String SURVIVAL_MODE = "survival";
     
     private static final int CORRECT_ANSWER_TO_BEAT_LEVEL = 5;
     
@@ -105,7 +109,9 @@ public class FastMathSpeechlet implements Speechlet {
             return handleAnswerModeResponse(intent, session);
         } else if ("GiveAnswerIntent".equals(intentName)) {
             return setUpSurvivalStage(intent, session);
-        }else if ("AMAZON.HelpIntent".equals(intentName)) {
+        } else if ("ContinueIntent".equals(intentName)) {
+        	return handleContinueStageResponse(intent,  session);
+        } else if ("AMAZON.HelpIntent".equals(intentName)) {
             return getHelpResponse(intent);
         } else if ("AMAZON.StopIntent".equals(intentName)) {
             return getStopResponse(intent);
@@ -124,8 +130,28 @@ public class FastMathSpeechlet implements Speechlet {
         // any cleanup logic goes here
     }
 
-
- 
+    private SpeechletResponse handleContinueStageResponse(final Intent intent, final Session session) {
+        // Create the welcome message.
+    	
+    	String speechText, repromptText;
+    	
+    	if(session.getAttributes().containsKey(STAGE_ID)) {
+    		if((Integer)session.getAttribute(STAGE_ID) != CONFIRM_STAGE) {
+    			speechText = "You haven't chosen the stage yet!";
+    			repromptText = "Please the mode you want to play. ";
+    			
+    			return getSpeechletResponse(speechText, repromptText, true);
+    		}else {
+    			session.setAttribute(STAGE_ID, ASK_ANSWER_STAGE);
+    			
+    			return setUpSurvivalStage(intent, session);
+    		}
+    	}else {
+    		 return null;
+    	}
+        
+    }
+    
     
     private SpeechletResponse getWelcomeResponse() {
         // Create the welcome message.
@@ -143,18 +169,25 @@ public class FastMathSpeechlet implements Speechlet {
 
     private SpeechletResponse handleAnswerModeResponse(final Intent intent, final Session session) {
     	
-    	Slot GamemodeSlot = intent.getSlot("GameMode");
-    	
     	String speechText = "";
     	
     	String repromptText = "";
     	
-    	if(GamemodeSlot != null && GamemodeSlot.getValue() != null) {
+    	if(session.getAttributes().containsKey(STAGE_ID)) {
+    		if((Integer)session.getAttribute(STAGE_ID) != ASK_MODE_STAGE) {
+    			speechText = "You do not have to choose stage right now!";
+    		}
+    	}
+    	
+    	Slot GamemodeSlot = intent.getSlot("GameMode");
+    	
+    	if(GamemodeSlot != null && GamemodeSlot.getValue() != null && speechText != null) {
+    		
+    		log.info("NOT NULL");
     		
     		String modeSlot = GamemodeSlot.getValue();
 
-    		switch(modeSlot) {
-    		case "Survival":
+    		if(modeSlot.toLowerCase().equals(SURVIVAL_MODE)) {
     			speechText = "Welcome to Survival Mode! Here you will be challenged with questions according to the level you are in. " +
     						"If you get five answers correct at your current level, you will advance to next level. " +
     						"For each question, you have at most eight seconds to answer. " +
@@ -164,22 +197,12 @@ public class FastMathSpeechlet implements Speechlet {
     			
     			repromptText = "Ready to start the game? Say Begin or Continue to go ahead. ";
     			
-    			session.setAttribute(STAGE_ID, ASK_ANSWER_STAGE);
-    			
-    			break;
-    		
-    		case "Practice":
-    			break;
-    		
-    		case "Time Trial":
-    			break;
-    		
-    		default:
-    			break;
+    			session.setAttribute(STAGE_ID, CONFIRM_STAGE);
     		}
-    		
     		return getSpeechletResponse(speechText, repromptText, true);
+    		
     	}else {
+    		
     		return getHelp();
     	}
             
@@ -198,7 +221,7 @@ public class FastMathSpeechlet implements Speechlet {
     	case 1:
     		int randX = RAND.nextInt(10);
     		
-    		int randY = RAND.nextInt(100) + 10;
+    		int randY = RAND.nextInt(50) + 10;
     		
     		int randZ = RAND.nextInt(1);
     		
@@ -212,9 +235,9 @@ public class FastMathSpeechlet implements Speechlet {
     			
     			return que;
     		}else {
-    			int answer  =  randX - randY;
+    			int answer  =  randY - randX;
     			
-    			String speech = "What is " + randX + " minus " + randY + " ? ";
+    			String speech = "What is " + randY + " minus " + randX + " ? ";
     			
     			Question que = new Question(speech, answer);
     			
@@ -223,8 +246,35 @@ public class FastMathSpeechlet implements Speechlet {
     		
     		
     	case 2:
-    		return null;
     		
+    		randX = RAND.nextInt(10);
+    		
+    		randY = RAND.nextInt(15);
+    		
+    		randZ = RAND.nextInt(1);
+    		
+    		if(randZ == 0) {
+    			
+    			int answer = randX * randY;
+    			
+    			String speech = "What is " + randX + " multiply by " + randY + " ? ";
+    			
+    			Question que = new Question(speech, answer);
+    			
+    			return que;
+    		}else {
+    			int product = randX * randY;
+    			
+    			int answer  =  product / randX;
+    			
+    			String speech = "What is " + product + " divided by " + randX + " ? ";
+    			
+    			Question que = new Question(speech, answer);
+    			
+    			return que;
+    		}
+    	case 3:
+    		return null;
     	default:
     		return null;
     	}
@@ -250,14 +300,27 @@ public class FastMathSpeechlet implements Speechlet {
     			
     			Slot answerSlot = intent.getSlot("Answer");
     			
+    			log.info(answerSlot.getValue() + "Answer in Float");
+    			
     			float answer = Float.parseFloat(answerSlot.getValue());
     			
     			int level = (Integer)session.getAttribute(CURRENT_LEVEL_ID);
     			
     			if(session.getAttributes().containsKey(ASK_QUESTION_TIME_ID)) {
     				
-    				Instant now = Instant.now();
-    				Duration timeElapsed = Duration.between((Instant)session.getAttribute(ASK_QUESTION_TIME_ID), now);
+    				LinkedHashMap LHM = (LinkedHashMap)session.getAttribute(ASK_QUESTION_TIME_ID);
+    				
+    				LocalDateTime now = LocalDateTime.now();
+    				
+    				LocalDateTime then, nowC;
+    				
+    				LocalDate lDT = LocalDate.now(), lDN = LocalDate.now();
+    				
+    				then = lDT.atTime(Integer.parseInt(LHM.get("hour").toString()), Integer.parseInt(LHM.get("minute").toString()), Integer.parseInt(LHM.get("second").toString()));
+    				
+    				nowC = lDN.atTime(now.getHour(), now.getMinute(), now.getSecond());
+    				
+    				Duration timeElapsed = Duration.between(then, nowC);
     		
     				if(timeElapsed.toMillis() < 8000) {
     					
@@ -289,7 +352,7 @@ public class FastMathSpeechlet implements Speechlet {
     								
     								session.setAttribute(CURRENT_QUESTION_ID, queN);
     								
-    								Instant nowA = Instant.now();
+    								LocalDateTime nowA = LocalDateTime.now();
     								
     			    				session.setAttribute(ASK_QUESTION_TIME_ID, nowA);
     								}
@@ -307,7 +370,7 @@ public class FastMathSpeechlet implements Speechlet {
     								
     								session.setAttribute(CURRENT_QUESTION_ID, queN);
     								
-    								Instant nowA = Instant.now();
+    								LocalDateTime nowA = LocalDateTime.now();
     								
     			    				session.setAttribute(ASK_QUESTION_TIME_ID, nowA);
     							}
@@ -323,7 +386,7 @@ public class FastMathSpeechlet implements Speechlet {
     							
     							speechText += queN.getQuestion();
     							
-								Instant nowA = Instant.now();
+    							LocalDateTime nowA = LocalDateTime.now();
 								
 			    				session.setAttribute(ASK_QUESTION_TIME_ID, nowA);
     						}
@@ -360,7 +423,7 @@ public class FastMathSpeechlet implements Speechlet {
         							
         							session.setAttribute(CURRENT_QUESTION_ID, queN);
         							
-    								Instant nowA = Instant.now();
+        							LocalDateTime nowA = LocalDateTime.now();
     								
     			    				session.setAttribute(ASK_QUESTION_TIME_ID, nowA);
     							}   							
@@ -378,7 +441,7 @@ public class FastMathSpeechlet implements Speechlet {
     							
     							session.setAttribute(CURRENT_QUESTION_ID, queN);
     							
-								Instant nowA = Instant.now();
+    							LocalDateTime nowA = LocalDateTime.now();
 								
 			    				session.setAttribute(ASK_QUESTION_TIME_ID, nowA);
     						}
@@ -420,7 +483,7 @@ public class FastMathSpeechlet implements Speechlet {
 								
 								speechText += queN.getQuestion();
 								
-								Instant nowA = Instant.now();
+								LocalDateTime nowA = LocalDateTime.now();
 								
 			    				session.setAttribute(ASK_QUESTION_TIME_ID, nowA);
 							}   							
@@ -437,7 +500,7 @@ public class FastMathSpeechlet implements Speechlet {
 							
 							speechText += queN.getQuestion();
 							
-							Instant nowA = Instant.now();
+							LocalDateTime nowA = LocalDateTime.now();
 							
 		    				session.setAttribute(ASK_QUESTION_TIME_ID, nowA);
 						}
@@ -457,7 +520,7 @@ public class FastMathSpeechlet implements Speechlet {
         		
         		speechText += que.getQuestion();
         		
-				Instant nowA = Instant.now();
+        		LocalDateTime nowA = LocalDateTime.now();
 				
 				session.setAttribute(ASK_QUESTION_TIME_ID, nowA);
     		}
@@ -474,7 +537,7 @@ public class FastMathSpeechlet implements Speechlet {
     		
     		speechText += que.getQuestion();
     		
-			Instant nowA = Instant.now();
+    		LocalDateTime nowA = LocalDateTime.now();
 			
 			session.setAttribute(ASK_QUESTION_TIME_ID, nowA);
 

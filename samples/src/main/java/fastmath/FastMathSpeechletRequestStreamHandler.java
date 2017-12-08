@@ -7,23 +7,19 @@
 
     or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
-package wiseguy;
+package fastmath;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import com.amazon.speech.speechlet.Speechlet;
 import com.amazon.speech.speechlet.lambda.SpeechletRequestStreamHandler;
 
 /**
- * This class could be the handler for an AWS Lambda function powering an Alexa Skills Kit
- * experience. To do this, simply set the handler field in the AWS Lambda console to
- * "wiseguy.WiseGuySpeechletRequestStreamHandler" For this to work, you'll also need to build this
- * project using the {@code lambda-compile} Ant task and upload the resulting zip file to power your
- * function.
+ * This class is created by the Lambda environment when a request comes in. All calls will be
+ * dispatched to the Speechlet passed into the super constructor.
  */
-public class WiseGuySpeechletRequestStreamHandler extends SpeechletRequestStreamHandler {
-
+public final class FastMathSpeechletRequestStreamHandler extends
+        SpeechletRequestStreamHandler {
     private static final Set<String> supportedApplicationIds;
 
     static {
@@ -35,13 +31,7 @@ public class WiseGuySpeechletRequestStreamHandler extends SpeechletRequestStream
         // supportedApplicationIds.add("amzn1.echo-sdk-ams.app.[unique-value-here]");
     }
 
-    public WiseGuySpeechletRequestStreamHandler() {
-        super(new WiseGuySpeechlet(), supportedApplicationIds);
+    public FastMathSpeechletRequestStreamHandler() {
+        super(new FastMathSpeechlet(), supportedApplicationIds);
     }
-
-    public WiseGuySpeechletRequestStreamHandler(Speechlet speechlet,
-            Set<String> supportedApplicationIds) {
-        super(speechlet, supportedApplicationIds);
-    }
-
 }
