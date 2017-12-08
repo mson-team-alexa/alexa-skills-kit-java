@@ -271,7 +271,7 @@ public class FastMathSpeechlet implements Speechlet {
     								
     								if((Integer)session.getAttribute(CURRENT_LEVEL_ID) == 5) {
     									
-    									speechText = "Wow! You are amazing! You just beat the hardest mathematic game in the history! " + 
+    									speechText = "<audio src=\"https://s3.amazonaws.com/cschool0/winner.mp3\"/>Wow! You are amazing! You just beat the hardest mathematic game in the history! " + 
     												"According to whoever's statistics, only 5 percent of our players can get through the game! " + 
     												"Congratulations! You are welcome to try the game again at any time! ";
     									
@@ -315,7 +315,7 @@ public class FastMathSpeechlet implements Speechlet {
     						}else {
     							session.setAttribute(ANSWERS_CORRECT_ID, 1);
     							
-    							speechText = "Great first try! Let's continue to the next question.";
+    							speechText = "<audio src=\"https://s3.amazonaws.com/cschool0/correct.mp3\"/>Great first try! Let's continue to the next question.";
     							
     							Question queN = generateQuestion(1);
     							
@@ -334,7 +334,7 @@ public class FastMathSpeechlet implements Speechlet {
     							int answersWrong = (Integer)session.getAttribute(ANSWERS_WRONG_ID);
     							
     							if(answersWrong == 4) {
-    								speechText = "Ah! Sorry, you have used all five chances of wrong answers. Try again!";
+    								speechText = "<audio src=\"https://s3.amazonaws.com/cschool0/loser.mp3\"/>Ah! Sorry, you have used all five chances of wrong answers. Try again!";
     								
     								session.setAttribute(HAVE_ANSWER_ID, ASK_QUESTION);
     								
@@ -367,7 +367,7 @@ public class FastMathSpeechlet implements Speechlet {
     						}else {
     							session.setAttribute(ANSWERS_WRONG_ID, 1);
     							
-    							speechText = "Sorry, you got the answer Wrong. " +
+    							speechText = "<audio src=\"https://s3.amazonaws.com/cschool0/incorrect.mp3\"/>Sorry, you got the answer Wrong. " +
     										"The question is " + que.getQuestion() +
     										"And the correct answer is " + que.getAnswer() + ". " +
     										"Better luck next Time! Here is the next question: ";
@@ -393,7 +393,7 @@ public class FastMathSpeechlet implements Speechlet {
 							int answersWrong = (Integer)session.getAttribute(ANSWERS_WRONG_ID);
 							
 							if(answersWrong == 4) {
-								speechText = "Ah! Sorry, you have used all five chances of wrong answers. Try again!";
+								speechText = "<audio src=\"https://s3.amazonaws.com/cschool0/loser.mp3\"/>Ah! Sorry, you have used all five chances of wrong answers. Try again!";
 								
 								session.setAttribute(HAVE_ANSWER_ID, ASK_QUESTION);
 								
@@ -410,7 +410,7 @@ public class FastMathSpeechlet implements Speechlet {
 							}else {
 								session.setAttribute(ANSWERS_WRONG_ID, answersWrong + 1);
 								
-								speechText = "The question you missed is " + que.getQuestion() +
+								speechText = "<audio src=\"https://s3.amazonaws.com/cschool0/incorrect.mp3\"/>The question you missed is " + que.getQuestion() +
 										"And the correct answer is " + que.getAnswer() + ". " +
 										"Better luck next Time! Here is the next question: ";
 								
@@ -427,7 +427,7 @@ public class FastMathSpeechlet implements Speechlet {
 						}else {
 							session.setAttribute(ANSWERS_WRONG_ID, 1);
 							
-							speechText = "The question you missed is " + que.getQuestion() +
+							speechText = "<audio src=\"https://s3.amazonaws.com/cschool0/incorrect.mp3\"/>The question you missed is " + que.getQuestion() +
 										"And the correct answer is " + que.getAnswer() + ". " +
 										"Better luck next Time! Here is the next question: ";
 							
