@@ -6,14 +6,14 @@ public class Question {
 	
 	private static float ANSWER;
 	
-	Question(String questionSpeech, int answer){
+	public Question(String questionSpeech, float f){
 		
 		QUESTION_SPEECH = questionSpeech;
 		
-		ANSWER = answer;
+		ANSWER = f;
 		
 	}
-	
+
 	public String getQuestion() {
 		return QUESTION_SPEECH;
 	}

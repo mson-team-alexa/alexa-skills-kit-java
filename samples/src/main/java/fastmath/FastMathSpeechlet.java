@@ -324,9 +324,13 @@ public class FastMathSpeechlet implements Speechlet {
     		
     				if(timeElapsed.toMillis() < 8000) {
     					
-    					log.info("Map" + (LinkedHashMap)session.getAttribute(CURRENT_QUESTION_ID));
+    					LinkedHashMap LHMQ = (LinkedHashMap)session.getAttribute(CURRENT_QUESTION_ID);	
     					
-    					Question que = (Question)session.getAttribute(CURRENT_QUESTION_ID);
+    					String question = LHMQ.get("question").toString();
+    					
+    					float answerT = Float.parseFloat(LHMQ.get("answer").toString());
+    					
+    					Question que = new Question(question, answerT);
     					
     					if(que.checkAnswer(answer)) {
     						
@@ -451,8 +455,15 @@ public class FastMathSpeechlet implements Speechlet {
     					}
     					
     				}else {
+    					log.info("The Time" + timeElapsed.toMillis());
     						
-    					Question que = (Question)session.getAttribute(CURRENT_QUESTION_ID);
+    					LinkedHashMap LHMQ = (LinkedHashMap)session.getAttribute(CURRENT_QUESTION_ID);	
+    					
+    					String question = LHMQ.get("question").toString();
+    					
+    					float answerT = Float.parseFloat(LHMQ.get("answer").toString());
+    					
+    					Question que = new Question(question, answerT);
     					
     					if(session.getAttributes().containsKey(ANSWERS_WRONG_ID)) {
 							int answersWrong = (Integer)session.getAttribute(ANSWERS_WRONG_ID);
