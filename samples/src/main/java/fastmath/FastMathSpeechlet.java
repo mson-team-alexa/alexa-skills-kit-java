@@ -324,6 +324,8 @@ public class FastMathSpeechlet implements Speechlet {
     		
     				if(timeElapsed.toMillis() < 8000) {
     					
+    					log.info("Map" + (LinkedHashMap)session.getAttribute(CURRENT_QUESTION_ID));
+    					
     					Question que = (Question)session.getAttribute(CURRENT_QUESTION_ID);
     					
     					if(que.checkAnswer(answer)) {
