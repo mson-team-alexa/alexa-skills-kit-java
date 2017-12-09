@@ -29,9 +29,12 @@ private static final String ANIMALS = "Animals";
 
 
 /*This will need to be replaced with sessions*/
-public String correctAnimal = "ardvark";
+public String correctAnimal = "cat";
 public int numPoints = 10;
 public int numStrikes = 0;
+public int whichAnimal = 2;
+String[] animalsounds = new String[] {"https://s3.amazonaws.com/final-project-mson/pMCJLWNd-giantanteater.mp3","https://s3.amazonaws.com/final-project-mson/ORw3KFcz-ee89c132fbf64a7cbb5ac65df7f7b5fb-hippo-001.mp3","https://s3.amazonaws.com/final-project-mson/EuzargZH-cat-meow-2-cat-stevens-2034822903.mp3"};
+
 /**/
 
 
@@ -130,7 +133,7 @@ private SpeechletResponse getHelpResponse() {
 
 private SpeechletResponse playGameResponse() {
     String speechText = "<speak> Guess the animal that makes this sound: "
-    		+ " <audio src=\"https://s3.amazonaws.com/final-project-mson/EuzargZH-cat-meow-2-cat-stevens-2034822903.mp3\" /> </speak>";
+    		+ " <audio src=\"" + animalsounds[2] + "\"/> </speak>";
     
     //Create reprompt
     SsmlOutputSpeech outputSpeech = new SsmlOutputSpeech();
