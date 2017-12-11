@@ -206,16 +206,6 @@ private SpeechletResponse handleGuessTheAnimal(Intent intent, final Session sess
     String speech = "";
     if (animalSlot != null && animalSlot.getValue() != null) {
         String animalName = animalSlot.getValue();
-        
-        log.info(animalName);
-        log.info(animal);
-        
-        if(animalName == "cat") {
-        		log.info("yes 1");
-        }
-        if(animal == "cat") {
-        		log.info("yes 2");
-        }
 
         //If the animal guessed is correct
         if(animalName.equals(animal)) {
@@ -230,8 +220,6 @@ private SpeechletResponse handleGuessTheAnimal(Intent intent, final Session sess
         }
         //If the animal guessed is incorrect
         if(!(animalName.equals(animal))) {
-        		log.info("animalName: " + animalName.getClass().getSimpleName());
-        		log.info("animal: " + animal.getClass().getSimpleName());
         		speech= "Sorry, That's not correct.";
         		totalStrikes++;
         		session.setAttribute(numStrikes, totalStrikes);
