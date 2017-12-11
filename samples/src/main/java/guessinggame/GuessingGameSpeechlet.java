@@ -1,5 +1,7 @@
 package guessinggame;
 
+import java.util.ArrayList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.amazon.speech.slu.Intent;
@@ -25,15 +27,28 @@ private static final Logger log = LoggerFactory.getLogger(GuessingGameSpeechlet.
 /**
  * Custom Slot key for the name animal given by the user
  */
-private static final String ANIMALS = "Animals";
+private static final String ANIMALS = "animal";
 
 
 /*This will need to be replaced with sessions*/
-public String correctAnimal = "cat";
-public int numPoints = 10;
-public int numStrikes = 0;
+public String correctAnimal = "correctAnimal";
+public String numPoints = "points";
+public String numStrikes = "strikes";
 public int whichAnimal = 2;
-String[] animalsounds = new String[] {"https://s3.amazonaws.com/final-project-mson/pMCJLWNd-giantanteater.mp3","https://s3.amazonaws.com/final-project-mson/ORw3KFcz-ee89c132fbf64a7cbb5ac65df7f7b5fb-hippo-001.mp3","https://s3.amazonaws.com/final-project-mson/EuzargZH-cat-meow-2-cat-stevens-2034822903.mp3"};
+
+// create lists of sounds of each difficulty
+private static final ArrayList<Sound> EASY_SOUNDS = new ArrayList<Sound>();
+private static final ArrayList<Sound> MEDIUM_SOUNDS = new ArrayList<Sound>();
+private static final ArrayList<Sound> HARD_SOUNDS = new ArrayList<Sound>();
+
+// adding sounds to lists
+static {
+EASY_SOUNDS.add(new Sound("https://s3.amazonaws.com/final-project-mson/EuzargZH-cat-meow-2-cat-stevens-2034822903.mp3", "meow!", "cat"));
+MEDIUM_SOUNDS.add(new Sound("https://s3.amazonaws.com/final-project-mson/ORw3KFcz-ee89c132fbf64a7cbb5ac65df7f7b5fb-hippo-001.mp3", "URGHJGJYGJGHHHGHH", "hippo"));
+HARD_SOUNDS.add(new Sound("https://s3.amazonaws.com/final-project-mson/pMCJLWNd-giantanteater.mp3", "SHHHRRRHRHHRH", "giant anteater"));
+}
+
+//String[] animalsounds = new String[] {"https://s3.amazonaws.com/final-project-mson/pMCJLWNd-giantanteater.mp3","https://s3.amazonaws.com/final-project-mson/ORw3KFcz-ee89c132fbf64a7cbb5ac65df7f7b5fb-hippo-001.mp3","https://s3.amazonaws.com/final-project-mson/EuzargZH-cat-meow-2-cat-stevens-2034822903.mp3"};
 
 /**/
 
@@ -65,7 +80,10 @@ public SpeechletResponse onIntent(final IntentRequest request, final Session ses
 
     //change based on intents
     if ("PlayGameIntent".equals(intentName)) {
-        return playGameResponse();
+    		// The reason these are set here is bc playGameResponse is called again after each level
+    		session.setAttribute(numPoints, 0);
+    		session.setAttribute(numStrikes, 0);
+        return playGameResponse(session);
     }else if("GuessAnimalIntent".equals(intentName)) {
     		return handleGuessTheAnimal(intent, session);
 	}else if ("AMAZON.HelpIntent".equals(intentName)) {
@@ -131,9 +149,28 @@ private SpeechletResponse getHelpResponse() {
     return SpeechletResponse.newAskResponse(speech, reprompt, card);
 }
 
-private SpeechletResponse playGameResponse() {
-    String speechText = "<speak> Guess the animal that makes this sound: "
-    		+ " <audio src=\"" + animalsounds[2] + "\"/> </speak>";
+private guessinggame.GuessingGameSpeechlet.Sound getSound(final Session session) {
+	int points = (int) session.getAttribute(numPoints);
+	//String animalSound = null;
+	if(points == 0) {
+		int index = (int) Math.floor(Math.random() * EASY_SOUNDS.size());
+		return EASY_SOUNDS.get(index);
+	} else if(points == 10){
+		int index = (int) Math.floor(Math.random() * MEDIUM_SOUNDS.size());
+		return MEDIUM_SOUNDS.get(index);
+	} else if(points == 20) {
+		int index = (int) Math.floor(Math.random() * HARD_SOUNDS.size());
+		return HARD_SOUNDS.get(index);
+	}
+	return null;
+}
+
+
+private SpeechletResponse playGameResponse(final Session session) {
+	
+	Sound animalSound = getSound(session);
+	session.setAttribute(correctAnimal, animalSound.animal_name);
+    String speechText = "<speak> Guess the animal that makes this sound: " + " <audio src=\"" + animalSound.mp3_link + "\"/> </speak>";
     
     //Create reprompt
     SsmlOutputSpeech outputSpeech = new SsmlOutputSpeech();
@@ -145,34 +182,55 @@ private SpeechletResponse playGameResponse() {
     return response;
 }
 
+
+private static class Sound {
+	
+    private final String mp3_link;
+    //private final String cardRepresentation;
+	private final String animal_name;
+    	
+    // takes a direct mp3 link and text representation of a sound
+    Sound(String mp3_link, String cardRepresentation, String animal_name) {
+        this.mp3_link = mp3_link;
+        //this.cardRepresentation = cardRepresentation;
+        this.animal_name = animal_name;
+    }
+}	
+
 private SpeechletResponse handleGuessTheAnimal(Intent intent, final Session session) {
 	// get the type of animal guessed
     Slot animalSlot = intent.getSlot(ANIMALS);
-    
+    String animal = (String) session.getAttribute(correctAnimal);
+    int totalPoints = (int) session.getAttribute(numPoints);
+    int totalStrikes = (int) session.getAttribute(numStrikes);
     String speech = "";
     if (animalSlot != null && animalSlot.getValue() != null) {
         String animalName = animalSlot.getValue();
-        
+        log.info(">" + animalName + "<");
+        log.info(">" + animal + "<");
+
         //If the animal guessed is correct
-        if(animalName == correctAnimal) {
+        if(animalName == animal) {
         		speech = "Good job! That's correct.";
-        		numPoints += 10;
+        		totalPoints += 10;
+        		session.setAttribute(numPoints, totalPoints);
         		//If you've gotten enough points to level up
-                if(numPoints == 10 || numPoints == 20) {
+                if(totalPoints == 10 || totalPoints == 20) {
                 		speech+="Nice work! You've leveled up! Now the animal sounds will be harder to guess.";
                 }
-        		playGameResponse();
+        		playGameResponse(session);
         }
         //If the animal guessed is incorrect
-        if(animalName != correctAnimal) {
+        if(animalName != animal) {
         		speech= "Sorry, That's not correct.";
-        		numStrikes++;
+        		totalStrikes++;
+        		session.setAttribute(numStrikes, totalStrikes);
         		 //If you've gotten three strikes
-                if(numStrikes == 3) {
+                if(totalStrikes == 3) {
                 		speech+="Game over! You got " + numPoints + " points.";
                 }
                 else
-                		playGameResponse();
+                		playGameResponse(session);
         }
         
         SsmlOutputSpeech outputSpeech = new SsmlOutputSpeech();
