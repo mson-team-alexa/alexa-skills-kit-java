@@ -1,0 +1,6 @@
+TellMeMYStoryIntent lets play {StoryName}
+TellMeMYStoryIntent I want to play {StoryName}
+TellMeMYStoryIntent I choose {StoryName}
+TellMeMYStoryIntent play the adventure {StoryName}
+
+TellMeMyOptionIntent {OptionNum}
