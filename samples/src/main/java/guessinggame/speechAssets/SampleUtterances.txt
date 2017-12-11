@@ -1,1 +1,16 @@
+<<<<<<< HEAD
 PlayGameIntent let's play 
+=======
+<<<<<<< Updated upstream
+GetHolidaysIntent what are the bart holidays
+GetHolidaysIntent holidays
+GetHolidaysIntent not running
+GetHolidaysIntent when does bart not run
+GetHolidaysIntent when will bart not run
+GetHolidaysIntent what are the holidays
+GetHolidaysIntent what the upcoming holidays are
+GetHolidaysIntent what the holidays are
+=======
+PlayGameIntent let's play
+>>>>>>> Stashed changes
+>>>>>>> origin/jack-mavis-wil
