@@ -35,13 +35,21 @@ public static Adventures getName(String name) {
     static {
     	ArrayList<Scenario> scenarios = new ArrayList<Scenario>();
  
-    	scenarios.add(new Scenario("If you would like to follow the coordinates, simply say “Follow”\n" , "If you wish to follow your gut and go another way, say “My Way”\n" ,  "outcome"));
     	
-    	scenarios.add(new Scenario("option 1", "option 2",  "outcome"));
+    	scenarios.add(new Scenario("To follow the coordinates, say Follow" , "To follow your gut and go another way, say My Way" ,  "outcome"));
     	
-    	scenarios.add(new Scenario("option 1", "option 2",  "outcome"));
+    	scenarios.add(new Scenario("To scan the black hole for life, say Scan ", "To orbit the black hole and search for nearby planets, say Search", "outcome"));
+   
+    	scenarios.add(new Scenario("To translate the message, say Translate", "To fix the power, say Fix",  "outcome"));
     	
-    	scenarios.add(new Scenario("option 1", "option 2",  "outcome"));
+    	scenarios.add(new Scenario("To fix the engines, say Fix", "To figure out why the engines lost power, say Engines", "outcome"));
+    	
+    	scenarios.add(new Scenario("To scan the planet for life, say Scan", "To search for more planets, say Search",  "outcome"));
+    	
+    	scenarios.add(new Scenario("To fix the power and escape, say Fix", "To send a peace letter to the aliens, say Letter",  "outcome"));
+    	
+    	scenarios.add(new Scenario("To find the threat, say Find", "To leave in the escape pod, say Leave",  "outcome"));
+    	
 
     	
     	Adventures a = new Adventures("Ajaz's Adventure" , scenarios );
