@@ -536,12 +536,14 @@ public class FastMathSpeechlet implements Speechlet {
     			repromptText = "You can choose from level one to level 5, which one would you choose?";
     			
     			session.setAttribute(ASK_LEVEL_ID, GENERATE_QUESTION_STAGE);
+    			
     		}else if((Integer)session.getAttribute(ASK_LEVEL_ID) == ANSWER_QUESTION_STAGE) {
+    			
     			LinkedHashMap LHMQ = (LinkedHashMap)session.getAttribute(CURRENT_QUESTION_ID);
     			
     			Question que = getQuestionFromLinkedHashMap(LHMQ);
     			
-    			Slot answerSlot = intent.getSlot("answer");
+    			Slot answerSlot = intent.getSlot("Answer");
     			
     			if(answerSlot != null && answerSlot.getValue() != null) {
     				float answer = Float.parseFloat(answerSlot.getValue());
@@ -581,6 +583,8 @@ public class FastMathSpeechlet implements Speechlet {
     					Question que = generateQuestion(levelAsked);
     					
     					session.setAttribute(CURRENT_QUESTION_ID, que);
+    					
+    					session.setAttribute(LEVEL_ID, levelAsked);
     					
     					speechText = "Your first question chosen for level " + levelAsked + " is : " + que.getQuestion();
     					
