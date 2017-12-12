@@ -4,10 +4,27 @@ GiveAnswerIntent I think the answer is {Answer}
 GiveAnswerIntent I believe the Answer is {Answer}
 GiveAnswerIntent I choose {Answer}
 GiveAnswerIntent My answer is {Answer}
-GiveAnswerIntent Continue
+CancelIntent Cancel
+CancelIntent Quit
+CancelIntent Quit game
+CancelIntent Quit the level
+CancelIntent Change Mode
+CancelIntent Stop the level
+CancelIntent Stop playing the mode
+ContinueIntent Begin
+ContinueIntent Continue
+ContinueIntent Next question
 AnswerModeIntent {GameMode}
 AnswerModeIntent I want to play {GameMode}
 AnswerModeIntent I want to play with {GameMode}
 AnswerModeIntent The mode I want to play is {GameMode}
 AnswerModeIntent I choose {GameMode}
 AnswerModeIntent The mode is {GameMode}
+AnswerLevelIntent Level {Level}
+AnswerLevelIntent I choose Level {Level}
+AnswerLevelIntent I want to play Level {Level}
+AnswerLevelIntent I hope to play Level {Level}
+DoNotKnowIntent I don't know
+DoNotKnowIntent I don't know how to answer the question
+DoNotKnowIntent I do not know the answer
+DoNotKnowIntent I don't know the answer

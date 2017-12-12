@@ -19,6 +19,21 @@
       ]
     },
     {
+      "intent": "AnswerLevelIntent",
+      "slots": [
+        {
+          "name" : "Level",
+          "type": "AMAZON.NUMBER"
+        }
+      ]
+    },
+    {
+      "intent": "DoNotKnowIntent"
+    }
+    {
+      "intent": "CancelIntent"
+    },
+    {
       "intent": "AMAZON.HelpIntent"
     },
     {
