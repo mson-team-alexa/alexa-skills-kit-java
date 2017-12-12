@@ -40,17 +40,17 @@ public final class Stories {
         
         STORY_COLLECTION.add(
         		new AesopFable("The Stag and His Reflection",
-        				"<speak> <prosody pitch =+50%> "
+        				"<speak> <emphasis level = \"moderate\">  " 
         				+ "A Stag, drinking from a crystal spring, saw himself mirrored in the clear water. " 
-        				+ "He greatly admired the graceful arch  of his antlers, but he was very much ashamed of his spindling legs. " + "</prosody>"
-        				/* + "<prosody pitch =\"-33.3%\"> "+ "How can it be, " + "</prosody>"
-        				+ "<prosody pitch =\"+25%\"> " + " he sighed, " + "</prosody"
-        				+ "<prosody pitch =\"-33.3%\"> "+ " that I should be cursed with such legs when I have so magnificent a crown. " + "</prosody"
-        				+ "<prosody pitch =\"+25%\"> " + "At that moment he scented a panther, and in an instant was bounding away through the forest. "
+        				+ "He greatly admired the graceful arch  of his antlers, but he was very much ashamed of his spindling legs. "
+        				+ "<prosody pitch =\"-33.3%\"> "+ "How can it be, " + "</prosody>"
+        				+  " he sighed, "
+        				+ "<prosody pitch =\"-33.3%\"> "+ " that I should be cursed with such legs when I have so magnificent a crown. " + "</prosody>"
+        				+ "At that moment he scented a panther, and in an instant was bounding away through the forest. "
         				+ "But as he ran, his wide-spreading antlers caught in the branches of the trees, and soon the Panther overtook him. "
         				+ "Then the Stag perceived that the legs of which he was so ashamed would have saved him, "
-        				+ "had it not been for the useless ornaments on his head. </prosody> </speak> " */,
-        			"<speak> <emphasis level=\"strong\">" + "We often make much of the ornamental and despise the useful." 
+        				+ "had it not been for the useless ornaments on his head. </emphasis> </speak> ",
+        			"<speak> <emphasis level=\"strong\"> " + "We often make much of the ornamental and despise the useful." 
         	+ " </emphasis> </speak>"	));
     } 
     
