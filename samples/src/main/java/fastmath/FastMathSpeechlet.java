@@ -86,7 +86,7 @@ public class FastMathSpeechlet implements Speechlet {
     private static Random RAND = new Random();
 
 	private Object _;
-
+ 
     @Override
     public void onSessionStarted(final SessionStartedRequest request, final Session session)
             throws SpeechletException {
@@ -638,6 +638,7 @@ public class FastMathSpeechlet implements Speechlet {
     			
     			Slot answerSlot = intent.getSlot("Answer");
     			
+<<<<<<< HEAD
     			if(answerSlot != null && answerSlot.getValue() != null) {
     				log.info(answerSlot.getValue() + "Answer in Float");
         			
@@ -818,10 +819,93 @@ public class FastMathSpeechlet implements Speechlet {
         					Question que = new Question(question, answerT);
         					
         					if(session.getAttributes().containsKey(ANSWERS_WRONG_ID)) {
+=======
+    			float answer = Float.parseFloat(answerSlot.getValue());
+    			
+    			int level = (Integer)session.getAttribute(CURRENT_LEVEL_ID);
+    			
+    			if(session.getAttributes().containsKey(ASK_QUESTION_TIME_ID)) {
+    				
+    				Instant now = Instant.now();
+    				Duration timeElapsed = Duration.between((Instant)session.getAttribute(ASK_QUESTION_TIME_ID), now);
+    		
+    				if(timeElapsed.toMillis() < 8000) {
+    					
+    					Question que = (Question)session.getAttribute(CURRENT_QUESTION_ID);
+    					
+    					if(que.checkAnswer(answer)) {
+    						
+    						if(session.getAttributes().containsKey(ANSWERS_CORRECT_ID)) {
+    							
+    							if((Integer)session.getAttribute(ANSWERS_CORRECT_ID) == 4) {
+    								
+    								if((Integer)session.getAttribute(CURRENT_LEVEL_ID) == 5) {
+    									
+    									speechText = "<audio src=\"https://s3.amazonaws.com/cschool0/winner.mp3\"/>Wow! You are amazing! You just beat the hardest mathematic game in the history! " + 
+    												"According to whoever's statistics, only 5 percent of our players can get through the game! " + 
+    												"Congratulations! You are welcome to try the game again at any time! ";
+    									
+    									session.setAttribute(STAGE_ID, ASK_MODE_STAGE);
+    								}else {
+    									speechText = "Great Job! You have beaten Level " + level + ". " +
+    											"Now you will be challenged with questions from " + (level + 1) + ". " + 
+    											"Prepare for it! Here is your question: ";
+    								
+    								session.setAttribute(CURRENT_LEVEL_ID, level + 1);
+    								
+    								Question queN = generateQuestion((Integer)session.getAttribute(CURRENT_LEVEL_ID));
+    								
+    								speechText += queN.getQuestion();
+    								
+    								session.setAttribute(CURRENT_QUESTION_ID, queN);
+    								
+    								Instant nowA = Instant.now();
+    								
+    			    				session.setAttribute(ASK_QUESTION_TIME_ID, nowA);
+    								}
+
+    							}else {
+    								int answersCorrectBefore = (Integer)session.getAttribute(ANSWERS_CORRECT_ID);
+    								
+    								session.setAttribute(ANSWERS_CORRECT_ID, answersCorrectBefore + 1);
+    								
+    								speechText = "<audio src=\"https://s3.amazonaws.com/cschool0/correct.mp3\"/>Congratulations! You got the question correct. Let's continue to the next one.";
+    								
+    								Question queN = generateQuestion((Integer)session.getAttribute(CURRENT_LEVEL_ID));
+    								
+    								speechText += queN.getQuestion();
+    								
+    								session.setAttribute(CURRENT_QUESTION_ID, queN);
+    								
+    								Instant nowA = Instant.now();
+    								
+    			    				session.setAttribute(ASK_QUESTION_TIME_ID, nowA);
+    							}
+    							
+    						}else {
+    							session.setAttribute(ANSWERS_CORRECT_ID, 1);
+    							
+    							speechText = "<audio src=\"https://s3.amazonaws.com/cschool0/correct.mp3\"/>Great first try! Let's continue to the next question.";
+    							
+    							Question queN = generateQuestion(1);
+    							
+    							session.setAttribute(CURRENT_QUESTION_ID, queN);
+    							
+    							speechText += queN.getQuestion();
+    							
+								Instant nowA = Instant.now();
+								
+			    				session.setAttribute(ASK_QUESTION_TIME_ID, nowA);
+    						}
+    						
+    					}else {
+    						
+    						if(session.getAttributes().containsKey(ANSWERS_WRONG_ID)) {
+>>>>>>> origin/joshua-jasper-joey
     							int answersWrong = (Integer)session.getAttribute(ANSWERS_WRONG_ID);
     							
     							if(answersWrong == 4) {
-    								speechText = "Ah! Sorry, you have used all five chances of wrong answers. Try again!";
+    								speechText = "<audio src=\"https://s3.amazonaws.com/cschool0/loser.mp3\"/>Ah! Sorry, you have used all five chances of wrong answers. Try again!";
     								
     								session.setAttribute(HAVE_ANSWER_ID, ASK_QUESTION);
     								
@@ -840,7 +924,12 @@ public class FastMathSpeechlet implements Speechlet {
     							}else {
     								session.setAttribute(ANSWERS_WRONG_ID, answersWrong + 1);
     								
+<<<<<<< HEAD
     								speechText = "The question you missed is " + que.getQuestion() +
+=======
+    								speechText = "<audio src=\"https://s3.amazonaws.com/cschool0/incorrect.mp3\"/>Sorry, you got the answer Wrong. " +
+    										"The question is " + que.getQuestion() +
+>>>>>>> origin/joshua-jasper-joey
     										"And the correct answer is " + que.getAnswer() + ". " +
     										"Better luck next Time! Here is the next question: ";
     								
@@ -857,7 +946,12 @@ public class FastMathSpeechlet implements Speechlet {
     						}else {
     							session.setAttribute(ANSWERS_WRONG_ID, 1);
     							
+<<<<<<< HEAD
     							speechText = "The question you missed is " + que.getQuestion() +
+=======
+    							speechText = "<audio src=\"https://s3.amazonaws.com/cschool0/incorrect.mp3\"/>Sorry, you got the answer Wrong. " +
+    										"The question is " + que.getQuestion() +
+>>>>>>> origin/joshua-jasper-joey
     										"And the correct answer is " + que.getAnswer() + ". " +
     										"Better luck next Time! Here is the next question: ";
     							
@@ -871,11 +965,75 @@ public class FastMathSpeechlet implements Speechlet {
     							
     		    				session.setAttribute(ASK_QUESTION_TIME_ID, nowA);
     						}
+<<<<<<< HEAD
         					
         				}
         			}
     			}else {
     				speechText = "You answer is invalid! ";
+=======
+    						
+    					}
+    					
+    				}else {
+    						
+    					Question que = (Question)session.getAttribute(CURRENT_QUESTION_ID);
+    					
+    					if(session.getAttributes().containsKey(ANSWERS_WRONG_ID)) {
+							int answersWrong = (Integer)session.getAttribute(ANSWERS_WRONG_ID);
+							
+							if(answersWrong == 4) {
+								speechText = "<audio src=\"https://s3.amazonaws.com/cschool0/loser.mp3\"/>Ah! Sorry, you have used all five chances of wrong answers. Try again!";
+								
+								session.setAttribute(HAVE_ANSWER_ID, ASK_QUESTION);
+								
+								session.setAttribute(ANSWERS_WRONG_ID, 0);
+								
+								session.setAttribute(ANSWERS_CORRECT_ID, 0);
+								
+								session.setAttribute(CURRENT_QUESTION_ID, null);
+								
+								session.setAttribute(CURRENT_LEVEL_ID, 1);
+								//End Game
+								//Initialize all Session Components
+								
+							}else {
+								session.setAttribute(ANSWERS_WRONG_ID, answersWrong + 1);
+								
+								speechText = "<audio src=\"https://s3.amazonaws.com/cschool0/incorrect.mp3\"/>The question you missed is " + que.getQuestion() +
+										"And the correct answer is " + que.getAnswer() + ". " +
+										"Better luck next Time! Here is the next question: ";
+								
+								Question queN = generateQuestion((Integer)session.getAttribute(CURRENT_LEVEL_ID));
+								
+								session.setAttribute(CURRENT_QUESTION_ID, queN);
+								
+								speechText += queN.getQuestion();
+								
+								Instant nowA = Instant.now();
+								
+			    				session.setAttribute(ASK_QUESTION_TIME_ID, nowA);
+							}   							
+						}else {
+							session.setAttribute(ANSWERS_WRONG_ID, 1);
+							
+							speechText = "<audio src=\"https://s3.amazonaws.com/cschool0/incorrect.mp3\"/>The question you missed is " + que.getQuestion() +
+										"And the correct answer is " + que.getAnswer() + ". " +
+										"Better luck next Time! Here is the next question: ";
+							
+							Question queN = generateQuestion(1);
+							
+							session.setAttribute(CURRENT_QUESTION_ID, queN);
+							
+							speechText += queN.getQuestion();
+							
+							Instant nowA = Instant.now();
+							
+		    				session.setAttribute(ASK_QUESTION_TIME_ID, nowA);
+						}
+    					
+    				}
+>>>>>>> origin/joshua-jasper-joey
     			}
 
     		}else {
