@@ -174,11 +174,14 @@ import com.amazon.speech.ui.Reprompt;
 	    
 	    private SpeechletResponse handleTellMeMyOptionIntent(Intent intent, final Session session) {
 	        Slot optionSlot = intent.getSlot("OptionNum");
-	        
+	    	int userOp = 0;
+String response = "";
 	        Scenario currentScenario = (Scenario) session.getAttribute("CURR_SCENARIO");
 
-	        
 	       
+            
+            
+            
 	        
 	        // if the scenario is not null
 	        if (currentScenario != null) {
@@ -245,8 +248,9 @@ import com.amazon.speech.ui.Reprompt;
 	            Scenario curr_scenario = curr_story.getScenList().get(curr_scenario_num);	            
 	            session.setAttribute("CURR_SCENARIO", curr_scenario);
 	            
-	            Slot optionSlot = intent.getSlot(CUSTOM_SLOT_OPTION_NUM);
-	            userOp = Integer.parseInt(optionSlot.getValue());
+	            
+		        Slot optionSlot1 = intent.getSlot(CUSTOM_SLOT_OPTION_NUM);
+	            userOp = Integer.parseInt(optionSlot1.getValue());
 	            switch(userOp)
 	            {
 	            case 1: 
@@ -263,9 +267,6 @@ import com.amazon.speech.ui.Reprompt;
 	            }
 	            	curr_scenario_num++;
 	            	session.setAttribute("SCENARIO_NUMBER", curr_scenario_num);
-	            
-	            
-	            
 	            
 	            
 	            // have to get the user choice 

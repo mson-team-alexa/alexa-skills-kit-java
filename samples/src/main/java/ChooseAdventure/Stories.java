@@ -35,13 +35,13 @@ public static Adventures getName(String name) {
     static {
     	ArrayList<Scenario> scenarios = new ArrayList<Scenario>();
  
-    	scenarios.add(new Scenario("If you would like to follow the coordinates, simply say “Follow”\n" , "If you wish to follow your gut and go another way, say “My Way”\n" ,  "outcome"));
+    	scenarios.add(new Scenario("If you would like to follow the coordinates, simply say “Follow”\n" , "If you wish to follow your gut and go another way, say “My Way”\n" ,  "outcome" , "outcmoe"));
     	
-    	scenarios.add(new Scenario("option 1", "option 2",  "outcome"));
+    	scenarios.add(new Scenario("option 1", "option 2",  "outcome",  "outcome"));
     	
-    	scenarios.add(new Scenario("option 1", "option 2",  "outcome"));
+    	scenarios.add(new Scenario("option 1", "option 2",  "outcome",  "outcome"));
     	
-    	scenarios.add(new Scenario("option 1", "option 2",  "outcome"));
+    	scenarios.add(new Scenario("option 1", "option 2",  "outcome",  "outcome"));
 
     	
     	Adventures a = new Adventures("Ajaz's Adventure" , scenarios );
