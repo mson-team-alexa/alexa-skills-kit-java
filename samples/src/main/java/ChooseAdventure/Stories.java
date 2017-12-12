@@ -35,6 +35,7 @@ public static Adventures getName(String name) {
     static {
     	ArrayList<Scenario> scenarios = new ArrayList<Scenario>();
  
+<<<<<<< HEAD
     	
     	scenarios.add(new Scenario("Follow" , "My Way" ,  "outcome"));
     	
@@ -50,6 +51,15 @@ public static Adventures getName(String name) {
     	
     	scenarios.add(new Scenario("Find", "Leave",  "outcome"));
     	
+=======
+    	scenarios.add(new Scenario("If you would like to follow the coordinates, simply say “Follow”\n" , "If you wish to follow your gut and go another way, say “My Way”\n" ,  "outcome" , "outcmoe"));
+    	
+    	scenarios.add(new Scenario("option 1", "option 2",  "outcome",  "outcome"));
+    	
+    	scenarios.add(new Scenario("option 1", "option 2",  "outcome",  "outcome"));
+    	
+    	scenarios.add(new Scenario("option 1", "option 2",  "outcome",  "outcome"));
+>>>>>>> origin/ajaz
 
     	
     	Adventures a = new Adventures("Ajaz's Adventure" , scenarios );
