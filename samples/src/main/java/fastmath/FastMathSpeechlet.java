@@ -710,6 +710,8 @@ public class FastMathSpeechlet implements Speechlet {
         								
         								speechText += queN.getQuestion();
         								
+        								session.setAttribute(ANSWERS_CORRECT_ID, 0);
+        								
         								session.setAttribute(CURRENT_QUESTION_ID, queN);
         								
         								LocalDateTime nowA = LocalDateTime.now();
