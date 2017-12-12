@@ -7,7 +7,7 @@
           "type": "LIST_OF_STORY_NAMES"
         }
       ],
-      "intent": "TellMeMYStoryIntent"
+      "intent": "TellMeMyStoryIntent"
     },
     {
       "slots": [

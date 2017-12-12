@@ -30,6 +30,8 @@ import com.amazon.speech.ui.Reprompt;
 	     * Custom Slot key for the name of the story requested by the user
 	     */
 	    private static final String CUSTOM_SLOT_STORY_NAME = "StoryName";
+	    private static final String CUSTOM_SLOT_OPTION_NUM = "OptionNum";
+	    private int SCENARIO_NUMBER = 0;
 
 	        
 	    @Override
@@ -37,6 +39,9 @@ import com.amazon.speech.ui.Reprompt;
 	            throws SpeechletException {
 	        log.info("onSessionStarted requestId={}, sessionId={}", request.getRequestId(),
 	                session.getSessionId());
+	        
+	        SCENARIO_NUMBER = 0;
+	        session.setAttribute("SCENARIO_NUMBER", SCENARIO_NUMBER);
 
 	    }
 
@@ -61,8 +66,8 @@ import com.amazon.speech.ui.Reprompt;
 	        Intent intent = request.getIntent();
 	        String intentName = (intent != null) ? intent.getName() : null;
 
-	        if ("TellMeMYStoryIntent".equals(intentName)) { 
-	            return handleTellMeMYStoryIntent(intent, session);
+	        if ("TellMeMyStoryIntent".equals(intentName)) { 
+	            return handleTellMeMyStoryIntent(intent, session);
 	            
 	        
 	        } 
@@ -172,19 +177,35 @@ import com.amazon.speech.ui.Reprompt;
 	        
 	        Scenario currentScenario = (Scenario) session.getAttribute("CURR_SCENARIO");
 
+	        
+	       
+	        
 	        // if the scenario is not null
 	        if (currentScenario != null) {
 	            
+	        
+	        	
+	        	PlainTextOutputSpeech outputSpeech = new PlainTextOutputSpeech();
+	        	outputSpeech.setText(currentScenario.getop1());
+	        	Reprompt reprompt = new Reprompt();
+	        	reprompt.setOutputSpeech(outputSpeech);
+	        	SpeechletResponse resp = SpeechletResponse.newAskResponse(outputSpeech, reprompt);
+	        	return resp;
 	        		// Alexa should speak the corresponding option
 	        	
 	        } else {
-	        		
+	        	
+	        	PlainTextOutputSpeech outputSpeech = new PlainTextOutputSpeech();
+	        	outputSpeech.setText("Sorry, I couldn't find that option you requested. Maybe you said it incorrectly , please try again.");
+	        	Reprompt reprompt = new Reprompt();
+	        	reprompt.setOutputSpeech(outputSpeech);
+	        	SpeechletResponse resp = SpeechletResponse.newAskResponse(outputSpeech, reprompt);
+	        	return resp;
 	        		// Alexa should say some error message
 	        }
 	        
 	        
 
-	        	return null;
 	    	
 	    }
 
@@ -198,14 +219,14 @@ import com.amazon.speech.ui.Reprompt;
 	     *            the session object
 	     * @return SpeechletResponse the speechlet response
 	     */
-	    private SpeechletResponse handleTellMeMYStoryIntent(Intent intent, final Session session) {
+	    private SpeechletResponse handleTellMeMyStoryIntent(Intent intent, final Session session) {
 	        
 	    	String storyContent = ""; 
 	    	String option1 = "";
 	    	String option2 = "";
-	    	int userOp = 1;
+	    	int userOp = 0;
 	    	String response = "";
-	        
+	    
 	    	// get the name of the story from the custom slot (within the JSON request)
 	        Slot storySlot = intent.getSlot(CUSTOM_SLOT_STORY_NAME);
 	        
@@ -219,10 +240,13 @@ import com.amazon.speech.ui.Reprompt;
 	            
 //	            Scenario curr_scenario = new Scenario(option1, option2, response);
 	            
+	            int curr_scenario_num = (int) session.getAttribute("SCENARIO_NUMBER");
 	            // get the list of scenarios from the story
-	            Scenario curr_scenario = curr_story.getScenList().get(0);
-	            
+	            Scenario curr_scenario = curr_story.getScenList().get(curr_scenario_num);	            
 	            session.setAttribute("CURR_SCENARIO", curr_scenario);
+	            
+	            Slot optionSlot = intent.getSlot(CUSTOM_SLOT_OPTION_NUM);
+	            userOp = Integer.parseInt(optionSlot.getValue());
 	            switch(userOp)
 	            {
 	            case 1: 
@@ -232,9 +256,13 @@ import com.amazon.speech.ui.Reprompt;
 	            case 2:
 	            		response = curr_scenario.getop2();
 	            		break;
+	           default:
+	        	   		response = "Not valid a answer";
+	        	   		break;
 	            
 	            }
-	            	
+	            	curr_scenario_num++;
+	            	session.setAttribute("SCENARIO_NUMBER", curr_scenario_num);
 	            
 	            
 	            
@@ -251,11 +279,13 @@ import com.amazon.speech.ui.Reprompt;
 	            
 	            
 	            
-	            
+	        	
+	      
+	        	
 		        
 	            // create an appropriate SSML response
 		        SsmlOutputSpeech outputSpeech = new SsmlOutputSpeech();
-		        outputSpeech.setSsml(storyContent);
+		        outputSpeech.setSsml(response);
 		
 		        Reprompt reprompt = new Reprompt();
 		        reprompt.setOutputSpeech(null);
