@@ -177,13 +177,51 @@ import com.amazon.speech.ui.Reprompt;
 	    }
 	    
 	    private SpeechletResponse handleTellMeMyOptionIntent(Intent intent, final Session session) {
-	        Slot optionSlot = intent.getSlot("OptionNum");
+	    	String storyContent = ""; 
+	    	String option1 = "";
+	    	String option2 = "";
 	    	int userOp = 0;
-String response = "";
+	    	String response = "";
+	    
+	    	// get the name of the story from the custom slot (within the JSON request)
+	        Slot storySlot = intent.getSlot(CUSTOM_SLOT_STORY_NAME);
+	    
+	        Slot optionSlot = intent.getSlot("OptionNum");
+	        
 	        Scenario currentScenario = (Scenario) session.getAttribute("CURR_SCENARIO");
+	        if (storySlot != null && storySlot.getValue() != null) {
+	            String storyName = storySlot.getValue();
+	            session.setAttribute(CUSTOM_SLOT_STORY_NAME, storyName);
 
+	            //to get a scenario
+	            Adventures curr_story = ChooseAdventure.Stories.getName(storyName);
 	       
             
+	        
+            int curr_scenario_num = (int) session.getAttribute("SCENARIO_NUMBER");
+            // get the list of scenarios from the story
+            Scenario curr_scenario = curr_story.getScenList().get(curr_scenario_num);	            
+            session.setAttribute("CURR_SCENARIO", curr_scenario);
+            
+            
+	        Slot optionSlot1 = intent.getSlot(CUSTOM_SLOT_OPTION_NUM);
+            userOp = Integer.parseInt(optionSlot1.getValue());
+            switch(userOp)
+            {
+            case 1: 
+            		 response = curr_scenario.getop1();
+            		 break;
+            		 
+            case 2:
+            		response = curr_scenario.getop2();
+            		break;
+           default:
+        	   		response = "Not valid a answer";
+        	   		break;
+            
+            }
+            	curr_scenario_num++;
+            	session.setAttribute("SCENARIO_NUMBER", curr_scenario_num);
             
             
 	        
@@ -200,7 +238,8 @@ String response = "";
 	        	return resp;
 	        		// Alexa should speak the corresponding option
 	        	
-	        } else {
+	        } }
+	        else {
 	        	
 	        	PlainTextOutputSpeech outputSpeech = new PlainTextOutputSpeech();
 	        	outputSpeech.setText("Sorry, I couldn't find that option you requested. Maybe you said it incorrectly , please try again.");
@@ -210,12 +249,14 @@ String response = "";
 	        	return resp;
 	        		// Alexa should say some error message
 	        }
+	        //change this***********
+			return null;
 	        
 	        
 
 	    	
+	    
 	    }
-
 	    
 	    /**
 	     * Tells the story requested by the user
@@ -246,32 +287,7 @@ String response = "";
 	            Adventures curr_story = ChooseAdventure.Stories.getName(storyName);
 	            
 //	            Scenario curr_scenario = new Scenario(option1, option2, response);
-	            
-	            int curr_scenario_num = (int) session.getAttribute("SCENARIO_NUMBER");
-	            // get the list of scenarios from the story
-	            Scenario curr_scenario = curr_story.getScenList().get(curr_scenario_num);	            
-	            session.setAttribute("CURR_SCENARIO", curr_scenario);
-	            
-	            
-		        Slot optionSlot1 = intent.getSlot(CUSTOM_SLOT_OPTION_NUM);
-	            userOp = Integer.parseInt(optionSlot1.getValue());
-	            switch(userOp)
-	            {
-	            case 1: 
-	            		 response = curr_scenario.getop1();
-	            		 break;
-	            		 
-	            case 2:
-	            		response = curr_scenario.getop2();
-	            		break;
-	           default:
-	        	   		response = "Not valid a answer";
-	        	   		break;
-	            
-	            }
-	            	curr_scenario_num++;
-	            	session.setAttribute("SCENARIO_NUMBER", curr_scenario_num);
-	            
+	           
 	            
 	            // have to get the user choice 
 	            			// prompt the user with a choice
