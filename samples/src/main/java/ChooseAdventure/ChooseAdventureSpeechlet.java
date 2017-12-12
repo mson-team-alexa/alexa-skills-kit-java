@@ -107,20 +107,24 @@ import com.amazon.speech.ui.Reprompt;
 	                "Welcome, Commander. After years of training and countless successful missions, you have been chosen to embark on one of the most dangerous missions in the history of space travel."
 	                + " Your task, if you choose to accept it, is to locate and research black holes in outer space. "
 	                + " This has never been done before, and we cannot guarantee your safety. So lets go."
-	                + " Blast off in 5...4.3...2...1...BLAST OFF! (engine sound effect) It’s been 200 days since you traveled into space. "
+	                + " Blast off in 5...4.3...2...1...BLAST OFF! It's 200 days since you traveled into space. "
 	                + "There’s been minimal contact from your superiors as you travel deeper into space, waiting for your boss to give you your next task. "
 	                + "Suddenly, you hear a beeping noise- it’s a message from your boss! He’s sent you the coordinates of a suspected black hole and wants you to investigate."
-	                + " However, you have a feeling that there’s something hiding in space, waiting for you to find it..";
+	                + " However, you have a feeling that there’s something hiding in space, waiting for you to find it.."
+	                + " The choice is yours, commander" 
+	                + "To follow the coordinates, say Follow. To follow your gut and go another way, say My Way."
+	                ;
 	        String repromptText =
 	        		"Welcome, Commander. After years of training and countless successful missions, you have been chosen to embark on one of the most dangerous missions in the history of space travel."
 	    	                + " Your task, if you choose to accept it, is to locate and research black holes in outer space. "
 	    	                + " This has never been done before, and we cannot guarantee your safety. So lets go."
-	    	                + " Blast off in 5...4.3...2...1...BLAST OFF! (engine sound effect) It’s been 200 days since you traveled into space. "
+	    	                + " Blast off in 5...4.3...2...1...BLAST OFF! It’s been 200 days since you traveled into space. "
 	    	                + "There’s been minimal contact from your superiors as you travel deeper into space, waiting for your boss to give you your next task. "
 	    	                + "Suddenly, you hear a beeping noise- it’s a message from your boss! He’s sent you the coordinates of a suspected black hole and wants you to investigate."
 	    	                + " However, you have a feeling that there’s something hiding in space, waiting for you to find it.."
-	    	                + " The choice is yours, commander:\n" + 
-	    	                "";
+	    	                + " The choice is yours, commander:\n" 
+	    	                + "To follow the coordinates, say Follow. To follow your gut and go another way, say My Way."
+	    	                ;
 	        PlainTextOutputSpeech speech = new PlainTextOutputSpeech();
 	        speech.setText(speechText);
 	        
