@@ -5,7 +5,7 @@ GiveAnswerIntent I believe the Answer is {Answer}
 GiveAnswerIntent I choose {Answer}
 GiveAnswerIntent My answer is {Answer}
 CancelIntent Cancel
-CancelIntent Quit
+CancelIntent Quit mode
 CancelIntent Quit game
 CancelIntent Quit the level
 CancelIntent Change Mode

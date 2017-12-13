@@ -16,6 +16,9 @@ import java.util.ArrayList;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -74,6 +77,9 @@ public class FastMathSpeechlet implements Speechlet {
     private static final String SURVIVAL_MODE = "survival";
     private static final String PRACTICE_MODE = "practice";
     private static final String CHALLENGER_MODE = "challenger";
+    private static final String SURVIVAL_MODE_FULL = "survival mode";
+    private static final String PRACTICE_MODE_FULL = "practice mode";
+    private static final String CHALLENGER_MODE_FULL = "challenger mode";
     
     private static final int CORRECT_ANSWER_TO_BEAT_LEVEL = 5;
     
@@ -138,11 +144,11 @@ public class FastMathSpeechlet implements Speechlet {
         		return getHelp();
         	}
         	if(session.getAttributes().containsKey(MODE_ID)) {
-        		if(((String)session.getAttribute(MODE_ID)).equals(SURVIVAL_MODE)) {
+        		if(((String)session.getAttribute(MODE_ID)).equals(SURVIVAL_MODE) || ((String)session.getAttribute(MODE_ID)).equals(SURVIVAL_MODE_FULL)) {
         			return setUpSurvivalStage(intent, session, false, false);
-        		}else if(((String)session.getAttribute(MODE_ID)).equals(PRACTICE_MODE)) {
+        		}else if(((String)session.getAttribute(MODE_ID)).equals(PRACTICE_MODE) || ((String)session.getAttribute(MODE_ID)).equals(PRACTICE_MODE_FULL)) {
         			return setUpPracticeStage(intent, session, false, false);
-        		}else if(((String)session.getAttribute(MODE_ID)).equals(CHALLENGER_MODE)) {
+        		}else if(((String)session.getAttribute(MODE_ID)).equals(CHALLENGER_MODE) || ((String)session.getAttribute(MODE_ID)).equals(CHALLENGER_MODE_FULL)) {
         			return setUpChallengerStage(intent, session, false);
         		}else {
         			return getHelp();
@@ -358,7 +364,7 @@ public class FastMathSpeechlet implements Speechlet {
     			}else {
     				session.setAttribute(STAGE_ID, ASK_ANSWER_STAGE);
     				session.setAttribute(ASK_RANGE_ID, ASK_RANGE_STAGE);
-    				return null;
+    				return setUpChallengerStage(intent, session, false);
     			}
     		}
     	}else {
@@ -367,12 +373,12 @@ public class FastMathSpeechlet implements Speechlet {
         
     }
     
-    
     private SpeechletResponse getWelcomeResponse() {
         // Create the welcome message.
         String speechText =
                 "Welcome to Fast Math Game! You can choose to play in three different modes:" +
-                "Practice, Survival or Challenger. Now, which one would you like to play?";
+                "Practice, Survival or Challenger. Notice that these levels and modes can be extremely challenging. " + 
+                		"But anyway, practice makes perfect.    Now, which one would you like to play?";
         String repromptText =
                 "Please tell me the game mode that you would like to try.";
 
@@ -394,9 +400,7 @@ public class FastMathSpeechlet implements Speechlet {
     	Slot GamemodeSlot = intent.getSlot("GameMode");
     	
     	if(GamemodeSlot != null && GamemodeSlot.getValue() != null && speechText == "") {
-    		
-    		log.info("NOT NULL");
-    		
+
     		String modeSlot = GamemodeSlot.getValue();
 
     		if(modeSlot.toLowerCase().equals(SURVIVAL_MODE)) {
@@ -453,22 +457,30 @@ public class FastMathSpeechlet implements Speechlet {
     
     private SpeechletResponse getHelp() {
         String speechOutput =
-                "You can ask to play Survival, Practice and Challenger mode. Which mode would you want to play with?";
+                "There are something wrong with your answer. Please keep in mind that you have to say continue every time you enter a new mode. " +
+                "You will have to provide one level by saying level and level number for the practice mode, and you will have to provide a level range " +
+                "of two numbers within five for the challenger stage. You will not need to say any decimal answers so please do not include point " +
+                "in your answer. If you want to quit playing the current mode, just say quit mode or cancel. You are free to change your level in " +
+                "practice mode, but you won't be able to do this in survival or challenger mode unless you quit and reenter. What would you want to do now?";
         String repromptText =
-                "You can ask to play Survival, Practice and Challenger mode. Which mode would you want to play with?";
+        		"There are something wrong with your answer. Please keep in mind that you have to say continue every time you enter a new mode. " +
+                        "You will have to provide one level by saying level and level number for the practice mode, and you will have to provide a level range " +
+                        "of two numbers within five for the challenger stage. You will not need to say any decimal answers so please do not include point " +
+                        "in your answer. If you want to quit playing the current mode, just say quit mode or cancel. You are free to change your level in " +
+                        "practice mode, but you won't be able to do this in survival or challenger mode unless you quit and reenter. What would you want to do now?";
         return newAskResponse(speechOutput,true, repromptText, false);
     }
     
     private Question generateQuestion(int level) {
     	switch(level) {
     	case 1:
-    		int randX = RAND.nextInt(10);
+    		int randX = RAND.nextInt(11);
     		
-    		int randY = RAND.nextInt(50) + 10;
+    		int randY = RAND.nextInt(100) + 10;
     		
-    		int randZ = RAND.nextInt(1);
+    		float randZ = RAND.nextFloat();
     		
-    		if(randZ == 0) {
+    		if(randZ >= 0.5f) {
     			
     			int answer = randX + randY;
     			
@@ -490,13 +502,13 @@ public class FastMathSpeechlet implements Speechlet {
     		
     	case 2:
     		
-    		randX = RAND.nextInt(10);
+    		randX = RAND.nextInt(11);
     		
-    		randY = RAND.nextInt(15) + 10;
+    		randY = RAND.nextInt(16) + 10;
     		
-    		randZ = RAND.nextInt(1);
-    		
-    		if(randZ == 0) {
+    		randZ = RAND.nextFloat();
+
+    		if(randZ >= 0.5f) {
     			
     			int answer = randX * randY;
     			
@@ -516,31 +528,26 @@ public class FastMathSpeechlet implements Speechlet {
     			
     			return que;
     		}
+    		
     	case 3:
-    		float randXf = RAND.nextInt(15);
+    		randX = RAND.nextInt(11);
     		
-    		float randX_f = RAND.nextInt(9) / 10;
+    		randY = RAND.nextInt(13);
     		
-    		randXf = randXf + randX_f;
+    		randZ = RAND.nextInt(50);
     		
-    		float randYf = RAND.nextInt(15);
-    		
-    		float randY_f = RAND.nextInt(9) / 10;
-    		
-    		randYf = randYf + randY_f;
-    		
-    		if(randXf >= randYf) {
-    			String speech = "What is " + randXf + " plus " + randYf + " ? ";
+    		if((randX * randY) >= randZ) {
+    			String speech = "What is " + randX + " multiply by " + randY + " minus " + randZ + " ? ";
     			
-    			float answer = randXf + randYf;
+    			float answer = randX * randY - randZ;
     			
     			Question que = new Question(speech, answer);
         		
         		return que;
     		}else {
-    			String speech = "What is " + randYf + " minus " + randXf + " ? ";
+    			String speech = "What is " + randZ + " minus the product of " + randX + " and " + randY + " ? ";
     			
-    			float answer = randYf - randXf;
+    			float answer = randZ - (randX * randY);
     			
     			Question que = new Question(speech, answer);
     			
@@ -549,30 +556,34 @@ public class FastMathSpeechlet implements Speechlet {
     	
     	case 4:
     		
-    		randX = RAND.nextInt(10);
+    		randX = RAND.nextInt(101);
     		
-    		randYf = RAND.nextInt(10);
+    		float randYf = RAND.nextFloat() * 50;
     		
-    		randY_f = RAND.nextInt(9) / 10;
+    		BigDecimal bd = new BigDecimal(Float.toString(randYf));
     		
-    		randYf = randYf + randY_f;
+    		bd = bd.setScale(1, RoundingMode.HALF_UP);
     		
-    		randZ = RAND.nextInt(1);
+    		randYf = bd.floatValue();
     		
-    		if(randZ == 0) { 
-    			String speech = "What is " + randX + " multiply by " + randYf + " ? ";
+    		float anotherFloat = randX - randYf;
+    		
+    		randZ = RAND.nextFloat();
+    		
+    		if(randZ >= 0.5f) { 
+    			String speech = "What is " + anotherFloat + " plus " + randYf + " ? ";
     			
-    			float answer = randX * randYf;
+    			float answer = randX;
     			
     			Question que =  new Question(speech, answer);
     			
     			return que;
     		}else {
-    			float product = randX * randYf;
+    			randZ = randX + randYf;
     			
-    			String speech = "What is " + product + " divided by " + randX + " ? ";
+    			String speech = "What is " + randZ + " minus " + randYf + " ? ";
     			
-    			float answer = product / randX;
+    			float answer = randX;
     			
     			Question que = new Question(speech, answer);
     			
@@ -585,9 +596,16 @@ public class FastMathSpeechlet implements Speechlet {
     }
     
     private int pickRandomNumberInRange(int A, int B) {
-    	int random = RAND.nextInt(B - A);
+    	
+    	if(A == B) {
+    		return A;
+    	}
+    	
+    	int random = RAND.nextInt(B - A + 1);
     	
     	random += A;
+    	
+    	log.info("The Random Choice level is " + random);
     	
     	return random;
     }
@@ -623,7 +641,7 @@ public class FastMathSpeechlet implements Speechlet {
     		}
     	}
     	
-    	if(session.getAttributes().containsKey(ASK_RANGE_ID) && speechText != "") {
+    	if(session.getAttributes().containsKey(ASK_RANGE_ID) && speechText == "") {
     		if((Integer)session.getAttribute(ASK_RANGE_ID) == ASK_RANGE_STAGE) {
     			speechText = "Please choose the level range from the five levels that you want to play with. ";
     			
@@ -664,9 +682,9 @@ public class FastMathSpeechlet implements Speechlet {
     				}
     				
     			}else {
-    				speechText = "The range you asked was invalid! Please say any range between one to five";
+    				speechText = "The range you picked was invalid! Please say any range between one to five";
     				
-    				repromptText = "The range you asked was invalid! Please say any range between one to five";
+    				repromptText = "The range you picked was invalid! Please say any range between one to five";
     			}
     		}else {
     			Slot answerSlot =intent.getSlot("Answer");
@@ -705,6 +723,8 @@ public class FastMathSpeechlet implements Speechlet {
     				repromptText = "Your answer is invalid! Please try again! ";
     			}		
     		}
+    	}else if(speechText != "") {
+    		speechText = speechText;
     	}
     	
     	return getSpeechletResponse(speechText, repromptText, true);
@@ -777,7 +797,6 @@ public class FastMathSpeechlet implements Speechlet {
     	
     	if(session.getAttributes().containsKey(ASK_LEVEL_ID) && speechText == "") {
     		if((Integer)session.getAttribute(ASK_LEVEL_ID) == ASK_LEVEL_STAGE) {
-    			log.info("INVALID?????");
     			
     			speechText = "You can choose from level one to level 5, which one would you choose? Please answer in Level and number.";
 
@@ -956,8 +975,7 @@ public class FastMathSpeechlet implements Speechlet {
     			Slot answerSlot = intent.getSlot("Answer");
     			
     			if(answerSlot != null && answerSlot.getValue() != null) {
-    				log.info(answerSlot.getValue() + "Answer in Float");
-        			
+
         			float answer = Float.parseFloat(answerSlot.getValue());
         			
         			int level = (Integer)session.getAttribute(CURRENT_LEVEL_ID);
@@ -1125,8 +1143,7 @@ public class FastMathSpeechlet implements Speechlet {
         					}
         					
         				}else {
-        					log.info("The Time" + timeElapsed.toMillis());
-        						
+        					
         					LinkedHashMap LHMQ = (LinkedHashMap)session.getAttribute(CURRENT_QUESTION_ID);	
         					
         					String question = LHMQ.get("question").toString();
