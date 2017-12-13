@@ -147,9 +147,9 @@ public class FastMathSpeechlet implements Speechlet {
         		if(((String)session.getAttribute(MODE_ID)).equals(SURVIVAL_MODE)) {
         			return setUpSurvivalStage(intent, session, false, false);
         		}else if(((String)session.getAttribute(MODE_ID)).equals(PRACTICE_MODE)) {
-        			return setUpPracticeStage(intent, session, false, false);
+        			return setUpPracticeStage(intent, session, false, false, false);
         		}else if(((String)session.getAttribute(MODE_ID)).equals(CHALLENGER_MODE)) {
-        			return setUpChallengerStage(intent, session, false);
+        			return setUpChallengerStage(intent, session, false, false);
         		}else {
         			return getHelp();
         		}
@@ -183,7 +183,7 @@ public class FastMathSpeechlet implements Speechlet {
         		if((Integer)session.getAttribute(STAGE_ID) == ASK_ANSWER_STAGE) {
         			if(session.getAttributes().containsKey(MODE_ID)) {
         				if(((String)session.getAttribute(MODE_ID)).equals(CHALLENGER_MODE)) {
-        					return setUpChallengerStage(intent, session, false);
+        					return setUpChallengerStage(intent, session, false, false);
         				}else {
         					return getHelp();
         				}
@@ -196,14 +196,36 @@ public class FastMathSpeechlet implements Speechlet {
         	}else {
         		return getHelp();
         	}
-        }else if("DoNotKnowIntent".equals(intentName)) { 
+        } else if("RepeatQuestion".equals(intentName)) { 
         	if(session.getAttributes().containsKey(STAGE_ID)) {
         		if((Integer)session.getAttribute(STAGE_ID) == ASK_ANSWER_STAGE) {
         			if(session.getAttributes().containsKey(MODE_ID)) {
         				if(((String)session.getAttribute(MODE_ID)).equals(PRACTICE_MODE)) {
-        					return setUpPracticeStage(intent, session, false, true);
-        				}else if(session.getAttribute(MODE_ID) == SURVIVAL_MODE) {
+        					return setUpPracticeStage(intent, session, false, false, true);
+        				}else if(((String)session.getAttribute(MODE_ID)).equals(CHALLENGER_MODE)) {
+        					return setUpChallengerStage(intent, session, false, true);
+        				}else {
+        					return getHelp();
+        				}
+        			}else {
+        				return getHelp();
+        			}
+        		}else {
+        			return getHelp();
+        		}
+        	}else {
+        		return getHelp();
+        	}
+        } else if("DoNotKnowIntent".equals(intentName)) { 
+        	if(session.getAttributes().containsKey(STAGE_ID)) {
+        		if((Integer)session.getAttribute(STAGE_ID) == ASK_ANSWER_STAGE) {
+        			if(session.getAttributes().containsKey(MODE_ID)) {
+        				if(((String)session.getAttribute(MODE_ID)).equals(PRACTICE_MODE)) {
+        					return setUpPracticeStage(intent, session, false, true, false);
+        				}else if(((String)session.getAttribute(MODE_ID)).equals(SURVIVAL_MODE)) {
         					return setUpSurvivalStage(intent, session, false, true);
+        				}else if(((String)session.getAttribute(MODE_ID)).equals(CHALLENGER_MODE)) {
+        					return setUpChallengerStage(intent, session, true, false);
         				}else {
         					return getHelp();
         				}
@@ -221,7 +243,7 @@ public class FastMathSpeechlet implements Speechlet {
         		if((Integer)session.getAttribute(STAGE_ID) == ASK_ANSWER_STAGE) {
         			if(session.getAttributes().containsKey(MODE_ID)) {
         				if(((String)session.getAttribute(MODE_ID)).equals(PRACTICE_MODE)) {
-        					return setUpPracticeStage(intent, session, true, false);
+        					return setUpPracticeStage(intent, session, true, false, false);
         				}else {
         					return getHelp();
         				}
@@ -360,11 +382,11 @@ public class FastMathSpeechlet implements Speechlet {
     			}else if(((String)session.getAttribute(MODE_ID)).equals(PRACTICE_MODE)) {
     				session.setAttribute(STAGE_ID, ASK_ANSWER_STAGE);
     				session.setAttribute(ASK_LEVEL_ID, ASK_LEVEL_STAGE);
-    				return setUpPracticeStage(intent, session, false, false);
+    				return setUpPracticeStage(intent, session, false, false, false);
     			}else {
     				session.setAttribute(STAGE_ID, ASK_ANSWER_STAGE);
     				session.setAttribute(ASK_RANGE_ID, ASK_RANGE_STAGE);
-    				return setUpChallengerStage(intent, session, false);
+    				return setUpChallengerStage(intent, session, false,false);
     			}
     		}
     	}else {
@@ -410,6 +432,7 @@ public class FastMathSpeechlet implements Speechlet {
     						"If you spend more than eight seconds, the question will be counted wrong. " +
     						"You can have at most 5 questions wrong. You can exit the mode whenever you want by saying Quit or Cancel. " +
     						"You will not be able to change mode unlesss you quit the game mode. " +
+    						"You will also not be able to ask me to repeat the question in survival mode. " +
     						"If you get stuck or do not know the question, just say I don't know. " +
     						"Ready to start the game? Say Begin or Continue to proceed. ";
     			
@@ -423,6 +446,7 @@ public class FastMathSpeechlet implements Speechlet {
     			speechText = "Welcome to Practice Mode! In this mode, you can choose to practice math questions whatever the level you wanna be in. " +
     						 "You will not be given a time limit or wrong answers penalty. You can exit the mode whenever you want by saying Quit or Cancel. Have Fun! " +
     						 "If you get stuck or do not know the question, just say I don't know. " +
+    						 "If you need me to repeat the question, just say repeat the question or repeat. " +
     						 "Ready to start the game? Say Begin or Continue to proceed. ";
 			
     			repromptText = "Ready to start the game? Say Begin or Continue to go ahead. ";
@@ -434,6 +458,7 @@ public class FastMathSpeechlet implements Speechlet {
     			speechText = "Welcome to the Challenger Mode! In this mode, you can pick a range of two different levels, by saying, for example " +
     						"Level one to level two. You can also stay in the same level by just saying the same level. " +
     						"However, if you miss one question, the game is over. Prepare for it! " +
+    						"If you need me to repeat the question, just say repeat the question or repeat. " +
     						"You can exit the mode whenever you want by saying Quit or Cancel, and you can not change the level when you are playing. " +
     						"Ready to start the game? Say Begin or Continue to proceed. ";
     			
@@ -461,13 +486,15 @@ public class FastMathSpeechlet implements Speechlet {
                 "You will have to provide one level by saying level and level number for the practice mode, and you will have to provide a level range " +
                 "of two numbers within five for the challenger stage. You will not need to say any decimal answers so please do not include point " +
                 "in your answer. If you want to quit playing the current mode, just say quit mode or cancel. You are free to change your level in " +
-                "practice mode, but you won't be able to do this in survival or challenger mode unless you quit and reenter. What would you want to do now?";
+                "practice mode, but you won't be able to do this in survival or challenger mode unless you quit and reenter.You can ask me to repeat " + 
+                "the question in Practice and Challenger mode, but you can not do this in survival mode.   What would you want to do now?";
         String repromptText =
         		"There are something wrong with your answer. Please keep in mind that you have to say continue every time you enter a new mode. " +
                         "You will have to provide one level by saying level and level number for the practice mode, and you will have to provide a level range " +
                         "of two numbers within five for the challenger stage. You will not need to say any decimal answers so please do not include point " +
                         "in your answer. If you want to quit playing the current mode, just say quit mode or cancel. You are free to change your level in " +
-                        "practice mode, but you won't be able to do this in survival or challenger mode unless you quit and reenter. What would you want to do now?";
+                        "practice mode, but you won't be able to do this in survival or challenger mode unless you quit and reenter. " +  " "
+                        		+ "You can ask me to repeat the question in Practice and Challenger mode, but you can not do this in survival mode.  What would you want to do now?";
         return newAskResponse(speechOutput,true, repromptText, false);
     }
     
@@ -484,7 +511,7 @@ public class FastMathSpeechlet implements Speechlet {
     			
     			int answer = randX + randY;
     			
-    			String speech = "What is " + randX + " plus " + randY + " ? ";
+    			String speech = "What is     " + randX + "     plus      " + randY + " ? ";
     			
     			Question que = new Question(speech, answer);
     			
@@ -492,7 +519,7 @@ public class FastMathSpeechlet implements Speechlet {
     		}else {
     			int answer  =  randY - randX;
     			
-    			String speech = "What is " + randY + " minus " + randX + " ? ";
+    			String speech = "What is    " + randY + "      minus     " + randX + " ? ";
     			
     			Question que = new Question(speech, answer);
     			
@@ -512,7 +539,7 @@ public class FastMathSpeechlet implements Speechlet {
     			
     			int answer = randX * randY;
     			
-    			String speech = "What is " + randX + " multiply by " + randY + " ? ";
+    			String speech = "What is     " + randX + "    multiply by      " + randY + " ? ";
     			
     			Question que = new Question(speech, answer);
     			
@@ -522,7 +549,7 @@ public class FastMathSpeechlet implements Speechlet {
     			
     			int answer  =  product / randX;
     			
-    			String speech = "What is " + product + " divided by " + randX + " ? ";
+    			String speech = "What is     " + product + "     divided by      " + randX + " ? ";
     			
     			Question que = new Question(speech, answer);
     			
@@ -537,7 +564,7 @@ public class FastMathSpeechlet implements Speechlet {
     		randZ = RAND.nextInt(50);
     		
     		if((randX * randY) >= randZ) {
-    			String speech = "What is " + randX + " multiply by " + randY + " minus " + randZ + " ? ";
+    			String speech = "What is    " + randX + "    multiply by      " + randY + "        minus       " + randZ + " ? ";
     			
     			float answer = randX * randY - randZ;
     			
@@ -545,7 +572,7 @@ public class FastMathSpeechlet implements Speechlet {
         		
         		return que;
     		}else {
-    			String speech = "What is " + randZ + " minus the product of " + randX + " and " + randY + " ? ";
+    			String speech = "What is   " + randZ + "    minus the product of    " + randX + "   and    " + randY + " ? ";
     			
     			float answer = randZ - (randX * randY);
     			
@@ -566,12 +593,19 @@ public class FastMathSpeechlet implements Speechlet {
     		
     		randYf = bd.floatValue();
     		
-    		float anotherFloat = randX - randYf;
     		
     		randZ = RAND.nextFloat();
     		
     		if(randZ >= 0.5f) { 
-    			String speech = "What is " + anotherFloat + " plus " + randYf + " ? ";
+    			float anotherFloat = randX - randYf;
+    			
+    			BigDecimal bdA = new BigDecimal(Float.toString(anotherFloat));
+        		
+        		bdA = bdA.setScale(1, RoundingMode.HALF_UP);
+        		
+        		anotherFloat = bdA.floatValue();
+    			
+    			String speech = "What is      " + anotherFloat + "      plus      " + randYf + "    ? ";
     			
     			float answer = randX;
     			
@@ -579,9 +613,15 @@ public class FastMathSpeechlet implements Speechlet {
     			
     			return que;
     		}else {
-    			randZ = randX + randYf;
+    			float newFloat = randX + randYf;
     			
-    			String speech = "What is " + randZ + " minus " + randYf + " ? ";
+    			BigDecimal bdN = new BigDecimal(Float.toString(newFloat));
+        		
+        		bdN = bdN.setScale(1, RoundingMode.HALF_UP);
+        		
+        		newFloat = bdN.floatValue();
+
+    			String speech = "What is      " + newFloat + "         minus        " + randYf + " ? ";
     			
     			float answer = randX;
     			
@@ -610,7 +650,7 @@ public class FastMathSpeechlet implements Speechlet {
     	return random;
     }
     
-    private SpeechletResponse setUpChallengerStage(final Intent intent, final Session session, boolean doNotKnow) {
+    private SpeechletResponse setUpChallengerStage(final Intent intent, final Session session, boolean doNotKnow, boolean repeatQuestion) {
     	String speechText = "", repromptText = "";
     	
     	if(session.getAttributes().containsKey(STAGE_ID)) {
@@ -629,15 +669,21 @@ public class FastMathSpeechlet implements Speechlet {
     		if((Integer)session.getAttribute(ASK_RANGE_ID) == HAVE_RANGE_ANSWER_STAGE && doNotKnow) {
     			Question que = getQuestionFromLinkedHashMap((LinkedHashMap)session.getAttribute(CURRENT_QUESTION_ID));
     			
-    			speechText = "It's ok. The question you missed is " + que.getQuestion();
+    			speechText = "It's ok. The question you missed is:     " + que.getQuestion();
     			
-    			speechText += "The answer is " + que.getAnswer() + " . ";
+    			speechText += "The answer is:    " + que.getAnswer() + " . ";
     			
     			speechText += "Better luck next time! You are back in the main menu. Which mode would you want to play? ";
 				
 				repromptText = "You can choose from Survival, Practice and Challenger mode. Which mode would you want to play? ";
 				
 				initializeAllComponents(session, true);
+    		}else if((Integer)session.getAttribute(ASK_RANGE_ID) == HAVE_RANGE_ANSWER_STAGE && repeatQuestion) {
+    			Question que = getQuestionFromLinkedHashMap((LinkedHashMap)session.getAttribute(CURRENT_QUESTION_ID));
+    			
+    			speechText = "Sure, The question is:   " + que.getQuestion();
+    			
+    			repromptText = "The question is    " + que.getQuestion();
     		}
     	}
     	
@@ -664,7 +710,7 @@ public class FastMathSpeechlet implements Speechlet {
     					
     					Question que = generateQuestion(levelDecided);
     					
-    					speechText = "Get ready! Your first question is " + que.getQuestion();
+    					speechText = "Get ready! Your first question is:   " + que.getQuestion();
     					
     					session.setAttribute(LEVEL_A_ID, levelA);
     					
@@ -695,7 +741,7 @@ public class FastMathSpeechlet implements Speechlet {
     				Question que = getQuestionFromLinkedHashMap((LinkedHashMap)session.getAttribute(CURRENT_QUESTION_ID));
         			
     				if(que.checkAnswer(answer)) {
-    					speechText = "Nice! You got the question correct! Here is the next question: ";
+    					speechText = "Nice! You got the question correct! Here is the next question:     ";
     					
     					int levelDecided = pickRandomNumberInRange((Integer)session.getAttribute(LEVEL_A_ID), (Integer)session.getAttribute(LEVEL_B_ID));
     					
@@ -705,11 +751,11 @@ public class FastMathSpeechlet implements Speechlet {
     					
     					session.setAttribute(CURRENT_QUESTION_ID, queN);
     					
-    					repromptText = "Would you like to hear the question again? The question is " + queN.getQuestion();
+    					repromptText = "Would you like to hear the question again? The question is:      " + queN.getQuestion();
     				}else {
-    					speechText = "Oops! You got the answer wrong! The question is " + que.getQuestion();
+    					speechText = "Oops! You got the answer wrong! The question is:      " + que.getQuestion();
     					
-    					speechText += "And the answer is " + que.getAnswer() + " . ";
+    					speechText += "And the answer is:    " + que.getAnswer() + "   . ";
     					
     					initializeAllComponents(session, true);
     					
@@ -730,7 +776,7 @@ public class FastMathSpeechlet implements Speechlet {
     	return getSpeechletResponse(speechText, repromptText, true);
     }
     
-    private SpeechletResponse setUpPracticeStage(final Intent intent, final Session session, boolean levelChanged, boolean doNotKnow) {
+    private SpeechletResponse setUpPracticeStage(final Intent intent, final Session session, boolean levelChanged, boolean doNotKnow, boolean repeatQuestion) {
     	
     	String speechText = "", repromptText = "";
     	
@@ -747,18 +793,28 @@ public class FastMathSpeechlet implements Speechlet {
     	}
     	
     	if((Integer)session.getAttribute(ASK_LEVEL_ID) == ANSWER_QUESTION_STAGE && doNotKnow) {
+    		
     		LinkedHashMap LHMQ = (LinkedHashMap)session.getAttribute(CURRENT_QUESTION_ID);
 			
 			Question que = getQuestionFromLinkedHashMap(LHMQ);
 			
-			speechText = "It's ok. The question was " + que.getQuestion() +
-					"And the answer was " + que.getAnswer() + ". ";
+			speechText = "It's ok. The question is:      " + que.getQuestion() +
+					"And the answer is:     " + que.getAnswer() + ". ";
 		
 			Question queN = generateQuestion((Integer)session.getAttribute(LEVEL_ID));
 		
-			speechText += "Let's try another one: " + queN.getQuestion();
+			speechText += "Let's try another one:     " + queN.getQuestion();
 		
 			session.setAttribute(CURRENT_QUESTION_ID, queN);
+    	}else if((Integer)session.getAttribute(ASK_LEVEL_ID) == ANSWER_QUESTION_STAGE && repeatQuestion) {
+    		
+    		LinkedHashMap LHMQ = (LinkedHashMap)session.getAttribute(CURRENT_QUESTION_ID);
+			
+			Question que = getQuestionFromLinkedHashMap(LHMQ);
+    		
+    		speechText = "Sure, the question is       " +  que.getQuestion();
+    		
+    		repromptText = "The question is       " + que.getQuestion();
     	}
     	
     	if((Integer)session.getAttribute(ASK_LEVEL_ID) != GENERATE_QUESTION_STAGE && levelChanged) {
@@ -776,9 +832,9 @@ public class FastMathSpeechlet implements Speechlet {
 					
 					session.setAttribute(CURRENT_QUESTION_ID, que);
 					
-					speechText = "You have changed your level! Your first question chosen for level " + levelAsked + " is : " + que.getQuestion();
+					speechText = "You have changed your level! Your first question chosen for level " + levelAsked + " is:       " + que.getQuestion();
 					
-					repromptText = "Would you like to hear the question again? Your question is " + que.getQuestion();
+					repromptText = "Would you like to hear the question again? Your question is:     " + que.getQuestion();
 					
 					session.setAttribute(ASK_LEVEL_ID, ANSWER_QUESTION_STAGE);
 					
@@ -818,27 +874,27 @@ public class FastMathSpeechlet implements Speechlet {
     				if(que.checkAnswer(answer)) {
     					que = generateQuestion((Integer)session.getAttribute(LEVEL_ID));
     					
-    					speechText = "Good job, you get the answer correct! Here is your next question: " + que.getQuestion();
+    					speechText = "Good job, you get the answer correct! Here is your next question:       " + que.getQuestion();
     					
     					session.setAttribute(CURRENT_QUESTION_ID, que);
     					
-    					repromptText = "Would you like to listen to the question again? Your question is " + que.getQuestion();
+    					repromptText = "Would you like to listen to the question again? Your question is:       " + que.getQuestion();
     				}else {
-    					speechText = "You got the answer wrong, but it is ok. The question was " + que.getQuestion() +
-    								"And the answer was " + que.getAnswer() + ". ";
+    					speechText = "You got the answer wrong, but it is ok. The question is:       " + que.getQuestion() +
+    								"And the answer was    " + que.getAnswer() + ". ";
     					
     					Question queN = generateQuestion((Integer)session.getAttribute(LEVEL_ID));
     					
-    					speechText += "Let's try another one: " + queN.getQuestion();
+    					speechText += "Let's try another one:      " + queN.getQuestion();
     					
     					session.setAttribute(CURRENT_QUESTION_ID, queN);
     					
-    					repromptText = "Would you like to listen to the question again? Your question is " + queN.getQuestion();
+    					repromptText = "Would you like to listen to the question again? Your question is:      " + queN.getQuestion();
     				}
     			}else {
-    				speechText = "Your answer is invalid! The question is " + que.getQuestion();
+    				speechText = "Your answer is invalid! The question is:     " + que.getQuestion();
     				
-    				repromptText = "Would you like to hear the questiona again? The question is: " + que.getQuestion();
+    				repromptText = "Would you like to hear the questiona again? The question is:       " + que.getQuestion();
     			}
     		}else {
     			Slot levelSlot = intent.getSlot("Level");
@@ -853,9 +909,9 @@ public class FastMathSpeechlet implements Speechlet {
     					
     					session.setAttribute(LEVEL_ID, levelAsked);
     					
-    					speechText = "Your first question chosen for level " + levelAsked + " is : " + que.getQuestion();
+    					speechText = "Your first question chosen for level " + levelAsked + " is :       " + que.getQuestion();
     					
-    					repromptText = "Would you like to listen to the question again? Your question is " + que.getQuestion();
+    					repromptText = "Would you like to listen to the question again? Your question is:       " + que.getQuestion();
     					
     					session.setAttribute(ASK_LEVEL_ID, ANSWER_QUESTION_STAGE);
     					
@@ -929,8 +985,8 @@ public class FastMathSpeechlet implements Speechlet {
 							session.setAttribute(ANSWERS_WRONG_ID, answersWrong + 1);
 							
 							speechText = "Sorry, you got the answer Wrong. " +
-									"The question is " + que.getQuestion() +
-									"And the correct answer is " + que.getAnswer() + ". " +
+									"The question is:      " + que.getQuestion() +
+									"And the correct answer is:      " + que.getAnswer() + ". " +
 									"Better luck next Time! Here is the next question: ";
 							
 							Question queN = generateQuestion((Integer)session.getAttribute(CURRENT_LEVEL_ID));
@@ -947,8 +1003,8 @@ public class FastMathSpeechlet implements Speechlet {
 						session.setAttribute(ANSWERS_WRONG_ID, 1);
 						
 						speechText = "Sorry, you got the answer Wrong. " +
-									"The question is " + que.getQuestion() +
-									"And the correct answer is " + que.getAnswer() + ". " +
+									"The question is:      " + que.getQuestion() +
+									"And the correct answer is:     " + que.getAnswer() + ". " +
 									"Better luck next Time! Here is the next question: ";
 						
 						Question queN = generateQuestion(1);
@@ -988,9 +1044,9 @@ public class FastMathSpeechlet implements Speechlet {
 							session.setAttribute(ANSWERS_WRONG_ID, answersWrong + 1);
 							
 							speechText = "Sorry, you got the answer Wrong. " +
-									"The question is " + que.getQuestion() +
-									"And the correct answer is " + que.getAnswer() + ". " +
-									"Better luck next Time! Here is the next question: ";
+									"The question is:     " + que.getQuestion() +
+									"And the correct answer is       " + que.getAnswer() + ". " +
+									"Better luck next Time! Here is the next question:      ";
 							
 							Question queN = generateQuestion((Integer)session.getAttribute(CURRENT_LEVEL_ID));
 							
@@ -1006,9 +1062,9 @@ public class FastMathSpeechlet implements Speechlet {
 						session.setAttribute(ANSWERS_WRONG_ID, 1);
 						
 						speechText = "Sorry, you got the answer Wrong. " +
-									"The question is " + que.getQuestion() +
-									"And the correct answer is " + que.getAnswer() + ". " +
-									"Better luck next Time! Here is the next question: ";
+									"The question is:    " + que.getQuestion() +
+									"And the correct answer is:     " + que.getAnswer() + ". " +
+									"Better luck next Time! Here is the next question:      ";
 						
 						Question queN = generateQuestion(1);
 						
@@ -1091,7 +1147,7 @@ public class FastMathSpeechlet implements Speechlet {
         								}else {
         									speechText = "Great Job! You have beaten Level " + level + ". " +
         											"Now you will be challenged with questions from " + (level + 1) + ". " + 
-        											"Prepare for it! Here is your question: ";
+        											"Prepare for it! Here is your question:        ";
         								
         								session.setAttribute(CURRENT_LEVEL_ID, level + 1);
         								
@@ -1113,7 +1169,7 @@ public class FastMathSpeechlet implements Speechlet {
         								
         								session.setAttribute(ANSWERS_CORRECT_ID, answersCorrectBefore + 1);
         								
-        								speechText = "Congratulations! You got the question correct. Let's continue to the next one. ";
+        								speechText = "Congratulations! You got the question correct. Let's continue to the next one.       ";
         								
         								Question queN = generateQuestion((Integer)session.getAttribute(CURRENT_LEVEL_ID));
         								
@@ -1129,7 +1185,7 @@ public class FastMathSpeechlet implements Speechlet {
         						}else {
         							session.setAttribute(ANSWERS_CORRECT_ID, 1);
         							
-        							speechText = "Great first try! Let's continue to the next question.";
+        							speechText = "Great first try! Let's continue to the next question.           ";
         							
         							Question queN = generateQuestion(1);
         							
@@ -1166,9 +1222,9 @@ public class FastMathSpeechlet implements Speechlet {
         								session.setAttribute(ANSWERS_WRONG_ID, answersWrong + 1);
         								
         								speechText = "Sorry, you got the answer Wrong. " +
-        										"The question is " + que.getQuestion() +
-        										"And the correct answer is " + que.getAnswer() + ". " +
-        										"Better luck next Time! Here is the next question: ";
+        										"The question is       " + que.getQuestion() +
+        										"And the correct answer is        " + que.getAnswer() + ". " +
+        										"Better luck next Time! Here is the next question:        ";
         								
         								Question queN = generateQuestion((Integer)session.getAttribute(CURRENT_LEVEL_ID));
         								
@@ -1184,9 +1240,9 @@ public class FastMathSpeechlet implements Speechlet {
         							session.setAttribute(ANSWERS_WRONG_ID, 1);
         							
         							speechText = "Sorry, you got the answer Wrong. " +
-        										"The question is " + que.getQuestion() +
-        										"And the correct answer is " + que.getAnswer() + ". " +
-        										"Better luck next Time! Here is the next question: ";
+        										"The question is        " + que.getQuestion() +
+        										"And the correct answer is         " + que.getAnswer() + ". " +
+        										"Better luck next Time! Here is the next question:        ";
         							
         							Question queN = generateQuestion(1);
         							
@@ -1234,9 +1290,9 @@ public class FastMathSpeechlet implements Speechlet {
     							}else {
     								session.setAttribute(ANSWERS_WRONG_ID, answersWrong + 1);
     								
-    								speechText = "The question you missed is " + que.getQuestion() +
-    										"And the correct answer is " + que.getAnswer() + ". " +
-    										"Better luck next Time! Here is the next question: ";
+    								speechText = "The question you missed is   	 " + que.getQuestion() +
+    										"And the correct answer is		 " + que.getAnswer() + ". " +
+    										"Better luck next Time! Here is the next question:		 ";
     								
     								Question queN = generateQuestion((Integer)session.getAttribute(CURRENT_LEVEL_ID));
     								
@@ -1251,9 +1307,9 @@ public class FastMathSpeechlet implements Speechlet {
     						}else {
     							session.setAttribute(ANSWERS_WRONG_ID, 1);
     							
-    							speechText = "The question you missed is " + que.getQuestion() +
-    										"And the correct answer is " + que.getAnswer() + ". " +
-    										"Better luck next Time! Here is the next question: ";
+    							speechText = "The question you missed is      " + que.getQuestion() +
+    										"And the correct answer is      " + que.getAnswer() + ". " +
+    										"Better luck next Time! Here is the next question:        ";
     							
     							Question queN = generateQuestion(1);
     							
@@ -1281,7 +1337,7 @@ public class FastMathSpeechlet implements Speechlet {
         		
         		session.setAttribute(CURRENT_LEVEL_ID, 1);
         		
-        		speechText = "You first question is: ";
+        		speechText = "You first question is:          ";
         		
         		speechText += que.getQuestion();
         		
@@ -1300,7 +1356,7 @@ public class FastMathSpeechlet implements Speechlet {
     		
     		session.setAttribute(CURRENT_QUESTION_ID, que);
     		
-    		speechText = "Your first question is: ";
+    		speechText = "Your first question is:		 ";
     		
     		speechText += que.getQuestion();
     		
