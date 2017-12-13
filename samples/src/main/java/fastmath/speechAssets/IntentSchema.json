@@ -19,6 +19,19 @@
       ]
     },
     {
+      "intent": "AnswerRangeIntent",
+      "slots": [
+        {
+          "name" : "LevelA",
+          "type": "AMAZON.NUMBER"
+        },
+        {
+          "name" : "LevelB",
+          "type": "AMAZON.NUMBER"
+        }
+      ]
+    },
+    {
       "intent": "AnswerLevelIntent",
       "slots": [
         {

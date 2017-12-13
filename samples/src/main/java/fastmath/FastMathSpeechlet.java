@@ -62,10 +62,18 @@ public class FastMathSpeechlet implements Speechlet {
     private static final int ANSWER_QUESTION_STAGE = 2;
     private static final int GENERATE_QUESTION_STAGE = 1;
     
+    //Challenger Stages
+    private static final String ASK_RANGE_ID = "AskRangeID";
+    private static final String LEVEL_A_ID = "LevelAID";
+    private static final String LEVEL_B_ID = "LevelBID";
+    private static final int ASK_RANGE_STAGE = 1;
+    private static final int HAVE_RANGE_STAGE = 0;
+    private static final int HAVE_RANGE_ANSWER_STAGE = 2;
+    
     private static final String MODE_ID = "ModeID";
     private static final String SURVIVAL_MODE = "survival";
     private static final String PRACTICE_MODE = "practice";
-    private static final String TIME_TRIALL_MODE = "timetrial";
+    private static final String CHALLENGER_MODE = "challenger";
     
     private static final int CORRECT_ANSWER_TO_BEAT_LEVEL = 5;
     
@@ -122,11 +130,20 @@ public class FastMathSpeechlet implements Speechlet {
             return handleAnswerModeResponse(intent, session);
         } else if ("GiveAnswerIntent".equals(intentName)) {
         	
+        	if(session.getAttributes().containsKey(STAGE_ID)) {
+        		if((Integer)session.getAttribute(STAGE_ID) != ASK_ANSWER_STAGE) {
+        			return getHelp();
+        		}
+        	}else {
+        		return getHelp();
+        	}
         	if(session.getAttributes().containsKey(MODE_ID)) {
         		if(((String)session.getAttribute(MODE_ID)).equals(SURVIVAL_MODE)) {
-        			return setUpSurvivalStage(intent, session, false);
+        			return setUpSurvivalStage(intent, session, false, false);
         		}else if(((String)session.getAttribute(MODE_ID)).equals(PRACTICE_MODE)) {
         			return setUpPracticeStage(intent, session, false, false);
+        		}else if(((String)session.getAttribute(MODE_ID)).equals(CHALLENGER_MODE)) {
+        			return setUpChallengerStage(intent, session, false);
         		}else {
         			return getHelp();
         		}
@@ -144,7 +161,7 @@ public class FastMathSpeechlet implements Speechlet {
             	}else {
             		if(session.getAttributes().containsKey(MODE_ID)){
             			if(((String)session.getAttribute(MODE_ID)).equals(SURVIVAL_MODE)) {
-            				return setUpSurvivalStage(intent, session, true);
+            				return setUpSurvivalStage(intent, session, true, false);
             			}else {
             				return getHelp();
             			}
@@ -155,16 +172,33 @@ public class FastMathSpeechlet implements Speechlet {
         	}else {
         		return getHelp();
         	}
-        } else if("DoNotKnowIntent".equals(intentName)) { 
+        } else if("AnswerRangeIntent".equals(intentName)) {
+        	if(session.getAttributes().containsKey(STAGE_ID)) {
+        		if((Integer)session.getAttribute(STAGE_ID) == ASK_ANSWER_STAGE) {
+        			if(session.getAttributes().containsKey(MODE_ID)) {
+        				if(((String)session.getAttribute(MODE_ID)).equals(CHALLENGER_MODE)) {
+        					return setUpChallengerStage(intent, session, false);
+        				}else {
+        					return getHelp();
+        				}
+        			}else {
+        				return getHelp();
+        			}
+        		}else {
+        			return getHelp();
+        		}
+        	}else {
+        		return getHelp();
+        	}
+        }else if("DoNotKnowIntent".equals(intentName)) { 
         	if(session.getAttributes().containsKey(STAGE_ID)) {
         		if((Integer)session.getAttribute(STAGE_ID) == ASK_ANSWER_STAGE) {
         			if(session.getAttributes().containsKey(MODE_ID)) {
         				if(((String)session.getAttribute(MODE_ID)).equals(PRACTICE_MODE)) {
         					return setUpPracticeStage(intent, session, false, true);
         				}else if(session.getAttribute(MODE_ID) == SURVIVAL_MODE) {
-        					return getHelp(); // Add features for survival mode
-        				}
-        				else {
+        					return setUpSurvivalStage(intent, session, false, true);
+        				}else {
         					return getHelp();
         				}
         			}else {
@@ -224,6 +258,18 @@ public class FastMathSpeechlet implements Speechlet {
     		}
     	}
     	
+    	if(session.getAttributes().containsKey(ASK_RANGE_ID)) {
+    		session.setAttribute(ASK_RANGE_ID, ASK_RANGE_STAGE);
+    	}
+    	
+    	if(session.getAttributes().containsKey(LEVEL_A_ID)) {
+    		session.setAttribute(LEVEL_A_ID, null);
+    	}
+    	
+    	if(session.getAttributes().containsKey(LEVEL_B_ID)) {
+    		session.setAttribute(LEVEL_B_ID, null);
+    	}
+    	
     	if(session.getAttributes().containsKey(ASK_LEVEL_ID)){
     		session.setAttribute(ASK_LEVEL_ID, ASK_LEVEL_STAGE);
     	}
@@ -262,24 +308,24 @@ public class FastMathSpeechlet implements Speechlet {
     		if((Integer)session.getAttribute(STAGE_ID) == CONFIRM_STAGE){
     			speechText = "The mode you asked has been cancelled. Now, what would you like to play?";
     			
-    			repromptText = "You can choose from Surival, Practice, and Time Trial modes";
+    			repromptText = "You can choose from Surival, Practice, and Challenger modes";
     			
     			initializeAllComponents(session, true);
     		}else if((Integer)session.getAttribute(STAGE_ID) == ASK_MODE_STAGE){
     			speechText = "You have not chosen a mode yet! ";
     			
-    			repromptText = "You can choose from Surival, Practice, and Time Trial modes";
+    			repromptText = "You can choose from Surival, Practice, and Challenger modes";
     		}else {
     			speechText = "You exited the mode you are playing. What mode would you want to play now? ";
     			
-    			repromptText = "You can choose from Surival, Practice, and Time Trial modes";
+    			repromptText = "You can choose from Surival, Practice, and Challenger modes";
     			
     			initializeAllComponents(session, true);
     		}
     	}else {
-    		speechText = "You have not chosen a mode yet! You can choose from Surival, Practice, and Time Trial modes";
+    		speechText = "You have not chosen a mode yet! You can choose from Surival, Practice, and Challenger modes";
 			
-			repromptText = "You can choose from Surival, Practice, and Time Trial modes";
+			repromptText = "You can choose from Surival, Practice, and Challenger modes";
 			
 			initializeAllComponents(session, true);
     	}
@@ -303,15 +349,15 @@ public class FastMathSpeechlet implements Speechlet {
     			if(((String)session.getAttribute(MODE_ID)).equals(SURVIVAL_MODE)) {
     				session.setAttribute(STAGE_ID, ASK_ANSWER_STAGE);
         			session.setAttribute(HAVE_ANSWER_ID, ASK_QUESTION);
-        			return setUpSurvivalStage(intent, session, false);
+        			return setUpSurvivalStage(intent, session, false, false);
         			
     			}else if(((String)session.getAttribute(MODE_ID)).equals(PRACTICE_MODE)) {
     				session.setAttribute(STAGE_ID, ASK_ANSWER_STAGE);
     				session.setAttribute(ASK_LEVEL_ID, ASK_LEVEL_STAGE);
     				return setUpPracticeStage(intent, session, false, false);
     			}else {
-    				log.info("INVALID???");
-    				
+    				session.setAttribute(STAGE_ID, ASK_ANSWER_STAGE);
+    				session.setAttribute(ASK_RANGE_ID, ASK_RANGE_STAGE);
     				return null;
     			}
     		}
@@ -326,7 +372,7 @@ public class FastMathSpeechlet implements Speechlet {
         // Create the welcome message.
         String speechText =
                 "Welcome to Fast Math Game! You can choose to play in three different modes:" +
-                "Practice, Survival or Time Trial. Now, which one would you like to play?";
+                "Practice, Survival or Challenger. Now, which one would you like to play?";
         String repromptText =
                 "Please tell me the game mode that you would like to try.";
 
@@ -358,7 +404,9 @@ public class FastMathSpeechlet implements Speechlet {
     						"If you get five answers correct at your current level, you will advance to next level. " +
     						"For each question, you have at most eight seconds to answer. " +
     						"If you spend more than eight seconds, the question will be counted wrong. " +
-    						"You can have at most 5 questions wrong. " + 
+    						"You can have at most 5 questions wrong. You can exit the mode whenever you want by saying Quit or Cancel. " +
+    						"You will not be able to change mode unlesss you quit the game mode. " +
+    						"If you get stuck or do not know the question, just say I don't know. " +
     						"Ready to start the game? Say Begin or Continue to proceed. ";
     			
     			repromptText = "Ready to start the game? Say Begin or Continue to go ahead. ";
@@ -369,13 +417,26 @@ public class FastMathSpeechlet implements Speechlet {
     			
     		}else if(modeSlot.toLowerCase().equals(PRACTICE_MODE)) {
     			speechText = "Welcome to Practice Mode! In this mode, you can choose to practice math questions whatever the level you wanna be in. " +
-    						 "You will not be given a time limit or wrong answers penalty. Have Fun! " +
-						"Ready to start the game? Say Begin or Continue to proceed. ";
+    						 "You will not be given a time limit or wrong answers penalty. You can exit the mode whenever you want by saying Quit or Cancel. Have Fun! " +
+    						 "If you get stuck or do not know the question, just say I don't know. " +
+    						 "Ready to start the game? Say Begin or Continue to proceed. ";
 			
     			repromptText = "Ready to start the game? Say Begin or Continue to go ahead. ";
 			
     			session.setAttribute(MODE_ID,  PRACTICE_MODE);
 			
+    			session.setAttribute(STAGE_ID, CONFIRM_STAGE);
+    		}else if(modeSlot.toLowerCase().equals(CHALLENGER_MODE)) {
+    			speechText = "Welcome to the Challenger Mode! In this mode, you can pick a range of two different levels, by saying, for example " +
+    						"Level one to level two. You can also stay in the same level by just saying the same level. " +
+    						"However, if you miss one question, the game is over. Prepare for it! " +
+    						"You can exit the mode whenever you want by saying Quit or Cancel, and you can not change the level when you are playing. " +
+    						"Ready to start the game? Say Begin or Continue to proceed. ";
+    			
+    			repromptText = "Ready to start the game? Say Begin or Continue to go ahead. ";
+    			
+    			session.setAttribute(MODE_ID,  CHALLENGER_MODE);
+    			
     			session.setAttribute(STAGE_ID, CONFIRM_STAGE);
     		}
     		return getSpeechletResponse(speechText, repromptText, true);
@@ -392,9 +453,9 @@ public class FastMathSpeechlet implements Speechlet {
     
     private SpeechletResponse getHelp() {
         String speechOutput =
-                "You can ask to play Survival, Practice and Time Trial mode. Which mode would you want to play with?";
+                "You can ask to play Survival, Practice and Challenger mode. Which mode would you want to play with?";
         String repromptText =
-                "You can ask to play Survival, Practice and Time Trial mode. Which mode would you want to play with?";
+                "You can ask to play Survival, Practice and Challenger mode. Which mode would you want to play with?";
         return newAskResponse(speechOutput,true, repromptText, false);
     }
     
@@ -431,7 +492,7 @@ public class FastMathSpeechlet implements Speechlet {
     		
     		randX = RAND.nextInt(10);
     		
-    		randY = RAND.nextInt(15);
+    		randY = RAND.nextInt(15) + 10;
     		
     		randZ = RAND.nextInt(1);
     		
@@ -456,10 +517,197 @@ public class FastMathSpeechlet implements Speechlet {
     			return que;
     		}
     	case 3:
-    		return null;
+    		float randXf = RAND.nextInt(15);
+    		
+    		float randX_f = RAND.nextInt(9) / 10;
+    		
+    		randXf = randXf + randX_f;
+    		
+    		float randYf = RAND.nextInt(15);
+    		
+    		float randY_f = RAND.nextInt(9) / 10;
+    		
+    		randYf = randYf + randY_f;
+    		
+    		if(randXf >= randYf) {
+    			String speech = "What is " + randXf + " plus " + randYf + " ? ";
+    			
+    			float answer = randXf + randYf;
+    			
+    			Question que = new Question(speech, answer);
+        		
+        		return que;
+    		}else {
+    			String speech = "What is " + randYf + " minus " + randXf + " ? ";
+    			
+    			float answer = randYf - randXf;
+    			
+    			Question que = new Question(speech, answer);
+    			
+        		return que;
+    		}
+    	
+    	case 4:
+    		
+    		randX = RAND.nextInt(10);
+    		
+    		randYf = RAND.nextInt(10);
+    		
+    		randY_f = RAND.nextInt(9) / 10;
+    		
+    		randYf = randYf + randY_f;
+    		
+    		randZ = RAND.nextInt(1);
+    		
+    		if(randZ == 0) { 
+    			String speech = "What is " + randX + " multiply by " + randYf + " ? ";
+    			
+    			float answer = randX * randYf;
+    			
+    			Question que =  new Question(speech, answer);
+    			
+    			return que;
+    		}else {
+    			float product = randX * randYf;
+    			
+    			String speech = "What is " + product + " divided by " + randX + " ? ";
+    			
+    			float answer = product / randX;
+    			
+    			Question que = new Question(speech, answer);
+    			
+    			return que;
+    		}
+    	
     	default:
     		return null;
     	}
+    }
+    
+    private int pickRandomNumberInRange(int A, int B) {
+    	int random = RAND.nextInt(B - A);
+    	
+    	random += A;
+    	
+    	return random;
+    }
+    
+    private SpeechletResponse setUpChallengerStage(final Intent intent, final Session session, boolean doNotKnow) {
+    	String speechText = "", repromptText = "";
+    	
+    	if(session.getAttributes().containsKey(STAGE_ID)) {
+    		if((Integer)session.getAttribute(STAGE_ID) != ASK_ANSWER_STAGE) {
+    			speechText = "You have not chosen the mode yet! Please choose or confirm which mode you want to play first! ";
+    			
+        		repromptText = "You have not chosen the mode yet! Please choose or confirm which mode you want to play first! ";
+    		}
+    	}else {
+    		speechText = "You have not chosen the mode yet! Please choose or confirm which mode you want to play first! ";
+    		
+    		repromptText = "You have not chosen the mode yet! Please choose or confirm which mode you want to play first! ";
+    	}
+    	
+    	if(session.getAttributes().containsKey(ASK_RANGE_ID)) {
+    		if((Integer)session.getAttribute(ASK_RANGE_ID) == HAVE_RANGE_ANSWER_STAGE && doNotKnow) {
+    			Question que = getQuestionFromLinkedHashMap((LinkedHashMap)session.getAttribute(CURRENT_QUESTION_ID));
+    			
+    			speechText = "It's ok. The question you missed is " + que.getQuestion();
+    			
+    			speechText += "The answer is " + que.getAnswer() + " . ";
+    			
+    			speechText += "Better luck next time! You are back in the main menu. Which mode would you want to play? ";
+				
+				repromptText = "You can choose from Survival, Practice and Challenger mode. Which mode would you want to play? ";
+				
+				initializeAllComponents(session, true);
+    		}
+    	}
+    	
+    	if(session.getAttributes().containsKey(ASK_RANGE_ID) && speechText != "") {
+    		if((Integer)session.getAttribute(ASK_RANGE_ID) == ASK_RANGE_STAGE) {
+    			speechText = "Please choose the level range from the five levels that you want to play with. ";
+    			
+    			repromptText = "Please choose the level range from the five levels that you want to play with. ";
+    			
+    			session.setAttribute(ASK_RANGE_ID, HAVE_RANGE_STAGE);
+    		}else if((Integer)session.getAttribute(ASK_RANGE_ID) == HAVE_RANGE_STAGE){
+    			Slot levelASlot = intent.getSlot("LevelA");
+    			
+    			Slot levelBSlot = intent.getSlot("LevelB");
+    			
+    			if(levelASlot != null && levelBSlot != null && levelASlot.getValue() != null && levelBSlot.getValue() != null) {
+    				
+    				int levelA = Integer.parseInt(levelASlot.getValue());
+    				
+    				int levelB = Integer.parseInt(levelBSlot.getValue());
+    				
+    				if(levelA <= levelB && (levelA > 0 && levelA <= 5 && levelB > 0 && levelB <= 5)) {
+    					int levelDecided = pickRandomNumberInRange(levelA, levelB);
+    					
+    					Question que = generateQuestion(levelDecided);
+    					
+    					speechText = "Get ready! Your first question is " + que.getQuestion();
+    					
+    					session.setAttribute(LEVEL_A_ID, levelA);
+    					
+    					session.setAttribute(LEVEL_B_ID, levelB);
+    					
+    					session.setAttribute(ASK_RANGE_ID, HAVE_RANGE_ANSWER_STAGE);
+    					
+    					session.setAttribute(CURRENT_QUESTION_ID, que);
+    					
+    					repromptText = "Would you like to hear the question again? The question is " + que.getQuestion();
+    				}else {
+    					speechText = "You did not say the range correctly! Please say any number between one to five. ";
+    					
+    					repromptText = "You did not say the range correctly! Please say any number between one to five. ";
+    				}
+    				
+    			}else {
+    				speechText = "The range you asked was invalid! Please say any range between one to five";
+    				
+    				repromptText = "The range you asked was invalid! Please say any range between one to five";
+    			}
+    		}else {
+    			Slot answerSlot =intent.getSlot("Answer");
+    			
+    			if(answerSlot != null && answerSlot.getValue() != null) {
+    				float answer = Float.parseFloat(answerSlot.getValue());
+    				
+    				Question que = getQuestionFromLinkedHashMap((LinkedHashMap)session.getAttribute(CURRENT_QUESTION_ID));
+        			
+    				if(que.checkAnswer(answer)) {
+    					speechText = "Nice! You got the question correct! Here is the next question: ";
+    					
+    					int levelDecided = pickRandomNumberInRange((Integer)session.getAttribute(LEVEL_A_ID), (Integer)session.getAttribute(LEVEL_B_ID));
+    					
+    					Question queN = generateQuestion(levelDecided);
+    					
+    					speechText += queN.getQuestion();
+    					
+    					session.setAttribute(CURRENT_QUESTION_ID, queN);
+    					
+    					repromptText = "Would you like to hear the question again? The question is " + queN.getQuestion();
+    				}else {
+    					speechText = "Oops! You got the answer wrong! The question is " + que.getQuestion();
+    					
+    					speechText += "And the answer is " + que.getAnswer() + " . ";
+    					
+    					initializeAllComponents(session, true);
+    					
+    					speechText += "Better luck next time! You are back in the main menu. Which mode would you want to play? ";
+    					
+    					repromptText = "You can choose from Survival, Practice and Challenger mode. Which mode would you want to play? ";
+    				}
+    			}else {
+    				speechText = "Your answer is invalid! Please try again! ";
+    				
+    				repromptText = "Your answer is invalid! Please try again! ";
+    			}		
+    		}
+    	}
+    	
+    	return getSpeechletResponse(speechText, repromptText, true);
     }
     
     private SpeechletResponse setUpPracticeStage(final Intent intent, final Session session, boolean levelChanged, boolean doNotKnow) {
@@ -615,6 +863,7 @@ public class FastMathSpeechlet implements Speechlet {
     }
     
     private Question getQuestionFromLinkedHashMap(LinkedHashMap LHMQ) {
+    	
     	String question = LHMQ.get("question").toString();
 		
 		float answerT = Float.parseFloat(LHMQ.get("answer").toString());
@@ -624,7 +873,7 @@ public class FastMathSpeechlet implements Speechlet {
 		return que;
     }
     
-    private SpeechletResponse setUpSurvivalStage(final Intent intent, final Session session, boolean exceededTime) {
+    private SpeechletResponse setUpSurvivalStage(final Intent intent, final Session session, boolean exceededTime, boolean doNotKnow) {
         // Get the slots from the intent.
     	
     	String speechText, repromptText;
@@ -633,8 +882,72 @@ public class FastMathSpeechlet implements Speechlet {
     	
     	if((Integer)session.getAttribute(STAGE_ID) != ASK_ANSWER_STAGE) {
     		speechText = "You have to choose or confirm which mode you want to play before you enter the play mode!" +
-    				"There are three choices: Survival, practice and Time Trial. What is your choice? ";
+    				"There are three choices: Survival, practice and Challenger. What is your choice? ";
+    	}else {
+    		if(session.getAttributes().containsKey(HAVE_ANSWER_ID)) {
+    			if(((Integer)session.getAttribute(HAVE_ANSWER_ID)) == ASK_ANSWER_STAGE && doNotKnow) {
+    				Question que = getQuestionFromLinkedHashMap((LinkedHashMap)session.getAttribute(CURRENT_QUESTION_ID));
+    				
+    				if(session.getAttributes().containsKey(ANSWERS_WRONG_ID)) {
+						int answersWrong = (Integer)session.getAttribute(ANSWERS_WRONG_ID);
+						
+						if(answersWrong == 4) {
+							speechText = "Ah! Sorry, you have used all five chances of wrong answers. Try again!";
+							
+							session.setAttribute(HAVE_ANSWER_ID, ASK_QUESTION);
+							
+							session.setAttribute(ANSWERS_WRONG_ID, 0);
+							
+							session.setAttribute(ANSWERS_CORRECT_ID, 0);
+							
+							session.setAttribute(CURRENT_QUESTION_ID, null);
+							
+							session.setAttribute(CURRENT_LEVEL_ID, 1);
+							
+							session.setAttribute(STAGE_ID, ASK_MODE_STAGE);
+							
+						}else {
+							session.setAttribute(ANSWERS_WRONG_ID, answersWrong + 1);
+							
+							speechText = "Sorry, you got the answer Wrong. " +
+									"The question is " + que.getQuestion() +
+									"And the correct answer is " + que.getAnswer() + ". " +
+									"Better luck next Time! Here is the next question: ";
+							
+							Question queN = generateQuestion((Integer)session.getAttribute(CURRENT_LEVEL_ID));
+							
+							speechText += queN.getQuestion();
+							
+							session.setAttribute(CURRENT_QUESTION_ID, queN);
+							
+							LocalDateTime nowA = LocalDateTime.now();
+							
+		    				session.setAttribute(ASK_QUESTION_TIME_ID, nowA);
+						}   							
+					}else {
+						session.setAttribute(ANSWERS_WRONG_ID, 1);
+						
+						speechText = "Sorry, you got the answer Wrong. " +
+									"The question is " + que.getQuestion() +
+									"And the correct answer is " + que.getAnswer() + ". " +
+									"Better luck next Time! Here is the next question: ";
+						
+						Question queN = generateQuestion(1);
+						
+						speechText += queN.getQuestion();
+						
+						session.setAttribute(CURRENT_QUESTION_ID, queN);
+						
+						LocalDateTime nowA = LocalDateTime.now();
+						
+	    				session.setAttribute(ASK_QUESTION_TIME_ID, nowA);
+					}
+    			
+    			}
+    		}
     	}
+    	
+    	
     	
     	if(session.getAttributes().containsKey(HAVE_ANSWER_ID) && speechText == "") {
     		
@@ -684,10 +997,9 @@ public class FastMathSpeechlet implements Speechlet {
         								if((Integer)session.getAttribute(CURRENT_LEVEL_ID) == 5) {
         									
         									speechText = "Wow! You are amazing! You just beat the hardest mathematic game in the history! " + 
-        												"According to whoever's statistics, only 5 percent of our players can get through the game! " + 
+        												"According to whoever's statistics, only 0.11 percent of our players can get through the game! " + 
         												"Congratulations! You are welcome to try the game again at any time! ";
         									
-            								
             								session.setAttribute(HAVE_ANSWER_ID, ASK_QUESTION);
             								
             								session.setAttribute(ANSWERS_WRONG_ID, 0);
@@ -724,7 +1036,7 @@ public class FastMathSpeechlet implements Speechlet {
         								
         								session.setAttribute(ANSWERS_CORRECT_ID, answersCorrectBefore + 1);
         								
-        								speechText = "Congratulations! You got the question correct. Let's continue to the next one.";
+        								speechText = "Congratulations! You got the question correct. Let's continue to the next one. ";
         								
         								Question queN = generateQuestion((Integer)session.getAttribute(CURRENT_LEVEL_ID));
         								
