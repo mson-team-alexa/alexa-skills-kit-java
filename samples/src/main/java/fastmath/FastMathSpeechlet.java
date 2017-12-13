@@ -144,11 +144,11 @@ public class FastMathSpeechlet implements Speechlet {
         		return getHelp();
         	}
         	if(session.getAttributes().containsKey(MODE_ID)) {
-        		if(((String)session.getAttribute(MODE_ID)).equals(SURVIVAL_MODE) || ((String)session.getAttribute(MODE_ID)).equals(SURVIVAL_MODE_FULL)) {
+        		if(((String)session.getAttribute(MODE_ID)).equals(SURVIVAL_MODE)) {
         			return setUpSurvivalStage(intent, session, false, false);
-        		}else if(((String)session.getAttribute(MODE_ID)).equals(PRACTICE_MODE) || ((String)session.getAttribute(MODE_ID)).equals(PRACTICE_MODE_FULL)) {
+        		}else if(((String)session.getAttribute(MODE_ID)).equals(PRACTICE_MODE)) {
         			return setUpPracticeStage(intent, session, false, false);
-        		}else if(((String)session.getAttribute(MODE_ID)).equals(CHALLENGER_MODE) || ((String)session.getAttribute(MODE_ID)).equals(CHALLENGER_MODE_FULL)) {
+        		}else if(((String)session.getAttribute(MODE_ID)).equals(CHALLENGER_MODE)) {
         			return setUpChallengerStage(intent, session, false);
         		}else {
         			return getHelp();
@@ -403,7 +403,7 @@ public class FastMathSpeechlet implements Speechlet {
 
     		String modeSlot = GamemodeSlot.getValue();
 
-    		if(modeSlot.toLowerCase().equals(SURVIVAL_MODE)) {
+    		if(modeSlot.toLowerCase().equals(SURVIVAL_MODE) || modeSlot.toLowerCase().equals(SURVIVAL_MODE_FULL)) {
     			speechText = "Welcome to Survival Mode! Here you will be challenged with questions according to the level you are in. " +
     						"If you get five answers correct at your current level, you will advance to next level. " +
     						"For each question, you have at most eight seconds to answer. " +
@@ -419,7 +419,7 @@ public class FastMathSpeechlet implements Speechlet {
     			
     			session.setAttribute(STAGE_ID, CONFIRM_STAGE);
     			
-    		}else if(modeSlot.toLowerCase().equals(PRACTICE_MODE)) {
+    		}else if(modeSlot.toLowerCase().equals(PRACTICE_MODE) || modeSlot.toLowerCase().equals(PRACTICE_MODE_FULL)) {
     			speechText = "Welcome to Practice Mode! In this mode, you can choose to practice math questions whatever the level you wanna be in. " +
     						 "You will not be given a time limit or wrong answers penalty. You can exit the mode whenever you want by saying Quit or Cancel. Have Fun! " +
     						 "If you get stuck or do not know the question, just say I don't know. " +
@@ -430,7 +430,7 @@ public class FastMathSpeechlet implements Speechlet {
     			session.setAttribute(MODE_ID,  PRACTICE_MODE);
 			
     			session.setAttribute(STAGE_ID, CONFIRM_STAGE);
-    		}else if(modeSlot.toLowerCase().equals(CHALLENGER_MODE)) {
+    		}else if(modeSlot.toLowerCase().equals(CHALLENGER_MODE) || modeSlot.toLowerCase().equals(CHALLENGER_MODE_FULL)) {
     			speechText = "Welcome to the Challenger Mode! In this mode, you can pick a range of two different levels, by saying, for example " +
     						"Level one to level two. You can also stay in the same level by just saying the same level. " +
     						"However, if you miss one question, the game is over. Prepare for it! " +
@@ -904,7 +904,7 @@ public class FastMathSpeechlet implements Speechlet {
     				"There are three choices: Survival, practice and Challenger. What is your choice? ";
     	}else {
     		if(session.getAttributes().containsKey(HAVE_ANSWER_ID)) {
-    			if(((Integer)session.getAttribute(HAVE_ANSWER_ID)) == ASK_ANSWER_STAGE && doNotKnow) {
+    			if(((Integer)session.getAttribute(HAVE_ANSWER_ID)) == HAVE_ANSWER && doNotKnow) {
     				Question que = getQuestionFromLinkedHashMap((LinkedHashMap)session.getAttribute(CURRENT_QUESTION_ID));
     				
     				if(session.getAttributes().containsKey(ANSWERS_WRONG_ID)) {
@@ -962,7 +962,66 @@ public class FastMathSpeechlet implements Speechlet {
 	    				session.setAttribute(ASK_QUESTION_TIME_ID, nowA);
 					}
     			
+    			}else if(((Integer)session.getAttribute(HAVE_ANSWER_ID)) == HAVE_ANSWER && exceededTime) {
+    				
+    				Question que = getQuestionFromLinkedHashMap((LinkedHashMap)session.getAttribute(CURRENT_QUESTION_ID));
+    				
+    				if(session.getAttributes().containsKey(ANSWERS_WRONG_ID)) {
+						int answersWrong = (Integer)session.getAttribute(ANSWERS_WRONG_ID);
+						
+						if(answersWrong == 4) {
+							speechText = "Ah! Sorry, you have used all five chances of wrong answers. Try again!";
+							
+							session.setAttribute(HAVE_ANSWER_ID, ASK_QUESTION);
+							
+							session.setAttribute(ANSWERS_WRONG_ID, 0);
+							
+							session.setAttribute(ANSWERS_CORRECT_ID, 0);
+							
+							session.setAttribute(CURRENT_QUESTION_ID, null);
+							
+							session.setAttribute(CURRENT_LEVEL_ID, 1);
+							
+							session.setAttribute(STAGE_ID, ASK_MODE_STAGE);
+							
+						}else {
+							session.setAttribute(ANSWERS_WRONG_ID, answersWrong + 1);
+							
+							speechText = "Sorry, you got the answer Wrong. " +
+									"The question is " + que.getQuestion() +
+									"And the correct answer is " + que.getAnswer() + ". " +
+									"Better luck next Time! Here is the next question: ";
+							
+							Question queN = generateQuestion((Integer)session.getAttribute(CURRENT_LEVEL_ID));
+							
+							speechText += queN.getQuestion();
+							
+							session.setAttribute(CURRENT_QUESTION_ID, queN);
+							
+							LocalDateTime nowA = LocalDateTime.now();
+							
+		    				session.setAttribute(ASK_QUESTION_TIME_ID, nowA);
+						}   							
+					}else {
+						session.setAttribute(ANSWERS_WRONG_ID, 1);
+						
+						speechText = "Sorry, you got the answer Wrong. " +
+									"The question is " + que.getQuestion() +
+									"And the correct answer is " + que.getAnswer() + ". " +
+									"Better luck next Time! Here is the next question: ";
+						
+						Question queN = generateQuestion(1);
+						
+						speechText += queN.getQuestion();
+						
+						session.setAttribute(CURRENT_QUESTION_ID, queN);
+						
+						LocalDateTime nowA = LocalDateTime.now();
+						
+	    				session.setAttribute(ASK_QUESTION_TIME_ID, nowA);
+					}
     			}
+    				
     		}
     	}
     	
