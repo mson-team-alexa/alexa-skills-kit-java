@@ -28,3 +28,6 @@ DoNotKnowIntent I don't know
 DoNotKnowIntent I don't know how to answer the question
 DoNotKnowIntent I do not know the answer
 DoNotKnowIntent I don't know the answer
+AnswerRangeIntent From level {LevelA} to level {LevelB}
+AnswerRangeIntent Level {LevelA} to level {LevelB}
+AnswerRangeIntent From {LevelA} to {LevelB}
