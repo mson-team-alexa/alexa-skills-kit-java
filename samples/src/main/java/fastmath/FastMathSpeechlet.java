@@ -545,6 +545,10 @@ public class FastMathSpeechlet implements Speechlet {
     			
     			return que;
     		}else {
+    			while(randX == 0) {
+    				randX = RAND.nextInt(11);
+    			}
+	
     			int product = randX * randY;
     			
     			int answer  =  product / randX;
@@ -1112,7 +1116,7 @@ public class FastMathSpeechlet implements Speechlet {
         				
         				Duration timeElapsed = Duration.between(then, nowC);
         		
-        				if(timeElapsed.toMillis() < 20000) {
+        				if(timeElapsed.toMillis() < 30000) {
         					
         					LinkedHashMap LHMQ = (LinkedHashMap)session.getAttribute(CURRENT_QUESTION_ID);	
         					
@@ -1147,7 +1151,7 @@ public class FastMathSpeechlet implements Speechlet {
         									session.setAttribute(STAGE_ID, ASK_MODE_STAGE);
         								}else {
         									speechText = "Great Job! You have beaten Level " + level + ". " +
-        											"Now you will be challenged with questions from " + (level + 1) + ". " + 
+        											"Now you will be challenged with questions from level " + (level + 1) + ". " + 
         											"Prepare for it! Here is your question:        ";
         								
         								session.setAttribute(CURRENT_LEVEL_ID, level + 1);
