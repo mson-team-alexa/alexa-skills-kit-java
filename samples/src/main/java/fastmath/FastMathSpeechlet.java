@@ -504,7 +504,7 @@ public class FastMathSpeechlet implements Speechlet {
     	case 1:
     		int randX = RAND.nextInt(11);
     		
-    		int randY = RAND.nextInt(101) + 10;
+    		int randY = RAND.nextInt(41) + 10;
     		
     		float randZ = RAND.nextFloat();
     		
@@ -532,7 +532,7 @@ public class FastMathSpeechlet implements Speechlet {
     		
     		randX = RAND.nextInt(11);
     		
-    		randY = RAND.nextInt(16) + 10;
+    		randY = RAND.nextInt(11);
     		
     		randZ = RAND.nextFloat();
 
@@ -564,7 +564,7 @@ public class FastMathSpeechlet implements Speechlet {
     	case 3:
     		randX = RAND.nextInt(11);
     		
-    		randY = RAND.nextInt(13);
+    		randY = RAND.nextInt(11);
     		
     		int randI = RAND.nextInt(30);
     		
@@ -588,17 +588,16 @@ public class FastMathSpeechlet implements Speechlet {
     	
     	case 4:
     		
-    		randX = RAND.nextInt(101);
+    		randX = RAND.nextInt(51);
     		
-    		float randYf = RAND.nextFloat() * 50;
+    		float randYf = RAND.nextFloat() * 10;
     		
     		BigDecimal bd = new BigDecimal(Float.toString(randYf));
     		
     		bd = bd.setScale(1, RoundingMode.HALF_UP);
     		
     		randYf = bd.floatValue();
-    		
-    		
+
     		randZ = RAND.nextFloat();
     		
     		if(randZ >= 0.5f) { 
@@ -635,6 +634,9 @@ public class FastMathSpeechlet implements Speechlet {
     			return que;
     		}
     	
+    	case 5:
+    		
+    		
     	default:
     		return null;
     	}
