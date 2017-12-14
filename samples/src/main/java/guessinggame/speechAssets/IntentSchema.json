@@ -1,11 +1,16 @@
 {
   "intents": [
     {
-<<<<<<< Updated upstream
-      "intent": "PLAYGAMEINTENT"
-=======
-      "intent": “PlayGameIntent”
->>>>>>> Stashed changes
+      "intent": "PlayGameIntent"
+    },
+    {
+      "slots": [
+        {
+          "name": "animal",
+          "type": "ANIMALS"
+        }
+      ],
+      "intent": "GuessAnimalIntent"
     },
     {
       "intent": "AMAZON.HelpIntent"
