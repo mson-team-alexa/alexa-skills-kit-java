@@ -152,19 +152,39 @@ public static Adventures getName(String name) {
     	scenarios.add(new Scenario("Fix", "Letter",  
     			
     			//If Fix is selected (Ending Baa)
-    			"outcome", 
+    			"Just as soon as you fix the power, you see a fleet of ships approaching. You immediately recognize "
+    			+"them as American Interglactic Police spacecrafts- your boss must have sent them after you! You rush to the controls, "
+    			+" and initiate light speed. It will use up all of the remaining fuel, but they’ll never catch you!"
+    			+"GAME OVER. Thank you for playing!", 
     			
     			//If Letter is selected (Ending Bab)
-    			"outcome"));
+    			"After you send your letter, you see a bright light coming through the windows." + 
+    			"A loud message begins to play: Do not be alarmed human, the voice says," + 
+    			"We have received your message. We know you seek the answers behind the black holes, we are docking your ship now." + 
+    			"Come aboard, and we will give you shelter and share our knowledge." + 
+    			"Congratulations, commander! You've made contact with a friendly alien species and are learning their knowledge." + 
+    			"The mission was an amazing success!"
+    			+ "	GAME OVER. Thank you for playing!"
+    			));
     	
     	//if Choice Bb is selected
     	scenarios.add(new Scenario("Find", "Leave",  
     			
     			//if Find is selected (ending Bba)
-    			"outcome", 
+    			"You look outside the window to see a fleet of ships approaching. You immediately recognize \"\n" + 
+    			"them as American Interglactic Police spacecrafts- your boss must have sent them after you! You rush to the controls, \"\n" + 
+    			"and are about to initiate light speed before you hear the looming voice of your boss. "
+    			+"COMMANDER, THIS IS ADMIRAL BRIG, WE ARE BOARDING YOUR SHIP TO RETURN YOU TO EARTH ON THE CHARGES OF MUTINY."
+    			+"ACCEPT YOUR SURRENDER OR WE WILL DESTROY YOUR SHIP WITH YOU IN IT."
+    			+"You are arrested and sent back to Earth where you spend the rest of your days in prison, dreaming of the stars."
+    			+ "	GAME OVER. Thank you for playing!", 
     			
     			//if Leave is selected (ending Bbb)
-    			"outcome"));
+    			"You run down to the lower deck where the escape pods are held. The alarms get quieter as you enter the"
+    			+"pod. You buckle yourself in and press the big red eject button. You launch into space, heading towards Earth."
+    			+"Who knows what adventures might ensue next....TO BE CONTINUED"
+    			+ "	GAME OVER. Thank you for playing!"
+    			));
     	
 /*
     	scenarios.add(new Scenario("If you would like to follow the coordinates, simply say “Follow”\n" , "If you wish to follow your gut and go another way, say “My Way”\n" ,  "outcome" , "outcmoe"));
