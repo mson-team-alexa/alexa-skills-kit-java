@@ -39,7 +39,7 @@ static {
 }
 
 public ChooseAdventureSpeechletRequestStreamHandler() {
-    super(new ChooseAdventureSpeechlet(), supportedApplicationIds);
+    super(new ChooseAdventureSpeechlets(), supportedApplicationIds);
 }
 
 public ChooseAdventureSpeechletRequestStreamHandler(Speechlet speechlet,

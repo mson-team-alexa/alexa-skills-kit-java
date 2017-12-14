@@ -142,7 +142,28 @@ public class SessionSpeechlet implements Speechlet {
 
         return getSpeechletResponse(speechText, repromptText, true);
     }
-    
+    private SpeechletResponse getColorFromSession(final Intent intent, final Session session) {
+        String speechText;
+        boolean isAskResponse = false;
+
+        // Get the user's favorite color from the session.
+        String favoriteColor = (String) session.getAttribute(COLOR_KEY);
+
+        // Check to make sure user's favorite color is set in the session.
+
+        		if(favoriteColor.equals("ajaz"))
+        			speechText = String.format("Your favorite color is  Goodbye. poop");
+
+         else {
+            // Since the user's favorite color is not set render an error message.
+            speechText =
+                    "I'm not sure what your favorite color is. You can say, my favorite color is "
+                            + "red";
+            isAskResponse = true;
+        }
+
+        return getSpeechletResponse(speechText, speechText, isAskResponse);
+    }
     private SpeechletResponse setNameInSession(final Intent intent, final Session session) {
         // Get the slots from the intent.
         Map<String, Slot> slots = intent.getSlots();
@@ -202,26 +223,26 @@ public class SessionSpeechlet implements Speechlet {
      *            intent for the request
      * @return SpeechletResponse spoken and visual response for the intent
      */
-    private SpeechletResponse getColorFromSession(final Intent intent, final Session session) {
-        String speechText;
-        boolean isAskResponse = false;
-
-        // Get the user's favorite color from the session.
-        String favoriteColor = (String) session.getAttribute(COLOR_KEY);
-
-        // Check to make sure user's favorite color is set in the session.
-        if (StringUtils.isNotEmpty(favoriteColor)) {
-            speechText = String.format("Your favorite color is %s. Goodbye.", favoriteColor);
-        } else {
-            // Since the user's favorite color is not set render an error message.
-            speechText =
-                    "I'm not sure what your favorite color is. You can say, my favorite color is "
-                            + "red";
-            isAskResponse = true;
-        }
-
-        return getSpeechletResponse(speechText, speechText, isAskResponse);
-    }
+//    private SpeechletResponse getColorFromSession(final Intent intent, final Session session) {
+//        String speechText;
+//        boolean isAskResponse = false;
+//
+//        // Get the user's favorite color from the session.
+//        String favoriteColor = (String) session.getAttribute(COLOR_KEY);
+//
+//        // Check to make sure user's favorite color is set in the session.
+//        if (StringUtils.isNotEmpty(favoriteColor)) {
+//            speechText = String.format("Your favorite color is %s. Goodbye.", favoriteColor);
+//        } else {
+//            // Since the user's favorite color is not set render an error message.
+//            speechText =
+//                    "I'm not sure what your favorite color is. You can say, my favorite color is "
+//                            + "red";
+//            isAskResponse = true;
+//        }
+//
+//        return getSpeechletResponse(speechText, speechText, isAskResponse);
+//    }
 
     /**
      * Returns a Speechlet response for a speech and reprompt text.

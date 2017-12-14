@@ -4,3 +4,6 @@ TellMeMyStoryIntent I choose {StoryName}
 TellMeMyStoryIntent play the adventure {StoryName}
 
 TellMeMyOptionIntent {OptionNum}
+
+TellMeMyStoryIntent   {StoryName}
+ContinueIntent next
