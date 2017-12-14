@@ -209,11 +209,11 @@ import com.amazon.speech.ui.Reprompt;
             switch(userOp)
             {
             case 1: 
-            		 response = curr_scenario.getop1();
+        		response = curr_scenario.getResponse();
             		 break;
             		 
             case 2:
-            		response = curr_scenario.getop2();
+            		response = curr_scenario.getResponse2();
             		break;
            default:
         	   		response = "Not valid a answer";
@@ -231,7 +231,7 @@ import com.amazon.speech.ui.Reprompt;
 	        
 	        	
 	        	PlainTextOutputSpeech outputSpeech = new PlainTextOutputSpeech();
-	        	outputSpeech.setText(currentScenario.getop1());
+	        	outputSpeech.setText(response);
 	        	Reprompt reprompt = new Reprompt();
 	        	reprompt.setOutputSpeech(outputSpeech);
 	        	SpeechletResponse resp = SpeechletResponse.newAskResponse(outputSpeech, reprompt);
@@ -239,7 +239,7 @@ import com.amazon.speech.ui.Reprompt;
 	        		// Alexa should speak the corresponding option
 	        	
 	        } }
-	        else {
+	      
 	        	
 	        	PlainTextOutputSpeech outputSpeech = new PlainTextOutputSpeech();
 	        	outputSpeech.setText("Sorry, I couldn't find that option you requested. Maybe you said it incorrectly , please try again.");
@@ -248,10 +248,8 @@ import com.amazon.speech.ui.Reprompt;
 	        	SpeechletResponse resp = SpeechletResponse.newAskResponse(outputSpeech, reprompt);
 	        	return resp;
 	        		// Alexa should say some error message
-	        }
-	        //change this***********
-			return null;
 	        
+	       
 	        
 
 	    	
@@ -288,14 +286,42 @@ import com.amazon.speech.ui.Reprompt;
 	            
 //	            Scenario curr_scenario = new Scenario(option1, option2, response);
 	           
+	    	    
+		        Slot optionSlot = intent.getSlot("OptionNum");
+		        
+		        Scenario currentScenario = (Scenario) session.getAttribute("CURR_SCENARIO");
+		       
+		        
+	            int curr_scenario_num = (int) session.getAttribute("SCENARIO_NUMBER");
+	            // get the list of scenarios from the story
+	            Scenario curr_scenario = curr_story.getScenList().get(curr_scenario_num);	            
+	            session.setAttribute("CURR_SCENARIO", curr_scenario);
 	            
-	            // have to get the user choice 
-	            			// prompt the user with a choice
-	            			// grab the answer and go to switch case and return response
-	            			// then go on to tell the rest of the story
-	            			
 	            
-	            // get the story content for the corresponding story
+		        Slot optionSlot1 = intent.getSlot(CUSTOM_SLOT_OPTION_NUM);
+//	            switch(userOp)
+//	            {
+//	            case 1: 
+//	            		 response = curr_scenario.getResponse();
+//	            		 break;
+//	            		 
+//	            case 2:
+//	            		response = curr_scenario.getResponse2();
+//	            		break;
+//	           default:
+//	        	   		response = "You Failed";
+//	        	   		break;
+//	            
+//	            }
+		        
+		        
+		        //Look at outline
+		        	// were going to store user's answer in sessions then compare that with the option and return the recommended response
+		        // with if statements (this is the only way I understand it)
+	            	curr_scenario_num++;
+	            	session.setAttribute("SCENARIO_NUMBER", curr_scenario_num);
+	            
+	           
 	            
 	            
 	            
@@ -309,7 +335,7 @@ import com.amazon.speech.ui.Reprompt;
 		        outputSpeech.setSsml(response);
 		
 		        Reprompt reprompt = new Reprompt();
-		        reprompt.setOutputSpeech(null);
+		        reprompt.setOutputSpeech(outputSpeech);
 		        SpeechletResponse resp = SpeechletResponse.newAskResponse(outputSpeech, reprompt);
 		        return resp;
 		        
