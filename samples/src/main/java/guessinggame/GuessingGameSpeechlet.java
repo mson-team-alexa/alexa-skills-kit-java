@@ -48,6 +48,7 @@ MEDIUM_SOUNDS.add(new Sound("https://s3.amazonaws.com/final-project-mson/ORw3KFc
 HARD_SOUNDS.add(new Sound("https://s3.amazonaws.com/final-project-mson/pMCJLWNd-giantanteater.mp3", "SHHHRRRHRHHRH", "giant anteater"));
 }
 
+
 //String[] animalsounds = new String[] {"https://s3.amazonaws.com/final-project-mson/pMCJLWNd-giantanteater.mp3","https://s3.amazonaws.com/final-project-mson/ORw3KFcz-ee89c132fbf64a7cbb5ac65df7f7b5fb-hippo-001.mp3","https://s3.amazonaws.com/final-project-mson/EuzargZH-cat-meow-2-cat-stevens-2034822903.mp3"};
 
 /**/
@@ -83,7 +84,7 @@ public SpeechletResponse onIntent(final IntentRequest request, final Session ses
     		// The reason these are set here is bc playGameResponse is called again after each level
     		session.setAttribute(numPoints, 0);
     		session.setAttribute(numStrikes, 0);
-        return playGameResponse(session);
+        return playGameResponse(session, "");
     }else if("GuessAnimalIntent".equals(intentName)) {
     		return handleGuessTheAnimal(intent, session);
 	}else if ("AMAZON.HelpIntent".equals(intentName)) {
@@ -166,11 +167,11 @@ private guessinggame.GuessingGameSpeechlet.Sound getSound(final Session session)
 }
 
 
-private SpeechletResponse playGameResponse(final Session session) {
+private SpeechletResponse playGameResponse(final Session session, String speech) {
 	
 	Sound animalSound = getSound(session);
 	session.setAttribute(correctAnimal, animalSound.animal_name);
-    String speechText = "<speak> Guess the animal that makes this sound: " + " <audio src=\"" + animalSound.mp3_link + "\"/> </speak>";
+    String speechText = "<speak><p>" + speech + "</p> Guess the animal that makes this sound: " + " <audio src=\"" + animalSound.mp3_link + "\"/> </speak>";
     
     //Create reprompt
     SsmlOutputSpeech outputSpeech = new SsmlOutputSpeech();
@@ -209,18 +210,24 @@ private SpeechletResponse handleGuessTheAnimal(Intent intent, final Session sess
 
         //If the animal guessed is correct
         if(animalName.equals(animal)) {
-        		speech = "Good job! That's correct.";
+        		speech = "<p>Good job! That's correct</p>";
         		totalPoints += 10;
         		session.setAttribute(numPoints, totalPoints);
         		//If you've gotten enough points to level up
                 if(totalPoints == 10 || totalPoints == 20) {
-                		speech+="Nice work! You've leveled up! Now the animal sounds will be harder to guess.";
+                		speech+="You've leveled up! Now the animal sounds will be harder to guess";
                 }
-        		playGameResponse(session);
+                
+                //If you've won
+                if(totalPoints == 30) {
+                		speech += "<p>Nice work! You've won!</p>";
+                }
+                else
+                		return playGameResponse(session,speech);
         }
         //If the animal guessed is incorrect
         if(!(animalName.equals(animal))) {
-        		speech= "Sorry, That's not correct.";
+        		speech= "Sorry, That's not correct";
         		totalStrikes++;
         		session.setAttribute(numStrikes, totalStrikes);
         		 //If you've gotten three strikes
@@ -228,30 +235,21 @@ private SpeechletResponse handleGuessTheAnimal(Intent intent, final Session sess
                 		speech+="Game over! You got " + numPoints + " points.";
                 }
                 else
-                		playGameResponse(session);
+                		return playGameResponse(session, speech);
         }
         
-        SsmlOutputSpeech outputSpeech = new SsmlOutputSpeech();
-        outputSpeech.setSsml(speech);
-        
-        Reprompt reprompt = new Reprompt();
-        reprompt.setOutputSpeech(null);
-        SpeechletResponse response = SpeechletResponse.newAskResponse(outputSpeech, reprompt);
-        return response;
         
     }
     else {
-    	// Create the plain text output.
-        
-        speech = "Sorry, I've never heard of that animal.";
-
-        SsmlOutputSpeech outputSpeech = new SsmlOutputSpeech();
-        outputSpeech.setSsml(speech);
-        
-        Reprompt reprompt = new Reprompt();
-        reprompt.setOutputSpeech(null);
-        SpeechletResponse response = SpeechletResponse.newAskResponse(outputSpeech, reprompt);
-        return response;
+        speech = "Sorry, I've never heard of that animal";
     }
+    
+    SsmlOutputSpeech outputSpeech = new SsmlOutputSpeech();
+    outputSpeech.setSsml("<speak><p>" + speech + "</p></speak>");
+    
+    Reprompt reprompt = new Reprompt();
+    reprompt.setOutputSpeech(null);
+    SpeechletResponse response = SpeechletResponse.newAskResponse(outputSpeech, reprompt);
+    return response;
 }
 }
