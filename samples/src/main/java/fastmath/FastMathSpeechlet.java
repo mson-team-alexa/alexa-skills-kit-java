@@ -427,6 +427,7 @@ public class FastMathSpeechlet implements Speechlet {
 
     		if(modeSlot.toLowerCase().equals(SURVIVAL_MODE) || modeSlot.toLowerCase().equals(SURVIVAL_MODE_FULL)) {
     			speechText = "Welcome to Survival Mode! Here you will be challenged with questions according to the level you are in. " +
+    						"Please answer the question loudly and clearly, or your voice may result in a misunderstanding for me. " +
     						"If you get five answers correct at your current level, you will advance to next level. " +
     						"For each question, you have at most eight seconds to answer. " +
     						"If you spend more than eight seconds, the question will be counted wrong. " +
@@ -972,7 +973,7 @@ public class FastMathSpeechlet implements Speechlet {
 						int answersWrong = (Integer)session.getAttribute(ANSWERS_WRONG_ID);
 						
 						if(answersWrong == 4) {
-							speechText = "Ah! Sorry, you have used all five chances of wrong answers. Try again!";
+							speechText = "Ah! Sorry, you have used all five chances of wrong answers. Try again later! You are back in the main menu, which mode would you like to play?";
 							
 							session.setAttribute(HAVE_ANSWER_ID, ASK_QUESTION);
 							
@@ -1031,7 +1032,7 @@ public class FastMathSpeechlet implements Speechlet {
 						int answersWrong = (Integer)session.getAttribute(ANSWERS_WRONG_ID);
 						
 						if(answersWrong == 4) {
-							speechText = "Ah! Sorry, you have used all five chances of wrong answers. Try again!";
+							speechText = "Ah! Sorry, you have used all five chances of wrong answers. Try again later! You are back in the main menu, which mode would you like to play?";
 							
 							session.setAttribute(HAVE_ANSWER_ID, ASK_QUESTION);
 							
@@ -1276,7 +1277,7 @@ public class FastMathSpeechlet implements Speechlet {
     							int answersWrong = (Integer)session.getAttribute(ANSWERS_WRONG_ID);
     							
     							if(answersWrong == 4) {
-    								speechText = "<audio src=\"https://s3.amazonaws.com/cschool0/loser.mp3\"/>Ah! Sorry, you have used all five chances of wrong answers. Try again!";
+    								speechText = "Ah! Sorry, you have used all five chances of wrong answers. Try again later! You are back in the main menu, which mode would you like to play?";
     								
     								session.setAttribute(HAVE_ANSWER_ID, ASK_QUESTION);
     								
