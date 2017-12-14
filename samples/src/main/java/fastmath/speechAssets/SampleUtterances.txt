@@ -31,3 +31,7 @@ DoNotKnowIntent I don't know the answer
 AnswerRangeIntent From level {LevelA} to level {LevelB}
 AnswerRangeIntent Level {LevelA} to level {LevelB}
 AnswerRangeIntent From {LevelA} to {LevelB}
+RepeatQuestionIntent Repeat
+RepeatQuestionIntent Repeat the question
+RepeatQuestionIntent What
+RepeatQuestionIntent What was it

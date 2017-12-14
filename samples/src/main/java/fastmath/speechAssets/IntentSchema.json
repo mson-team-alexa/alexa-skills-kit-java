@@ -42,7 +42,13 @@
     },
     {
       "intent": "DoNotKnowIntent"
-    }
+    },
+    {
+      "intent": "ContinueIntent"
+    },
+    {
+      "intent": "RepeatQuestionIntent"
+    },
     {
       "intent": "CancelIntent"
     },
