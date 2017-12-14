@@ -138,10 +138,15 @@ public class FastMathSpeechlet implements Speechlet {
         	
         	if(session.getAttributes().containsKey(STAGE_ID)) {
         		if((Integer)session.getAttribute(STAGE_ID) != ASK_ANSWER_STAGE) {
-        			return getHelp();
+        			
+        			GetHelp gH = new GetHelp();
+        			
+        			return gH.notHavingAnswer();
         		}
         	}else {
-        		return getHelp();
+        		GetHelp gH = new GetHelp();
+    			
+    			return gH.notAskingAnything();
         	}
         	if(session.getAttributes().containsKey(MODE_ID)) {
         		if(((String)session.getAttribute(MODE_ID)).equals(SURVIVAL_MODE)) {
@@ -151,10 +156,14 @@ public class FastMathSpeechlet implements Speechlet {
         		}else if(((String)session.getAttribute(MODE_ID)).equals(CHALLENGER_MODE)) {
         			return setUpChallengerStage(intent, session, false, false);
         		}else {
-        			return getHelp();
+        			GetHelp gH = new GetHelp();
+        			
+        			return gH.noSuchMode();
         		}
         	}else {
-        		return getHelp();
+        		GetHelp gH = new GetHelp();
+    			
+    			return gH.notAskingAnything();
         	}
             
         } else if ("ContinueIntent".equals(intentName)) {
@@ -163,20 +172,28 @@ public class FastMathSpeechlet implements Speechlet {
             	if((Integer)session.getAttribute(STAGE_ID) == CONFIRM_STAGE){
             		return handleContinueStageResponse(intent,  session);
             	}else if((Integer)session.getAttribute(STAGE_ID) == ASK_MODE_STAGE){
-            		return getHelp();
+            		GetHelp gH = new GetHelp();
+        			
+        			return gH.notAskingMode();
             	}else {
             		if(session.getAttributes().containsKey(MODE_ID)){
             			if(((String)session.getAttribute(MODE_ID)).equals(SURVIVAL_MODE)) {
             				return setUpSurvivalStage(intent, session, true, false);
             			}else {
-            				return getHelp();
+            				GetHelp gH = new GetHelp();
+                			
+                			return gH.notNeedingContinue();
             			}
             		}else {
-            			return getHelp();
+            			GetHelp gH = new GetHelp();
+            			
+            			return gH.notAskingMode();
             		}
             	}
         	}else {
-        		return getHelp();
+        		GetHelp gH = new GetHelp();
+    			
+    			return gH.notAskingAnything();
         	}
         } else if("AnswerRangeIntent".equals(intentName)) {
         	if(session.getAttributes().containsKey(STAGE_ID)) {
@@ -185,16 +202,24 @@ public class FastMathSpeechlet implements Speechlet {
         				if(((String)session.getAttribute(MODE_ID)).equals(CHALLENGER_MODE)) {
         					return setUpChallengerStage(intent, session, false, false);
         				}else {
-        					return getHelp();
+        					GetHelp gH = new GetHelp();
+                			
+                			return gH.notNeedingAskingRange();
         				}
         			}else {
-        				return getHelp();
+        				GetHelp gH = new GetHelp();
+            			
+            			return gH.notAskingMode();
         			}
         		}else {
-        			return getHelp();
+        			GetHelp gH = new GetHelp();
+        			
+        			return gH.notHavingAnswer();
         		}
         	}else {
-        		return getHelp();
+        		GetHelp gH = new GetHelp();
+    			
+    			return gH.notAskingAnything();
         	}
         } else if("RepeatQuestionIntent".equals(intentName)) { 
         	if(session.getAttributes().containsKey(STAGE_ID)) {
@@ -205,16 +230,24 @@ public class FastMathSpeechlet implements Speechlet {
         				}else if(((String)session.getAttribute(MODE_ID)).equals(CHALLENGER_MODE)) {
         					return setUpChallengerStage(intent, session, false, true);
         				}else {
-        					return getHelp();
+        					GetHelp gH = new GetHelp();
+        	    			
+        	    			return gH.cantAskRepeat();
         				}
         			}else {
-        				return getHelp();
+        				GetHelp gH = new GetHelp();
+            			
+            			return gH.notAskingMode();
         			}
         		}else {
-        			return getHelp();
+        			GetHelp gH = new GetHelp();
+        			
+        			return gH.notHavingAnswer();
         		}
         	}else {
-        		return getHelp();
+        		GetHelp gH = new GetHelp();
+    			
+    			return gH.notAskingAnything();
         	}
         } else if("DoNotKnowIntent".equals(intentName)) { 
         	if(session.getAttributes().containsKey(STAGE_ID)) {
@@ -227,16 +260,24 @@ public class FastMathSpeechlet implements Speechlet {
         				}else if(((String)session.getAttribute(MODE_ID)).equals(CHALLENGER_MODE)) {
         					return setUpChallengerStage(intent, session, true, false);
         				}else {
-        					return getHelp();
+        					GetHelp gH = new GetHelp();
+        	    			
+        	    			return gH.notAskingAnything();
         				}
         			}else {
-        				return getHelp();
+        				GetHelp gH = new GetHelp();
+            			
+            			return gH.notAskingMode();
         			}
         		}else {
-        			return getHelp();
+        			GetHelp gH = new GetHelp();
+        			
+        			return gH.notHavingAnswer();
         		}
         	}else {
-        		return getHelp();
+        		GetHelp gH = new GetHelp();
+    			
+    			return gH.notAskingAnything();
         	}
         } else if("AnswerLevelIntent".equals(intentName)) {
         	if(session.getAttributes().containsKey(STAGE_ID)) {
@@ -245,22 +286,30 @@ public class FastMathSpeechlet implements Speechlet {
         				if(((String)session.getAttribute(MODE_ID)).equals(PRACTICE_MODE)) {
         					return setUpPracticeStage(intent, session, true, false, false);
         				}else {
-        					return getHelp();
+        					GetHelp gH = new GetHelp();
+        	    			
+        	    			return gH.cantAskLevel();
         				}
         			}else {
-        				return getHelp();
+        				GetHelp gH = new GetHelp();
+            			
+            			return gH.notAskingMode();
         			}
         		}else {
-        			return getHelp();
+        			GetHelp gH = new GetHelp();
+        			
+        			return gH.notHavingAnswer();
         		}
         	}else {
-        		return getHelp();
+        		GetHelp gH = new GetHelp();
+    			
+    			return gH.notAskingAnything();
         	}
         }
         	else if ("CancelIntent".equals(intentName)) {
         	return handleCancelStageResponse(intent, session);
         } else if ("AMAZON.HelpIntent".equals(intentName)) {
-            return getHelpResponse(intent);
+            return GetHelpResponse(intent);
         } else if ("AMAZON.StopIntent".equals(intentName)) {
             return getStopResponse(intent);
         } else if ("AMAZON.CancelIntent".equals(intentName)) {
@@ -390,7 +439,9 @@ public class FastMathSpeechlet implements Speechlet {
     			}
     		}
     	}else {
-    		 return getHelp();
+    		 GetHelp gH = new GetHelp();
+    		 
+    		 return gH.notAskingMode();
     	}
         
     }
@@ -399,7 +450,7 @@ public class FastMathSpeechlet implements Speechlet {
         // Create the welcome message.
         String speechText =
                 "Welcome to Fast Math Game! You can choose to play in three different modes:    " +
-                "Practice   ,   Survival    or   Challenger . Notice that these levels and modes can be extremely challenging. " + 
+                "Practice   ,   Survival,    or   Challenger. Notice that these levels and modes can be extremely challenging. " + 
                 		"But anyway, practice makes perfect.    Now, which one would you like to play?";
         String repromptText =
                 "Please tell me the game mode that you would like to try.";
@@ -475,29 +526,16 @@ public class FastMathSpeechlet implements Speechlet {
     		repromptText = speechText;
     		
     		return getSpeechletResponse(speechText, repromptText, true);
-    	}	
-    	else {
-    		return getHelp();
+    	}else {
+    		speechText = "Sorry, we do not have such mode! You can choose from survival, practice, or challenger mode. ";
+    		
+    		repromptText = "You can choose from survival, practice, or challenger mode. ";
+    		
+    		return getSpeechletResponse(speechText, repromptText, true);
     	}
     }
     
-    private SpeechletResponse getHelp() {
-        String speechOutput =
-                "There are something wrong with your answer. Please keep in mind that you have to say continue every time you enter a new mode. " +
-                "You will have to provide one level by saying level and level number for the practice mode, and you will have to provide a level range " +
-                "of two numbers within five for the challenger stage. You will not need to say any decimal answers so please do not include point " +
-                "in your answer. If you want to quit playing the current mode, just say quit mode or cancel. You are free to change your level in " +
-                "practice mode, but you won't be able to do this in survival or challenger mode unless you quit and reenter.You can ask me to repeat " + 
-                "the question in Practice and Challenger mode, but you can not do this in survival mode.   What would you want to do now?";
-        String repromptText =
-        		"There are something wrong with your answer. Please keep in mind that you have to say continue every time you enter a new mode. " +
-                        "You will have to provide one level by saying level and level number for the practice mode, and you will have to provide a level range " +
-                        "of two numbers within five for the challenger stage. You will not need to say any decimal answers so please do not include point " +
-                        "in your answer. If you want to quit playing the current mode, just say quit mode or cancel. You are free to change your level in " +
-                        "practice mode, but you won't be able to do this in survival or challenger mode unless you quit and reenter. " +  " "
-                        		+ "You can ask me to repeat the question in Practice and Challenger mode, but you can not do this in survival mode.  What would you want to do now?";
-        return newAskResponse(speechOutput,true, repromptText, false);
-    }
+
     
     private Question generateQuestion(int level) {
     	switch(level) {
@@ -937,8 +975,11 @@ public class FastMathSpeechlet implements Speechlet {
     	} else {
     		if(speechText != "") {
     			speechText = speechText;
+    			
     		}else {
-    			return getHelp();
+    			speechText = "You level has not been properly set up. Please quit the mode and reset it! ";
+    			
+    			repromptText = speechText;
     		}
     	}
     	
@@ -1179,6 +1220,14 @@ public class FastMathSpeechlet implements Speechlet {
         								
         								speechText = "Congratulations! You got the question correct. Let's continue to the next one.       ";
         								
+        								if((Integer)session.getAttribute(ANSWERS_CORRECT_ID) >= 3) {
+        									if((Integer)session.getAttribute(ANSWERS_CORRECT_ID) == 1) {
+        										speechText += "Only one more to go! Keep up! Here is the question. ";
+        									}else {
+        										speechText += "Only " + (5 - (Integer)session.getAttribute(ANSWERS_CORRECT_ID)) + " questions to go! Here is the new question: ";
+        									}
+        								}
+        								
         								Question queN = generateQuestion((Integer)session.getAttribute(CURRENT_LEVEL_ID));
         								
         								speechText += queN.getQuestion();
@@ -1385,7 +1434,7 @@ public class FastMathSpeechlet implements Speechlet {
         return getSpeechletResponse(speechText, repromptText, true);
     }
     
-	private SpeechletResponse getHelpResponse(Intent intent) {
+	private SpeechletResponse GetHelpResponse(Intent intent) {
     	String speechOutput =
                 "With Fast math, you can get"
                         + " a better idea of how good you can do with your math skills."
