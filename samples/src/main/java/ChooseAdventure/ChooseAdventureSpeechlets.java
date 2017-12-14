@@ -162,7 +162,7 @@ private SpeechletResponse setColorInSession(final Intent intent, final Session s
      if(favoriteColor.equals("follow")) 
         	speechText = String.format("You set the rocket to autopilot, heading towards the coordinates. It takes a few days, "
         			+" but eventually you reach the coordinates and see that your boss’s guess was right: "
-        			+ "there is a block hole here. You decide to play it safe before jumping into the hole, "
+        			+ "there is a black hole here. You decide to play it safe before jumping into the hole, "
         			+"but you’re not sure what to do first. Should you see if there’s any planets or life nearby?" 
         			+ "The choice is yours, commander:" + 
         			"	To scan the black hole for life, say Scan it." + 
@@ -181,13 +181,13 @@ private SpeechletResponse setColorInSession(final Intent intent, final Session s
      
      
      if(favoriteColor.equals("scan it"))
-		 speechText = String.format("You scan the black hole. The results come up negative- "
+		 speechText = String.format("You scan the black hole,  The results come up negative- "
     			+"there is no life in the hole. As soon as you get the results, "
     			+"the power goes out and you see a message saying that the engine has lost power. "
     			+"Your gut begins to sink as you feel the ship being pulled into black hole."
     			+"Without the engines, you will surely die, but you wonder what caused the engines to fail…" + 
     			"The choice is yours, commander:" + 
-    			"	To fix the engines, say Fix" + 
+    			"	To fix the engines, say Fix " + 
     			"	To figure out why the engines lost power, say Engines" );
     else if(favoriteColor.equals("search it"))
 		 speechText =String.format( "You orbit the black hole, looking for nearby planets. After a few hours, "
@@ -217,7 +217,7 @@ private SpeechletResponse setColorInSession(final Intent intent, final Session s
     			+"You begin to panic- do you try and find the threat or use an escape pod to head back to Earth?" + 
     			"The choice is yours, commander:" + 
     			"	To find the threat, say Find the thing" + 
-    			"	To leave in the escape pod, say Leave thing");
+    			"	To leave in the escape pod, say Leave the thing");
      
      
      
