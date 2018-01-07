@@ -24,37 +24,67 @@ import com.amazon.speech.ui.SimpleCard;
 
 public class Status {
 
-	private static final Logger log = LoggerFactory.getLogger(Status.class);
+	private  Logger log = LoggerFactory.getLogger(Status.class);
 
 	//Overall Status
-	public static final String O_STATUS_ID = "OverallStatusID";
-	public Map<String, String> O_Status;
-	public static final String ON_ROAD= "On_Road";
-	public static final String IN_CITY = "In_City";
-	public static final String IN_CAVE = "In_Cave";
-	public static final String IN_VILLAGE = "In_Village";
+	public String O_STATUS_ID = "OverallStatusID";
+	public Sub_Status O_Status;
+	public String ON_ROAD= "On_Road";
+	public String IN_CITY = "In_City";
+	public String IN_CAVE = "In_Cave";
+	public String IN_VILLAGE = "In_Village";
 	
 	//Normal Status
-	public static final String N_STATUS_ID = "NormalStatusID";
-	public Map<String, String> N_Status;
-	public static final String NORMAL = "Normal";
-	public static final String LIVING = "Living";
-	public static final String DEAD = "Dead";
-	public static final String IN_DANGER = "In_danger";
-	public static final String IN_BATTLE = "In_battle";
+	public String N_STATUS_ID = "NormalStatusID";
+	public Sub_Status N_Status;
+	public String NORMAL = "Normal";
+	public String LIVING = "Living";
+	public String DEAD = "Dead";
+	public String IN_DANGER = "In_danger";
+	public String IN_BATTLE = "In_battle";
 	
 	//Personal Status
-	public static final String P_STATUS_ID = "PersonalStatusID";
-	public Map<String, String> P_Status;
-	public static final String PERFECT = "Perfect";
-	public static final String SOME_SCARTCH = "Some_scratch";
-	public static final String IS_HURT = "Is_hurt";
-	public static final String BADLY_HURT = "Badly_Hurt";
+	public String P_STATUS_ID = "PersonalStatusID";
+	public Sub_Status P_Status;
+	public String PERFECT = "Perfect";
+	public String SOME_SCARTCH = "Some_scratch";
+	public String IS_HURT = "Is_hurt";
+	public String BADLY_HURT = "Badly_Hurt";
 
     public Status(String O_Status_n, String N_Status_n, String P_Status_n) {
-    	O_Status.put(O_STATUS_ID, O_Status_n);
-    	N_Status.put(N_STATUS_ID, N_Status_n);
-    	P_Status.put(P_STATUS_ID, P_Status_n);
+    	O_Status = new Sub_Status(O_STATUS_ID, O_Status_n);
+    	
+    	N_Status = new Sub_Status(N_STATUS_ID, N_Status_n);
+    	
+    	P_Status = new Sub_Status(P_STATUS_ID, P_Status_n);
+    }
+    
+    public class Sub_Status{
+    	
+    	String ID;
+    	
+    	String Content;
+    	
+    	Sub_Status(String i, String c) {
+    		ID = i;
+    		
+    		Content = c;
+    	}
+    	
+    	public String get(String id){
+    		if(id.equals(ID)) {
+    			return Content;
+    		}else {
+    			return null;
+    		}
+    	}
+
+    	
+    	public void replace(String i, String c) {
+    		if(i.equals(ID)) {
+    			Content = c;
+    		}
+    	}
     }
     
     

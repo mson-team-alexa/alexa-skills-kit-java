@@ -26,7 +26,7 @@ To run this example skill you need to do two things. The first is to deploy the 
 13. Set the Event Source type as Alexa Skills kit and Enable it now. Click Submit.
 14. Copy the ARN from the top right to be used later in the Alexa Skill Setup.
 
-### Alexa Skill Setup
+### Alexa Skill Setup           
 1. Go to the [Alexa Console](https://developer.amazon.com/edw/home.html) and click Add a New Skill.
 2. Set "AddressSkill" as the skill name and "address skill" as the invocation name, this is what is used to activate your skill. For example you would say: "Alexa, Ask address Skill what's my address."
 3. Select the Lambda ARN for the skill Endpoint and paste the ARN copied from above. Click Next.

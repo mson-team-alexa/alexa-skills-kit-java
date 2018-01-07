@@ -28,11 +28,7 @@ public class Inventory{
     }
 	
 	public void addRestoration(Restoration r) {
-		restorations.add(a);
-	}
-	
-	public ArrayList<String> getAllInventory(){
-		
+		restorations.add(r);
 	}
 }
 

@@ -9,30 +9,55 @@ import AbsurdRPG.CustomClasses.Location.Locations;
 
 public class AvailableNPCs {
 
-	private final static String HEAD_OF_VILLAGE = "The head of the village";
+	private static String HEAD_OF_VILLAGE;
 	
-	private final static String VILLAGER = "Villagers";
+	private static String VILLAGER;
 	
-	private final static String DWELLERS = "Dwellers";
+	private static String DWELLERS;
 	
-	private final static String SILVER_SMITH = "the Silver Smith";
-	private final static String SILVER_SMITH_MASTER = "the Silver Smith Master";
+	private static String SILVER_SMITH;
+	private static String SILVER_SMITH_MASTER;
 	
-	private final static String MERCHANT = "Merchant";
-	private final static String RICH_MERCHANT = "wealthy Merchant";
+	private static String MERCHANT;
+	private static String RICH_MERCHANT;
 	
-	private final static String OVER_LORD ="the Over Lord";
-	private final static String KING = "the King";
-	private final static String QUEEN = "the Queen";
+	private static String OVER_LORD;
+	private static String KING;
+	private static String QUEEN;
 	
-	private final static String PRINCESS = "the Princess";
-	private final static String PRINCE = "the Prince";
+	private static String PRINCESS;
+	private static String PRINCE;
 	
-	private final static String GUARD = "the guards";
-	private final static String GUARDIAN = "the guardians";
+	private static String GUARD;
+	private static String GUARDIAN;
 	
 	private AvailableNPCs() {
+
 		
+	}
+	
+	public static void initialize() {
+		HEAD_OF_VILLAGE = "The head of the village";
+		
+		VILLAGER = "Villagers";
+		
+		DWELLERS = "Dwellers";
+		
+		SILVER_SMITH = "the Silver Smith";
+		SILVER_SMITH_MASTER = "the Silver Smith Master";
+		
+		MERCHANT = "Merchant";
+		RICH_MERCHANT = "wealthy Merchant";
+		
+		OVER_LORD ="the Over Lord";
+		KING = "the King";
+		QUEEN = "the Queen";
+		
+		PRINCESS = "the Princess";
+		PRINCE = "the Prince";
+		
+		GUARD = "the guards";
+		GUARDIAN = "the guardians";
 	}
 	
 	public static ArrayList<String> returnAvailableNPCs(){

@@ -20,7 +20,7 @@ public final class Locations {
 	public static final String CITY_OF_UNIFLORA = "Uniflora";
 	
 	//Locations
-	public static Location DownhillVillage = new Location("Downhill Village", 10, 10);
+	public static Location DownhillVillage;
 	
 	public static int days_Needed;
 	
@@ -37,6 +37,7 @@ public final class Locations {
 	}
 
 	public static Route routeFromAToB(Location A, Location B) {
+
 		Vector<Integer> v = new Vector<Integer>();
 		
 		v.add(A.getLocationInVector().get(0) - B.getLocationInVector().get(0));
@@ -60,7 +61,10 @@ public final class Locations {
 		return days_Elapsed;
 	}
 	
-	public static void Populate() {
+	public static void Populate() {	
+		locations = new ArrayList<Location>();
+		
+		DownhillVillage = new Location("Downhill Village", 10, 10);
 		
 		DownhillVillage.populate(NPCForVillage(DownhillVillage));
 

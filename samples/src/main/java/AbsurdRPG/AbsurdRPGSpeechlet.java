@@ -31,8 +31,10 @@ import com.amazon.speech.ui.SsmlOutputSpeech;
 import AbsurdRPG.CustomClasses.AbsurdRPG;
 import AbsurdRPG.CustomClasses.Actions;
 import AbsurdRPG.CustomClasses.Conversations;
+import AbsurdRPG.CustomClasses.Player;
 import AbsurdRPG.CustomClasses.Quests;
 import AbsurdRPG.CustomClasses.Location.Locations;
+import AbsurdRPG.CustomClasses.NPCs.AvailableNPCs;
 import AbsurdRPG.CustomClasses.Inventory.*;
 
 import com.amazon.speech.ui.Reprompt;
@@ -59,10 +61,8 @@ public class AbsurdRPGSpeechlet implements Speechlet {
         session.setAttribute(MAIN_SESSION_ID, "Beginning");
         
         session.setAttribute(SUBJECT_ID, null);
-        
-        Quests.Initialize();
-        
-        Locations.Populate();
+
+        AbsurdRPG.initialize();
     }
 
     @Override
@@ -88,29 +88,27 @@ public class AbsurdRPGSpeechlet implements Speechlet {
 
         	if(session.getAttributes().containsKey(TUTORIAL)) {
         		if(((String)session.getAttribute(TUTORIAL)).equals("Talk")){
-        			if("InitiateConversationIntent".equals(intentName)) {	
-        				session.setAttribute(TUTORIAL, "ChooseSubject");
-        				session.setAttribute("TalkWithHeadOfVillage", 0);
+        			if("InitiateConversationIntent".equals(intentName)) {	       				
         				return AbsurdRPG.getSpeechletResponseBySession(session);
         			}else {
-        				String speechText = Conversations.tutorial_wanring_talk;
+        				String speechText = Conversations.tutorial_wanring_talk + Actions.initiateTalk();
         				
         				return newAskResponse(speechText, false, speechText, false);
         			}
         		}else if(((String)session.getAttribute(TUTORIAL)).equals("ChooseSubject")) {
         			if("ChooseSubjectIntent".equals(intentName)) {
-        				Slot nameSlot = intent.getSlot("NPC_name");
+        				Slot nameSlot = intent.getSlot("NPC");
         				
             			if(nameSlot != null && nameSlot.getValue() != null) {
+            				
+            				session.setAttribute(SUBJECT_ID, nameSlot.getValue());
             				
             				if(Actions.checkSubject(nameSlot.getValue()) != null) {
             					
             					if(nameSlot.getValue().equals(Locations.DownhillVillage.returnPopulation().get(0).name)) {
             						session.setAttribute("TalkWithHeadOfVillage", 1);
             					}
-            					
-            					session.setAttribute(SUBJECT_ID, nameSlot.getValue());
-            					
+
             					SpeechletResponse sR = AbsurdRPG.getSpeechletResponseBySession(session);
                 				
             					if(((Integer)session.getAttribute("TalkWithHeadOfVillage")) == 1) {
@@ -127,12 +125,12 @@ public class AbsurdRPGSpeechlet implements Speechlet {
             					return AbsurdRPG.getSpeechletResponseBySession(session);
             				}
             			}else {
-            				String speechText = Conversations.tutorial_invalid_character;
+            				String speechText = Conversations.tutorial_invalid_character + Actions.initiateTalk();
     						
     						return newAskResponse(speechText, false, speechText, false);
             			}
         			}else {
-        				String speechText = Conversations.tutorial_wanring_talk;
+        				String speechText = Conversations.tutorial_wanring_talk + Actions.initiateTalk();
         				
         				return newAskResponse(speechText, false, speechText, false);
         			}
@@ -146,8 +144,10 @@ public class AbsurdRPGSpeechlet implements Speechlet {
         		if ("SkipTutorialIntent".equals(intentName)) {
                 	session.setAttribute(TUTORIAL, "Confirm");
                 	
+                	session.setAttribute(MAIN_SESSION_ID, "In Game");
+                	
                 	return null;
-                }else if("TakeTutorialIntent".equals(intentName)){
+                }else if("TakeTutorialIntent".equals(intentName) || "AgreeIntent".equals(intentName)){
                 	String speechText = Conversations.take_tutorial;
                 	
                 	session.setAttribute(TUTORIAL, "Talk");

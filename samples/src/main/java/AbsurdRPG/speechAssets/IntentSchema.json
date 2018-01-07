@@ -1,17 +1,23 @@
 {
   "intents": [
     {
-      "intent": "TellMeAJokeIntent"
+      "intent": "InitiateConversationIntent"
     },
     {
-      "intent": "WhosThereIntent"
+      "intent": "SkipTutorialIntent"
     },
     {
-      "intent": "SetupNameWhoIntent",
+      "intent": "TakeTutorialIntent"
+    },
+        {
+      "intent": "AgreeIntent"
+    },
+    {
+      "intent": "ChooseSubjectIntent",
       "slots":[
         {
-          "name": "SetupName",
-          "type": "LIST_OF_SETUP_NAMES"
+          "name": "NPC",
+          "type": "LIST_OF_NPC_NAMES"
         }
       ]
     },
@@ -26,3 +32,8 @@
     }
   ]
 }
+
+
+
+
+

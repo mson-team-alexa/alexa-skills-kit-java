@@ -17,6 +17,10 @@ import com.amazon.speech.speechlet.SpeechletResponse;
 import com.amazon.speech.ui.OutputSpeech;
 import com.amazon.speech.ui.PlainTextOutputSpeech;
 import com.amazon.speech.ui.SsmlOutputSpeech;
+
+import AbsurdRPG.CustomClasses.Location.Locations;
+import AbsurdRPG.CustomClasses.NPCs.AvailableNPCs;
+
 import com.amazon.speech.ui.Reprompt;
 import com.amazon.speech.ui.SimpleCard;
 
@@ -30,12 +34,27 @@ public final class AbsurdRPG {
 
     private static final String SUBJECT_ID = "SubjectID";
     
+    public static void initialize() {
+        Player.initialize();
+        
+        Conversations.initialize();
+        
+        Locations.Populate();
+       
+        Quests.Initialize();
+        
+        AvailableNPCs.initialize();
+    }
+    
 	public static SpeechletResponse getSpeechletResponseBySession(final Session session) {
 		if(session.getAttributes().containsKey(MAIN_SESSION_ID)) {
 			if(((String)session.getAttribute(MAIN_SESSION_ID)).equals("Beginning")) {
 				if(((String)session.getAttribute(TUTORIAL)).equals("Talk")){
 					
 					ArrayList<String> speechText = Actions.initiateTalk();
+					
+					session.setAttribute(TUTORIAL, "ChooseSubject");
+					session.setAttribute("TalkWithHeadOfVillage", 0);
 					
 					return newAskResponse(speechText.get(0), false, speechText.get(1), false);
 				}else if(((String)session.getAttribute(TUTORIAL)).equals("ChooseSubject")){
@@ -48,6 +67,8 @@ public final class AbsurdRPG {
 	        				
 	        				//accept tutorial quest
 							Actions.acceptQuest(speechText,Quests.Tutorial_quest, session);
+							
+							log.info("Quest is:   "  + Quests.Tutorial_quest);
 							
 	        				repromptText = "You can now go outside of the village by saying go to, and, location. Or Just say, go to quest location. ";
 	        			}else {

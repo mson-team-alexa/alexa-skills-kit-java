@@ -8,47 +8,78 @@ import org.slf4j.LoggerFactory;
 
 import AbsurdRPG.CustomClasses.Inventory.Inventory;
 import AbsurdRPG.CustomClasses.Location.Location;
+import AbsurdRPG.CustomClasses.Location.Locations;
 
 public class Player{
 
-	//Status Variale
+	//Status Variable
 	//Overall Status
-	public static final String O_STATUS_ID = "OverallStatusID";
+	public static String O_STATUS_ID;
 	public Map<String, String> O_Status;
-	public static final String ON_ROAD= "On_Road";
-	public static final String IN_CITY = "In_City";
-	public static final String IN_CAVE = "In_Cave";
-	public static final String IN_VILLAGE = "In_Village";
+	public static String ON_ROAD;
+	public static String IN_CITY;
+	public static String IN_CAVE;
+	public static String IN_VILLAGE;
 	
 	//Normal Status
-	public static final String N_STATUS_ID = "NormalStatusID";
+	public static String N_STATUS_ID;
 	public Map<String, String> N_Status;
-	public static final String NORMAL = "Normal";
-	public static final String IN_DANGER = "In_danger";
-	public static final String IN_BATTLE = "In_battle";
+	public static String NORMAL;
+	public static String IN_DANGER;
+	public static String IN_BATTLE;
 	
 	//Personal Status
-	public static final String P_STATUS_ID = "PersonalStatusID";
+	public static String P_STATUS_ID;
 	public Map<String, String> P_Status;
-	public static final String PERFECT = "Perfect";
-	public static final String SOME_SCARTCH = "Some_scratch";
-	public static final String IS_HURT = "Is_hurt";
-	public static final String BADLY_HURT = "Badly_Hurt";
+	public static String PERFECT;
+	public static String SOME_SCARTCH;
+	public static String IS_HURT;
+	public static String BADLY_HURT;
 	
 	public static final Logger log = LoggerFactory.getLogger(Player.class);
 
 	public static boolean isAlive;
 	
 	public static Integer HealthPoints;
+	public static Integer Max_HealthPoints;
 	
     public static Location CURRENT_LOCATION;
     
     public static Status CURRENT_STATUS;
 	
 	private Player() {
-		HealthPoints = 50;
+		
+	}
+	
+	public static void initialize() {
+		isAlive = true;
+		
+		Max_HealthPoints= 50;
+		
+		HealthPoints = 50;		
+		
+		O_STATUS_ID = "OverallStatusID";
+		ON_ROAD= "On_Road";
+		IN_CITY = "In_City";
+		IN_CAVE = "In_Cave";
+		IN_VILLAGE = "In_Village";
+		
+		//Normal Status
+		N_STATUS_ID = "NormalStatusID";
+		NORMAL = "Normal";
+		IN_DANGER = "In_danger";
+		IN_BATTLE = "In_battle";
+		
+		//Personal Status
+		P_STATUS_ID = "PersonalStatusID";
+		PERFECT = "Perfect";
+		SOME_SCARTCH = "Some_scratch";
+		IS_HURT = "Is_hurt";
+		BADLY_HURT = "Badly_Hurt";
 
 		CURRENT_STATUS = new Status(IN_VILLAGE, NORMAL, PERFECT);
+		
+		CURRENT_LOCATION = Locations.DownhillVillage;
 	}
 	
 	//Status Code
@@ -61,11 +92,11 @@ public class Player{
     }
     
     public static String getNormalStatus() {
-    	return CURRENT_STATUS.O_Status.get(N_STATUS_ID);
+    	return CURRENT_STATUS.N_Status.get(N_STATUS_ID);
     }
     
     public static String getPersonalStatus() {
-    	return CURRENT_STATUS.O_Status.get(P_STATUS_ID);
+    	return CURRENT_STATUS.P_Status.get(P_STATUS_ID);
     }
     
     public void setCurrentStatus(String O_Status_n, String N_Status_n, String P_Status_n) {

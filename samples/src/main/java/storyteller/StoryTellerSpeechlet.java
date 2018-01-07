@@ -292,5 +292,23 @@ public class StoryTellerSpeechlet implements Speechlet {
         
         return null;
     }
+
+	@Override
+	public SpeechletResponse onIntent(IntentRequest arg0, Session arg1) throws SpeechletException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SpeechletResponse onLaunch(LaunchRequest arg0, Session arg1) throws SpeechletException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void onSessionStarted(SessionStartedRequest arg0, Session arg1) throws SpeechletException {
+		// TODO Auto-generated method stub
+		
+	}
     
 }

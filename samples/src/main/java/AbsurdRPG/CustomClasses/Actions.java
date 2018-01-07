@@ -22,9 +22,7 @@ public class Actions {
     	s += ". You have accepted the quest: " + quest.name;
     	
     	session.setAttribute(ACTIVE_QUEST_ID, quest);
-    	
-    	log.
-    	
+
     	Quests.quests.add(quest);
     }
     

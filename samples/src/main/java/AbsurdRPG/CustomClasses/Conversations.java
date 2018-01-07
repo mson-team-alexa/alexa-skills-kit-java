@@ -29,17 +29,26 @@ public class Conversations {
 	private final static String GUARDIAN = "the guardians";
 	
 	// Confirm for tutorial
-	public static String take_tutorial = "You have chosen to take the tutorial! ";
+	public static String take_tutorial;
 	
 	// For tutorial
-	public static String tutorial_wanring_talk = "You did not follow the step! You need to talk with the head of vilalge right now. Say, talk, to "
-			+ "get available people and choose, the head of the village. ";
-	public static String tutorial_invalid_character = "You did not choose a valid character! " + Actions.initiateTalk();
-	public static String tutorial_warning_choose_subject = "You should choose a subject to talk with right now! " + Actions.initiateTalk();
+	public static String tutorial_wanring_talk;
+	public static String tutorial_invalid_character;
+	public static String tutorial_warning_choose_subject;
 	
 	
 	private Conversations() {
 		
+	}
+	
+	
+	public static void initialize(){
+		take_tutorial = "You have chosen to take the tutorial! ";
+		
+		tutorial_wanring_talk = "You did not follow the step! You need to talk with the head of vilalge right now. Say, talk, to "
+				+ "get available people and choose, the head of the village. ";
+		tutorial_invalid_character = "You did not choose a valid character! ";
+	    tutorial_warning_choose_subject = "You should choose a subject to talk with right now! ";
 	}
 	
 	public static ArrayList<String> getConversationsForDownhillVillage(String name, final Session session) {
