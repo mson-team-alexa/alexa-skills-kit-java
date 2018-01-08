@@ -535,9 +535,7 @@ public class FastMathSpeechlet implements Speechlet {
     	}
     }
     
-<<<<<<< HEAD
 
-=======
     private SpeechletResponse getHelp() {
         String speechOutput =
                 "There is something wrong with your answer. Please keep in mind that you have to say continue every time you enter a new mode. " +
@@ -555,7 +553,7 @@ public class FastMathSpeechlet implements Speechlet {
                         		+ "You can ask me to repeat the question in Practice and Challenger mode, but you can not do this in survival mode.  What would you want to do now?";
         return newAskResponse(speechOutput,true, repromptText, false);
     }
->>>>>>> origin/joshua-jasper-joey
+
     
     private Question generateQuestion(int level) {
     	switch(level) {
@@ -646,7 +644,11 @@ public class FastMathSpeechlet implements Speechlet {
     	
     	case 4:
     		
-    		randX = RAND.nextInt(51);
+    		randX = RAND.nextInt(51) + 10;
+    		
+    		if(randX > 50) {
+    			randX -= 10;
+    		}
     		
     		float randYf = RAND.nextFloat() * 10;
     		
@@ -667,7 +669,7 @@ public class FastMathSpeechlet implements Speechlet {
         		
         		anotherFloat = bdA.floatValue();
     			
-    			String speech = "What is.      " + anotherFloat + ".      plus.      " + randYf + "    ? ";
+    			String speech = "What is.  " + anotherFloat + ".  plus.  " + randYf + " ? ";
     			
     			float answer = randX;
     			
@@ -693,7 +695,116 @@ public class FastMathSpeechlet implements Speechlet {
     		}
     	
     	case 5:
+    		randY = RAND.nextInt(11) + 10;
     		
+    		randX = RAND.nextInt(3);
+		
+    		switch(randX) {
+    		case 0:
+    			float randZC;
+    			
+    			randZ = RAND.nextFloat();
+    			
+    			bd = new BigDecimal(Float.toString(randZ));
+        		
+        		bd = bd.setScale(1, RoundingMode.HALF_UP);
+        		
+        		randZ = bd.floatValue();
+        		
+        		if(randZ * 2 >= 1) {
+        			randZC = 2 - randZ * 2;
+        		}else {
+        			randZC = 1 - randZ * 2;
+        		}
+    			
+    			if(randZ >= 0.5) {
+    				randZ += 1;
+    			}else {
+    				randZ += 2;
+    			}
+
+    			float anotherRand = RAND.nextInt(7) + randZC;
+    			
+    			float answer = anotherRand + randZ * 2;
+    			
+    			String speech = "What is. " + randZ + ", multiplies by, two, plus, " + anotherRand + " ?";
+    			
+    			Question que = new Question(speech, answer);
+    			
+    			return que;	
+
+    		case 1:
+    			randZ = RAND.nextFloat();
+			
+    			bd = new BigDecimal(Float.toString(randZ));
+    		
+    			bd = bd.setScale(1, RoundingMode.HALF_UP);
+    		
+    			randZ = bd.floatValue();
+    		
+    			if(randZ * 3 >= 1) {
+    				if(randZ * 3 > 2) {
+    					randZC = 3 - 3 * randZ;
+    				}else {
+    					randZC = 2 - 3 * randZ;
+    				}
+    			}else {
+    				randZC = 1 - randZ * 3;
+    			}
+    			
+    			if(randZ >= 0.5) {
+    				randZ += 1;
+    			}else {
+    				randZ += 2;
+    			}
+
+    			anotherRand = RAND.nextInt(7) + randZC;
+			
+    			answer = anotherRand + randZ * 3;
+			
+    			speech = "What is. " + randZ + ", multiplies by, three, plus, " + anotherRand + " ?";
+			
+    			que = new Question(speech, answer);
+			
+    			return que;
+    			
+    		case 2:
+    			randZ = RAND.nextFloat();
+    			
+    			bd = new BigDecimal(Float.toString(randZ));
+    		
+    			bd = bd.setScale(1, RoundingMode.HALF_UP);
+    		
+    			randZ = bd.floatValue();
+    		
+    			if(randZ * 4 >= 1) {
+    				if(randZ * 4 > 3) {
+    					randZC = 4 - 4 * randZ;
+    				}else if(randZ * 4 > 2) {
+    					randZC = 3 - 4 * randZ;
+    				}else {
+    					randZC = 2 - 4 * randZ;
+    				}
+    			}else {
+    				randZC = 1 - randZ * 4;
+    			}
+    			
+    			if(randZ >= 0.5) {
+    				randZ += 1;
+    			}else {
+    				randZ += 2;
+    			}
+
+    			anotherRand = RAND.nextInt(7) + randZC;
+			
+    			answer = anotherRand + randZ * 4;
+			
+    			speech = "What is. " + randZ + ", multiplies by, four, plus, " + anotherRand + " ?";
+			
+    			que = new Question(speech, answer);
+			
+    			return que;
+    		}
     		
     	default:
     		return null;
